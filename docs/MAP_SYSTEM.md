@@ -1,31 +1,27 @@
 # Roguelike Map System
 
-A layered tile-based map system using Godot 4's TileMap layers for efficient world representation and entity placement.
+A layered tile-based map system using Godot 4's TileMaplayers for efficient world representation and entity placement.
 
 ## Core Concepts
 
-The map system uses a single TileMap node with multiple layers to represent different aspects of the world:
+The map system uses a single Map node with multiple layers to represent different aspects of the world:
 
-```
-WorldTileMap (TileMap)
-├── Layer 0: "floor"        # Base terrain you can walk on
-├── Layer 1: "features"     # Special terrain (water, pits, etc)
-└── Layer 2: "fixtures"     # Interactive/blocking objects (walls, doors, chests)
-```
+**World Structure**
+- Layer 0: Floor - Base terrain you can walk on
+- Layer 1: Features - Special terrain (water, pits, etc)
+- Layer 2: Fixtures - Interactive/blocking objects (walls, doors, chests)
 
 ## Layer Details
 
 ### Floor Layer (0)
 Base walkable terrain that forms the ground of your world.
 
-```gdscript
-# Custom Data
-class FloorData:
-    var movement_cost: float = 1.0    # Base movement cost
-    var floor_type: String            # "stone", "dirt", "grass"
-    var footstep_sound: String        # Sound effect reference
-    var is_slippery: bool = false     # Affects movement
-```
+**Properties:**
+- Entity blueprint reference
+- Movement cost for traversal
+- Floor type identifier
+- Sound properties
+- Movement modifiers (e.g., flamable)
 
 **Examples:**
 - Stone floor
@@ -36,14 +32,12 @@ class FloorData:
 ### Features Layer (1)
 Special terrain elements that affect gameplay.
 
-```gdscript
-# Custom Data
-class FeatureData:
-    var movement_cost: float = 1.0     # Movement modifier
-    var damage_per_turn: float = 0     # Damage dealt per turn
-    var feature_type: String           # "water", "lava", "pit"
-    var effect_type: String            # Status effect applied
-```
+**Properties:**
+- Entity blueprint reference
+- Movement modifiers
+- Damage properties
+- Feature type identifier
+- Status effect properties
 
 **Examples:**
 - Water (slows movement)
@@ -54,16 +48,13 @@ class FeatureData:
 ### Fixtures Layer (2)
 Static objects that can be converted to entities. This includes both structural elements (walls) and interactive objects.
 
-```gdscript
-# Custom Data
-class FixtureData:
-    var blueprint_path: String         # Path to entity blueprint
-    var fixture_type: String          # "wall", "door", "chest"
-    var is_blocking: bool = true      # Blocks movement
-    var is_destructible: bool = false # Can be broken
-    var blocks_sight: bool = true     # Affects FOV
-    var interaction_type: String      # How to interact (NONE for walls)
-```
+**Properties:**
+- Entity blueprint reference
+- Fixture type identifier
+- Movement blocking properties
+- Destructibility
+- Vision blocking properties
+- Interaction methods
 
 **Examples:**
 Structural:
@@ -80,57 +71,36 @@ Interactive:
 
 ## TileSet Configuration
 
-### Physics Layers
-```gdscript
-enum PhysicsLayer {
-    NONE,
-    FLOOR,
-    FEATURE,
-    FIXTURE
-}
-```
+### Physics Layer System
+The system defines distinct physics layers for collision handling:
+- None: No physics interaction
+- Floor: Base terrain collision
+- Feature: Special terrain collision
+- Fixture: Object collision
 
-### Custom Data Layers
-```gdscript
-var custom_data = {
-    "movement_cost": {"type": TYPE_FLOAT, "default": 1.0},
-    "blueprint_path": {"type": TYPE_STRING, "default": ""},
-    "fixture_type": {"type": TYPE_STRING, "default": ""},
-    "interaction_type": {"type": TYPE_STRING, "default": ""},
-    "is_blocking": {"type": TYPE_BOOL, "default": false},
-    "blocks_sight": {"type": TYPE_BOOL, "default": false}
-}
-```
+### Custom Properties
+Each tile can have various properties that define its behavior:
+- Movement costs
+- Entity references
+- Type identifiers
+- Interaction methods
+- Blocking flags
+- Vision properties
 
 ## Runtime Behavior
 
-### Layer Processing Order
-1. Process floor for base navigation
-2. Apply feature effects
-3. Convert fixtures to entities
+### Processing Order
+The system processes layers in a specific order to ensure proper game state:
+1. Floor layer processing for base navigation
+2. Feature layer effects application
+3. Fixture conversion to entities
 
-### Example Usage
-
-```gdscript
-# Setting up the TileMap
-var world_map = TileMap.new()
-world_map.add_layer(-1)  # Floor
-world_map.add_layer(-1)  # Features
-world_map.add_layer(-1)  # Fixtures
-
-# Getting tile data
-var tile_data = world_map.get_cell_tile_data(0, Vector2i(0, 0))
-var movement_cost = tile_data.get_custom_data("movement_cost")
-
-# Converting fixtures to entities
-func convert_fixtures_to_entities():
-    var fixtures_layer = 2
-    for cell in world_map.get_used_cells(fixtures_layer):
-        var tile_data = world_map.get_cell_tile_data(fixtures_layer, cell)
-        var blueprint = tile_data.get_custom_data("blueprint_path")
-        if blueprint:
-            spawn_entity_at_position(blueprint, cell)
-```
+### World Building
+The map system provides tools for:
+- Layer management
+- Tile property access
+- Entity conversion
+- Runtime modifications
 
 ## Best Practices
 
@@ -144,15 +114,126 @@ func convert_fixtures_to_entities():
    - Minimize runtime conversion
    - Cache navigation data
 
-3. **Design**
-   - Plan tile variations
-   - Consider gameplay impact
-   - Think about visual stacking
 
 4. **Extension**
    - Easy to add new tile types
    - Flexible custom data
    - Clear conversion rules
+
+## Map Queries and Entity Management
+
+The map system maintains a comprehensive view of the game world through efficient tracking and querying mechanisms.
+
+### Entity Tracking System
+The world map maintains several key data structures:
+- Position-based entity lookup
+- Active entity list
+- Cached position states
+
+### Query Types
+
+#### Position Queries
+The system provides several ways to query entities at specific positions:
+
+1. **Full Position Query**
+   - Returns all entities at a position
+   - Useful for complete state analysis
+   - Example: Checking what's on a tile before movement
+
+2. **Filtered Position Query**
+   - Returns entities of a specific type
+   - Useful for targeted checks
+   - Example: Finding items for pickup
+
+3. **State Queries**
+   - Quick checks for common conditions:
+     * Is position blocked?
+     * What's the movement cost?
+     * Is position visible?
+   - Optimized for frequent access
+
+#### Area Queries
+For larger-scale information gathering:
+
+1. **Rectangular Area**
+   - Query all entities within a rectangle
+   - Useful for room-based operations
+   - Example: Room-wide effects
+
+2. **Radius Search**
+   - Find entities within a circular area
+   - Useful for AOE effects and visibility
+   - Example: Explosion damage
+
+### Entity Management
+
+The system handles entity lifecycle through three main operations:
+
+1. **Registration**
+   - Adds entities to the tracking system
+   - Updates cached position states
+   - Triggers appropriate events
+
+2. **Removal**
+   - Cleans up entity references
+   - Updates position caches
+   - Handles cleanup events
+
+3. **Movement**
+   - Updates position tracking
+   - Maintains cache consistency
+   - Notifies interested systems
+
+### Event System
+
+The map broadcasts key events to interested systems:
+
+1. **Entity Events**
+   - Entity added to position
+   - Entity removed from position
+   - Entity moved between positions
+
+2. **Position Events**
+   - Position contents changed
+   - Position state changed (blocked/unblocked)
+
+### Common Operations
+
+1. **Movement Planning**
+   Before moving an entity, the system:
+   - Checks destination for blocking entities
+   - Calculates total movement cost
+   - Verifies path clearance
+   - Updates entity positions
+
+2. **Combat Targeting**
+   For area effect abilities:
+   - Identifies entities in range
+   - Filters for valid targets
+   - Applies effects to targets
+
+3. **Environment Interaction**
+   When interacting with the environment:
+   - Identifies interactive elements
+   - Determines valid interactions
+   - Triggers appropriate responses
+
+### Best Practices
+
+1. **Query Optimization**
+   - Cache frequently accessed data
+   - Use filtered queries when possible
+   - Batch area queries for performance
+
+2. **Event Usage**
+   - Subscribe only to relevant events
+   - Handle events efficiently
+   - Clean up event listeners
+
+3. **Entity Management**
+   - Register entities immediately after creation
+   - Clean up entities properly on removal
+   - Keep position data consistent
 
 ## Future Extensions
 

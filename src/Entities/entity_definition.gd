@@ -11,6 +11,7 @@ extends Resource
 @export var type: Entity.EntityType
 
 @export_category("Components")
+@export var terrain_template: TerrainComponentDefinition
 @export var combat_template: CombatComponentTemplate
 @export var ai_type: Entity.AIType
 @export var item_template: ItemComponentTemplate

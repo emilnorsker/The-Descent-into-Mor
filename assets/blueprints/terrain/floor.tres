@@ -1,0 +1,13 @@
+@tool
+extends EntityBlueprint
+
+func _init() -> void:
+	name = "Stone Floor"
+	type = Entity.EntityType.TERRAIN
+	is_blocking_movment = false
+	
+	# Create and configure terrain component
+	terrain_template = TerrainComponentDefinition.new()
+	terrain_template.blocks_sight = false
+	terrain_template.movement_cost = 1.0
+	terrain_template.terrain_type = "floor" 
