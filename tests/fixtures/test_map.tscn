@@ -1,6 +1,15 @@
-[gd_scene load_steps=2 format=3 uid="uid://b6x6pd0wuv5x8"]
+[gd_scene load_steps=2 format=3 uid="uid://b4e2mhx6m8ut"]
 
-[ext_resource type="Script" path="res://src/Map/map.gd" id="1_e4q5f"]
+[ext_resource type="Script" path="res://src/Map/game_map.gd" id="1_map"]
 
-[node name="Map" type="Node2D"]
-script = ExtResource("1_e4q5f") 
+[node name="Map" type="Node"]
+script = ExtResource("1_map")
+
+[node name="Floor" type="TileMapLayer" parent="."]
+z_index = 0
+
+[node name="Features" type="TileMapLayer" parent="."]
+z_index = 1
+
+[node name="Fixtures" type="TileMapLayer" parent="."]
+z_index = 2 

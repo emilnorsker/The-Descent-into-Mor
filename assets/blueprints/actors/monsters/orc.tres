@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="EntityBlueprint" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/entity_blueprint.gd" id="1_0"]
+[ext_resource type="Script" path="res://src/Components/Blueprints/fighter_component_blueprint.gd" id="2_0"]
+
+[sub_resource type="Resource" id="1"]
+script = ExtResource("2_0")
+max_hp = 10
+power = 3
+defense = 0
+
+[resource]
+script = ExtResource("1_0")
+name = "Orc"
+type = 2
+is_blocking_movment = true
+combat_blueprint = SubResource("1")
+ai_type = 1 

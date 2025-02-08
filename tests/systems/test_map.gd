@@ -28,6 +28,9 @@ func test_map_has_required_layers() -> void:
 	assert_not_null(test_map.floor_layer, "Map should have a floor layer")
 	assert_not_null(test_map.feature_layer, "Map should have a feature layer")
 	assert_not_null(test_map.fixture_layer, "Map should have a fixture layer")
+	assert_eq(test_map.floor_layer.get_class(), "TileMapLayer", "Floor layer should be a TileMapLayer")
+	assert_eq(test_map.feature_layer.get_class(), "TileMapLayer", "Feature layer should be a TileMapLayer")
+	assert_eq(test_map.fixture_layer.get_class(), "TileMapLayer", "Fixture layer should be a TileMapLayer")
 
 # Test Entity Placement and Stacking
 func test_basic_tile_layer_stacking() -> void:

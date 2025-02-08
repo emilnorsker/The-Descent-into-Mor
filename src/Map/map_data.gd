@@ -1,29 +1,17 @@
 class_name MapData
-extends RefCounted
+extends Resource
 
-var map: Map
+signal entity_placed(entity: Entity)
+
+var entities: Array[Entity] = []
+var pathfinder: AStar2D
 var player: Entity
 
-func _init(map: Map) -> void:
-	self.map = map
+func get_items() -> Array[Entity]:
+	return entities.filter(func(e): return e.type == Entity.EntityType.ITEM)
 
-func register_blocking_entity(entity: Entity) -> void:
-	map.register_entity(entity, entity.grid_position)
-
-func unregister_blocking_entity(entity: Entity) -> void:
-	map.remove_entity(entity, entity.grid_position)
-
-func get_blocking_entities_at(pos: Vector2i) -> Array[Entity]:
-	return map.get_entities_at(pos).filter(func(e): return e.is_blocking_movement())
-
-func is_position_blocked(pos: Vector2i) -> bool:
-	return map.is_position_blocked(pos)
-
-func get_movement_cost_at(pos: Vector2i) -> float:
-	return map.get_movement_cost_at(pos)
-
-func get_entities_at(pos: Vector2i) -> Array[Entity]:
-	return map.get_entities_at(pos)
-
-func get_entities_of_type_at(pos: Vector2i, type: Entity.EntityType) -> Array[Entity]:
-	return map.get_entities_of_type_at(pos, type) 
+func get_tile(pos: Vector2i) -> Entity:
+	for entity in entities:
+		if entity.grid_position == pos and entity.type == Entity.EntityType.TERRAIN:
+			return entity
+	return null 

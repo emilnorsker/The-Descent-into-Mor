@@ -12,9 +12,9 @@ func activate(action: ItemAction) -> bool:
 
 func consume(consumer: Entity) -> void:
 	var inventory: InventoryComponent = consumer.inventory_component
-	inventory.items.erase(entity)
+	inventory.drop(entity)
 	entity.queue_free()
 
 
 func get_targeting_radius() -> int:
-	return -1
+	return data.targeting_radius if data.has_method("targeting_radius") else -1

@@ -4,17 +4,16 @@ extends Action
 
 func perform() -> bool:
 	var inventory: InventoryComponent = entity.inventory_component
-	var map_data: MapData = get_map_data()
 	
-	for item in map_data.get_items():
+	for item in GameMap.get_entities_of_type_at(entity.grid_position, Entity.EntityType.ITEM):
 		if entity.grid_position == item.grid_position:
-			if inventory.items.size() >= inventory.capacity:
+			if inventory.is_full():
 				SignalBus.message_sent.emit("Your inventory is full.", ColorPallete.IMPOSSIBLE)
 				return false
 			
-			map_data.entities.erase(item)
+			GameMap.erase(item, item.grid_position)
 			item.get_parent().remove_child(item)
-			inventory.items.append(item)
+			inventory.add(item)
 			SignalBus.message_sent.emit(
 				"You picked up the %s!" % item.get_entity_name(),
 				Color.WHITE
