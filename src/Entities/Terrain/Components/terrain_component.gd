@@ -5,10 +5,11 @@ var blocks_sight: bool
 var movement_cost: float
 var terrain_type: String
 
-func _init(definition: TerrainComponentDefinition) -> void:
-	blocks_sight = definition.blocks_sight
-	movement_cost = definition.movement_cost
-	terrain_type = definition.terrain_type
+func _init(blueprint: TerrainComponentBlueprint) -> void:
+	super._init()
+	blocks_sight = blueprint.blocks_sight
+	movement_cost = blueprint.movement_cost
+	terrain_type = blueprint.terrain_type
 
 func get_movement_cost() -> float:
 	return movement_cost

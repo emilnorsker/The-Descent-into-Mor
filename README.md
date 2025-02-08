@@ -58,7 +58,7 @@ FixtureComponentTemplate
 
 ## Blueprint System
 
-Blueprints are complete entity definitions stored as `.tres` resource files.
+Blueprints are complete entity data implementations stored as `.tres` resource files.
 
 ### Structure
 
@@ -171,7 +171,7 @@ Common actions:
 
 2. **Data-Driven**
    - Keep configuration in templates
-   - Use blueprints for entity definitions
+   - Use blueprints for entity templates
    - Avoid hardcoding values
 
 3. **Extension Points**

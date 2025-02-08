@@ -23,21 +23,18 @@ var power: int:
 	get:
 		return base_power + get_power_bonus()
 
-
 var death_texture: AtlasTexture
 var death_color: Color
 var xp_given: int
 
-
-func _init(definition: CombatComponentDefinition) -> void:
-	max_hp = definition.max_hp
-	hp = definition.max_hp
-	base_defense = definition.defense
-	base_power = definition.power
-	death_texture = definition.death_texture
-	death_color = definition.death_color
-	xp_given = definition.xp_given
-
+func _init(blueprint: CombatComponentBlueprint) -> void:
+	max_hp = blueprint.max_hp
+	hp = blueprint.max_hp
+	base_defense = blueprint.defense
+	base_power = blueprint.power
+	death_texture = blueprint.death_texture
+	death_color = blueprint.death_color
+	xp_given = blueprint.xp_given
 
 func heal(amount: int) -> int:
 	if hp == max_hp:
@@ -52,10 +49,8 @@ func heal(amount: int) -> int:
 	hp = new_hp_value
 	return amount_recovered
 
-
 func take_damage(amount: int) -> void:
 	hp -= amount
-
 
 func die(trigger_side_effects := true) -> void:
 	var death_message: String
@@ -81,18 +76,15 @@ func die(trigger_side_effects := true) -> void:
 	entity.type = Entity.EntityType.CORPSE
 	get_map_data().unregister_blocking_entity(entity)
 
-
 func get_defense_bonus() -> int:
 	if entity.equipment_component:
 		return entity.equipment_component.get_defense_bonus()
 	return 0
 
-
 func get_power_bonus() -> int:
 	if entity.equipment_component:
 		return entity.equipment_component.get_power_bonus()
 	return 0
-
 
 func get_save_data() -> Dictionary:
 	return {
@@ -101,7 +93,6 @@ func get_save_data() -> Dictionary:
 		"power": base_power,
 		"defense": base_defense
 	}
-
 
 func restore(save_data: Dictionary) -> void:
 	max_hp = save_data["max_hp"]

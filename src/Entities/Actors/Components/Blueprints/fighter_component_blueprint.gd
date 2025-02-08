@@ -1,5 +1,5 @@
-class_name CombatComponentTemplate
-extends ItemComponentTemplate
+class_name CombatComponentBlueprint
+extends ItemComponentBlueprint
 
 @export_category("Stats")
 @export var max_hp: int = 30

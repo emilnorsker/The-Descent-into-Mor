@@ -6,11 +6,11 @@ var current_xp: int
 var level_up_base: int
 var level_up_factor: int
 
-func _init(definition: ProgressionComponentDefinition) -> void:
-	current_level = definition.level
-	current_xp = definition.current_xp
-	level_up_base = definition.level_up_base
-	level_up_factor = definition.level_up_factor
+func _init(blueprint: ProgressionComponentBlueprint) -> void:
+	current_level = blueprint.level
+	current_xp = blueprint.current_xp
+	level_up_base = blueprint.level_up_base
+	level_up_factor = blueprint.level_up_factor
 
 func get_xp_to_next_level() -> int:
 	return level_up_base + current_level * level_up_factor

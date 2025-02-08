@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="EntityBlueprint" load_steps=3 format=3 uid="uid://test_floor"]
+
+[ext_resource type="Script" path="res://src/Entities/entity_blueprint.gd" id="1_script"]
+[ext_resource type="Resource" path="res://tests/fixtures/test_terrain_component.tres" id="2_terrain"]
+
+[resource]
+script = ExtResource("1_script")
+name = "Test Floor"
+type = 3  # EntityType.TERRAIN
+is_blocking_movment = false
+terrain_blueprint = ExtResource("2_terrain") 

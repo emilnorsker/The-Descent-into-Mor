@@ -15,9 +15,13 @@ func before_each() -> void:
 	add_child_autofree(test_map)
 	
 	# Create test entities with real blueprints
-	player = Entity.new(test_map, Vector2i(1, 1), "player")
-	orc = Entity.new(test_map, Vector2i(2, 2), "orc")
-	sword = Entity.new(test_map, Vector2i(1, 1), "sword")
+	var player_blueprint = preload("res://assets/blueprints/actors/player.tres")
+	var orc_blueprint = preload("res://assets/blueprints/actors/monsters/orc.tres")
+	var sword_blueprint = preload("res://assets/blueprints/items/weapons/sword.tres")
+	
+	player = Entity.from_blueprint(player_blueprint, Vector2i(1, 1))
+	orc = Entity.from_blueprint(orc_blueprint, Vector2i(2, 2))
+	sword = Entity.from_blueprint(sword_blueprint, Vector2i(1, 1))
 
 # Test Core Map Functionality
 func test_map_has_required_layers() -> void:
@@ -30,7 +34,7 @@ func test_basic_tile_layer_stacking() -> void:
 	var pos = Vector2i(1, 1)
 	
 	# Get all entities at position before adding dynamic entities
-	var base_entities = test_map.get_entities_at(pos)
+	var base_entities = GameMap.get_entities_at(pos)
 	
 	# Verify we get floor, feature, and fixture in correct order
 	assert_eq(base_entities.size(), 3, "Should have floor, feature, and fixture")
@@ -42,10 +46,10 @@ func test_complete_entity_stacking() -> void:
 	var pos = Vector2i(1, 1)
 	
 	# Place dynamic entities
-	test_map.register_entity(sword, pos)  # Item
-	test_map.register_entity(player, pos) # Actor
+	GameMap.register_entity(sword, pos)  # Item
+	GameMap.register_entity(player, pos) # Actor
 	
-	var all_entities = test_map.get_entities_at(pos)
+	var all_entities = GameMap.get_entities_at(pos)
 	
 	# Verify complete stacking order: floor -> feature -> fixture -> items -> actors
 	assert_eq(all_entities.size(), 5, "Should have all 5 entity types stacked")
@@ -64,31 +68,31 @@ func test_combat_positioning() -> void:
 	var player_pos = Vector2i(1, 1)
 	var orc_pos = Vector2i(2, 2)
 	
-	test_map.register_entity(player, player_pos)
-	test_map.register_entity(orc, orc_pos)
+	GameMap.register_entity(player, player_pos)
+	GameMap.register_entity(orc, orc_pos)
 	
 	# Verify combat range
 	var distance = player.distance(orc_pos)
 	assert_eq(distance, 1, "Entities should be at melee range")
 	
 	# Test blocking
-	assert_true(test_map.is_position_blocked(player_pos), "Player position should be blocked")
-	assert_true(test_map.is_position_blocked(orc_pos), "Orc position should be blocked")
+	assert_true(GameMap.is_position_blocked(player_pos), "Player position should be blocked")
+	assert_true(GameMap.is_position_blocked(orc_pos), "Orc position should be blocked")
 
 # Test Movement and Position Updates
 func test_entity_movement() -> void:
 	var start_pos = Vector2i(1, 1)
 	var end_pos = Vector2i(2, 1)
 	
-	test_map.register_entity(player, start_pos)
+	GameMap.register_entity(player, start_pos)
 	watch_signals(test_map) # Watch for movement signals
 	
-	test_map.move_entity(player, start_pos, end_pos)
+	player.move(end_pos - start_pos)
 	
 	# Verify movement
 	assert_signal_emitted_with_parameters(test_map, "entity_moved", [player, start_pos, end_pos])
-	assert_false(test_map.is_position_blocked(start_pos), "Start position should no longer be blocked")
-	assert_true(test_map.is_position_blocked(end_pos), "End position should now be blocked")
+	assert_false(GameMap.is_position_blocked(start_pos), "Start position should no longer be blocked")
+	assert_true(GameMap.is_position_blocked(end_pos), "End position should now be blocked")
 
 # Test Area Effects
 func test_area_effects() -> void:
@@ -96,11 +100,11 @@ func test_area_effects() -> void:
 	var radius = 2
 	
 	# Place entities in a pattern
-	test_map.register_entity(player, Vector2i(2, 2))  # Center
-	test_map.register_entity(orc, Vector2i(3, 2))     # Edge of radius
-	test_map.register_entity(sword, Vector2i(5, 5))   # Outside radius
+	GameMap.register_entity(player, Vector2i(2, 2))  # Center
+	GameMap.register_entity(orc, Vector2i(3, 2))     # Edge of radius
+	GameMap.register_entity(sword, Vector2i(5, 5))   # Outside radius
 	
-	var affected = test_map.get_entities_in_radius(center, radius)
+	var affected = GameMap.get_entities_in_radius(center, radius)
 	assert_eq(affected.size(), 2, "Should affect 2 entities within radius")
 	assert_has(affected, player, "Should affect player at center")
 	assert_has(affected, orc, "Should affect orc at edge")
@@ -111,16 +115,14 @@ func test_item_interaction() -> void:
 	var pos = Vector2i(1, 1)
 	
 	# Place sword and player
-	test_map.register_entity(sword, pos)
-	test_map.register_entity(player, pos)
+	GameMap.register_entity(sword, pos)
+	GameMap.register_entity(player, pos)
 	
 	# Verify item is accessible
-	var items = test_map.get_entities_of_type_at(pos, Entity.EntityType.ITEM)
+	var items = GameMap.get_entities_of_type_at(pos, Entity.EntityType.ITEM)
 	assert_eq(items.size(), 1, "Should find the sword")
 	
-    # TODO: Test item interaction, e.g. pick up, drop, use, throw, etc.
-    # This should be done in the action system test
 	# Remove item (simulating pickup)
-	test_map.remove_entity(sword, pos)
-	items = test_map.get_entities_of_type_at(pos, Entity.EntityType.ITEM)
+	GameMap.remove_entity(sword, pos)
+	items = GameMap.get_entities_of_type_at(pos, Entity.EntityType.ITEM)
 	assert_eq(items.size(), 0, "Item should be removed after pickup")

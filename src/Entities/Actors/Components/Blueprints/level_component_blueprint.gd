@@ -1,4 +1,4 @@
-class_name ProgressionComponentTemplate
+class_name ProgressionComponentBlueprint
 extends Resource
 
 @export var level: int = 1

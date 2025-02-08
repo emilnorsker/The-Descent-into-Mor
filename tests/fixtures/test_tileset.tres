@@ -1,0 +1,6 @@
+[gd_resource type="TileSet" format=3 uid="uid://b6x6pd0wuv5x8"]
+
+[resource]
+tile_size = Vector2i(32, 32)
+custom_data_layer_0/name = "blueprint_path"
+custom_data_layer_0/type = 4 

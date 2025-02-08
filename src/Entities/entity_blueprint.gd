@@ -11,11 +11,11 @@ extends Resource
 @export var type: Entity.EntityType
 
 @export_category("Components")
-@export var terrain_template: TerrainComponentDefinition
-@export var combat_template: CombatComponentTemplate
+@export var terrain_blueprint: TerrainComponentBlueprint
+@export var combat_blueprint: CombatComponentBlueprint
 @export var ai_type: Entity.AIType
-@export var item_template: ItemComponentTemplate
+@export var item_blueprint: ItemComponentBlueprint
 @export var inventory_capacity: int = 0
-@export var progression_template: ProgressionComponentTemplate
+@export var progression_blueprint: ProgressionComponentBlueprint
 @export var has_equipment: bool = false
-@export var light_template: LightComponentTemplate
+@export var light_blueprint: LightComponentBlueprint

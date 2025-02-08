@@ -2,19 +2,17 @@ class_name Map
 extends Node2D
 
 # Node references
-@onready var tilemap: TileMap = $TileMap
 @onready var floor_layer: TileMapLayer = $Floor
 @onready var feature_layer: TileMapLayer = $Features
 @onready var fixture_layer: TileMapLayer = $Fixtures
 
-# Cache for loaded blueprints
 var _blueprint_cache: Dictionary = {}
-
 # Entity tracking
 var entities_by_position: Dictionary = {}  # Vector2i -> Array[Entity]
 var active_entities: Array[Entity] = []    # All non-terrain entities
 var blocking_positions: Dictionary = {}     # Vector2i -> bool
 var opaque_positions: Dictionary = {}      # Vector2i -> bool
+var player: Entity                        # Reference to the player entity
 
 # Signals
 signal entity_added(entity: Entity, pos: Vector2i)
@@ -27,6 +25,9 @@ func _ready() -> void:
     assert(floor_layer != null, "Map must have a Floor layer!")
     assert(feature_layer != null, "Map must have a Features layer!")
     assert(fixture_layer != null, "Map must have a Fixtures layer!")
+    
+    # Register as current map
+    GameMap.current_map = self
 
 # Entity Management
 func register_entity(entity: Entity, pos: Vector2i) -> void:
@@ -106,23 +107,6 @@ func get_movement_cost_at(pos: Vector2i) -> float:
             total_cost *= entity.get_movement_cost()
     return total_cost
 
-# Area Queries
-func get_entities_in_rect(start: Vector2i, end: Vector2i) -> Array[Entity]:
-    var entities: Array[Entity] = []
-    for y in range(start.y, end.y + 1):
-        for x in range(start.x, end.x + 1):
-            entities.append_array(get_entities_at(Vector2i(x, y)))
-    return entities
-
-func get_entities_in_radius(center: Vector2i, radius: int) -> Array[Entity]:
-    var entities: Array[Entity] = []
-    for y in range(center.y - radius, center.y + radius + 1):
-        for x in range(center.x - radius, center.x + radius + 1):
-            var pos = Vector2i(x, y)
-            if center.distance_to(pos) <= radius:
-                entities.append_array(get_entities_at(pos))
-    return entities
-
 # Helper Methods
 func _update_position_flags(pos: Vector2i) -> void:
     blocking_positions[pos] = false
@@ -158,15 +142,5 @@ func _get_tile_entity(layer: TileMapLayer, pos: Vector2i) -> Entity:
         _blueprint_cache[blueprint_path] = blueprint
     
     # Create entity from blueprint
-    var entity = Entity.new()
-    entity.type = blueprint.type
-    entity.blocks_movement = blueprint.is_blocking_movment
-    entity.grid_position = pos
-    
-    # Add terrain component if it's a terrain entity
-    if blueprint.terrain_template:
-        var terrain_component = TerrainComponent.new(blueprint.terrain_template)
-        entity.add_child(terrain_component)
-        terrain_component.entity = entity
-    
+    var entity = Entity.from_blueprint(blueprint, pos)
     return entity

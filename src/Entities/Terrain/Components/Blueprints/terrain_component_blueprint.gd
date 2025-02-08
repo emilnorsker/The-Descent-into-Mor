@@ -1,4 +1,4 @@
-class_name TerrainComponentDefinition
+class_name TerrainComponentBlueprint
 extends Resource
 
 @export var blocks_sight: bool = false
