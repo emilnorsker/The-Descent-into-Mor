@@ -1,0 +1,36 @@
+[gd_resource type="Resource" script_class="EntityDefinition" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://src/Entities/entity_definition.gd" id="1_script"]
+[ext_resource type="Script" path="res://src/Entities/Actors/Components/ComponentDefinitions/equippable_component_definition.gd" id="2_equip"]
+[ext_resource type="Script" path="res://src/Entities/Actors/Components/ComponentDefinitions/light_component_definition.gd" id="3_light"]
+[ext_resource type="Texture2D" uid="uid://h7i8uiwlysq2" path="res://assets/images/kenney_1-bit-pack/monochrome_packed.png" id="4_texture"]
+
+[sub_resource type="Resource" id="Resource_equip"]
+script = ExtResource("2_equip")
+equipment_type = 0  # MAIN_HAND
+power_bonus = 1
+defense_bonus = 0
+
+[sub_resource type="Resource" id="Resource_light"]
+script = ExtResource("3_light")
+range = 128.0
+color = Color(1.0, 0.7, 0.3, 1.0)
+angle = 0
+fan_angle = 6.28319
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_torch"]
+atlas = ExtResource("4_texture")
+region = Rect2(0, 0, 16, 16)
+visible = false
+
+[resource]
+script = ExtResource("1_script")
+name = "Torch"
+texture = SubResource("AtlasTexture_torch")
+color = Color(1.0, 1.0, 1.0, 1.0)
+is_blocking_movment = false
+type = 1
+ai_type = 0
+item_definition = SubResource("Resource_equip")
+light_definition = SubResource("Resource_light")
+inventory_capacity = 0 
