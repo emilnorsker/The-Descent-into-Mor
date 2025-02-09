@@ -35,62 +35,46 @@ var terrain_component: TerrainComponent
 # Action queue for all entities
 var action_queue: Array[Action] = []
 
-static func from_blueprint(blueprint: EntityBlueprint, pos: Vector2i) -> Entity:
+var components: Dictionary = {}
+
+func _init() -> void:
+	grid_position = Vector2i.ZERO
+
+static func from_blueprint(blueprint: Resource, position: Vector2i) -> Entity:
 	var entity = Entity.new()
+	entity.grid_position = position
 	entity.setup_from_blueprint(blueprint)
-	entity.grid_position = pos
 	return entity
 
-func _init(blueprint: EntityBlueprint = null, grid_position: Vector2i = Vector2i.ZERO) -> void:
-	self.grid_position = grid_position
-	
-	if blueprint:
-		setup_from_blueprint(blueprint)
-
-func setup_from_blueprint(blueprint: EntityBlueprint) -> void:
+func setup_from_blueprint(blueprint: Resource) -> void:
+	if not blueprint or not blueprint is EntityBlueprint:
+		return
+		
 	_blueprint = blueprint
+	entity_name = blueprint.entity_name
+	blocks_movement = blueprint.blocks_movement
 	type = blueprint.type
-	blocks_movement = blueprint.is_blocking_movment
-	entity_name = blueprint.name
-	texture = blueprint.texture
-	modulate = blueprint.color
+	key = blueprint.key
 	
-	# Setup components
-	if blueprint.terrain_blueprint:
-		terrain_component = TerrainComponent.new(blueprint.terrain_blueprint)
-		add_child(terrain_component)
-	
-	if blueprint.combat_blueprint:
-		combat_component = CombatComponent.new(blueprint.combat_blueprint)
-		add_child(combat_component)
-	
-	if blueprint.ai_type == AIType.HOSTILE:
-		ai_component = HostileEnemyAIComponent.new(blueprint.ai_blueprint)
-		add_child(ai_component)
-	
-	if blueprint.item_blueprint:
-		if blueprint.item_blueprint is ConsumableComponentBlueprint:
-			consumable_component = ConsumableComponent.new(blueprint.item_blueprint)
-			add_child(consumable_component)
-		else:
-			equippable_component = EquippableComponent.new(blueprint.item_blueprint)
-			add_child(equippable_component)
-	
-	if blueprint.light_blueprint:
-		light_component = LightComponent.new(blueprint.light_blueprint)
-		add_child(light_component)
-	
-	if blueprint.inventory_blueprint:
-		inventory_component = InventoryComponent.new(blueprint.inventory_blueprint)
-		add_child(inventory_component)
-	
-	if blueprint.progression_blueprint:
-		progression_component = ProgressionComponent.new(blueprint.progression_blueprint)
-		add_child(progression_component)
-	
-	if blueprint.equipment_blueprint:
-		equipment_component = EquipmentComponent.new(blueprint.equipment_blueprint)
-		add_child(equipment_component)
+	for component_data in blueprint.get_components():
+		var component_name = component_data.name
+		var component_properties = component_data.properties
+		add_component(component_name, component_properties)
+
+func add_component(component_name: String, properties: Dictionary = {}) -> void:
+	var component_script = load("res://src/Components/" + component_name + ".gd")
+	if component_script:
+		var component = component_script.new()
+		for key in properties:
+			component.set(key, properties[key])
+		components[component_name] = component
+		add_child(component)
+
+func get_component(component_name: String) -> Node:
+	return components.get(component_name)
+
+func has_component(component_name: String) -> bool:
+	return components.has(component_name)
 
 func queue_action(action: Action) -> void:
 	action_queue.append(action)
@@ -126,17 +110,17 @@ func get_entity_name() -> String:
 	return entity_name
 
 func get_entity_type() -> int:
-	return _blueprint.type
+	return type
 
 func is_alive() -> bool:
-	return ai_component != null
+	return has_component("AIComponent")
 
 func blocks_sight() -> bool:
-	if terrain_component:
-		return terrain_component.blocks_sight()
+	if has_component("TerrainComponent"):
+		return get_component("TerrainComponent").blocks_sight()
 	return false
 
 func get_movement_cost() -> float:
-	if terrain_component:
-		return terrain_component.movement_cost()
+	if has_component("TerrainComponent"):
+		return get_component("TerrainComponent").movement_cost()
 	return 1.0
