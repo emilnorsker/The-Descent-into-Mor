@@ -131,6 +131,9 @@ func test_combat_positioning() -> void:
 
 # Test Movement and Position Updates
 func test_entity_movement() -> void:
+	# Clear any existing entities
+	GameMap.clear()
+	
 	var start_pos = Vector2i(1, 1)
 	var end_pos = Vector2i(2, 1)
 	
@@ -146,33 +149,55 @@ func test_entity_movement() -> void:
 
 # Test Area Effects
 func test_area_effects() -> void:
+	# Clear any existing entities and skip level loading
+	GameMap.clear()
+	
 	var center = Vector2i(2, 2)
 	var radius = 2
 	
+	# Create fresh entities for this test
+	var player_blueprint = preload("res://assets/blueprints/actors/player.tres")
+	var orc_blueprint = preload("res://assets/blueprints/actors/monsters/orc.tres")
+	var sword_blueprint = preload("res://assets/blueprints/items/weapons/sword.tres")
+	
+	var test_player = Entity.from_blueprint(player_blueprint, Vector2i(2, 2))
+	var test_orc = Entity.from_blueprint(orc_blueprint, Vector2i(3, 2))
+	var test_sword = Entity.from_blueprint(sword_blueprint, Vector2i(5, 5))
+	
 	# Place entities in a pattern
-	GameMap.register_entity(player, Vector2i(2, 2))  # Center
-	GameMap.register_entity(orc, Vector2i(3, 2))     # Edge of radius
-	GameMap.register_entity(sword, Vector2i(5, 5))   # Outside radius
+	GameMap.register_entity(test_player, Vector2i(2, 2))  # Center
+	GameMap.register_entity(test_orc, Vector2i(3, 2))     # Edge of radius
+	GameMap.register_entity(test_sword, Vector2i(5, 5))   # Outside radius
 	
 	var affected = GameMap.get_entities_in_radius(center, radius)
 	assert_eq(affected.size(), 2, "Should affect 2 entities within radius")
-	assert_has(affected, player, "Should affect player at center")
-	assert_has(affected, orc, "Should affect orc at edge")
-	assert_does_not_have(affected, sword, "Should not affect sword outside radius")
+	assert_has(affected, test_player, "Should affect player at center")
+	assert_has(affected, test_orc, "Should affect orc at edge")
+	assert_does_not_have(affected, test_sword, "Should not affect sword outside radius")
 
 # Test Item Interaction Scenarios
 func test_item_interaction() -> void:
+	# Clear any existing entities and skip level loading
+	GameMap.clear()
+	
 	var pos = Vector2i(1, 1)
 	
+	# Create fresh entities for this test
+	var player_blueprint = preload("res://assets/blueprints/actors/player.tres")
+	var sword_blueprint = preload("res://assets/blueprints/items/weapons/sword.tres")
+	
+	var test_player = Entity.from_blueprint(player_blueprint, pos)
+	var test_sword = Entity.from_blueprint(sword_blueprint, pos)
+	
 	# Place sword and player
-	GameMap.register_entity(sword, pos)
-	GameMap.register_entity(player, pos)
+	GameMap.register_entity(test_sword, pos)
+	GameMap.register_entity(test_player, pos)
 	
 	# Verify item is accessible
 	var items = GameMap.get_entities_of_type_at(pos, Entity.EntityType.ITEM)
 	assert_eq(items.size(), 1, "Should find the sword")
 	
 	# Remove item (simulating pickup)
-	GameMap.erase(sword)
+	GameMap.erase(test_sword)
 	items = GameMap.get_entities_of_type_at(pos, Entity.EntityType.ITEM)
 	assert_eq(items.size(), 0, "Item should be removed after pickup")
