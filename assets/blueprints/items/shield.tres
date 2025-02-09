@@ -4,14 +4,19 @@
 
 [resource]
 script = ExtResource("1_script")
-entity_name = "Floor"
+entity_name = "Shield"
 blocks_movement = false
-type = 3
-key = "floor"
-components = Array[Dictionary]([{
-	"name": "TerrainComponent",
+type = 1  # EntityType.ITEM
+key = "shield"
+components = [{
+	"name": "ArmorComponent",
 	"properties": {
-		"elevation": 0,
-		"movement_cost": 1.0
+		"slot": "shield",
+		"protection": 2
 	}
-}]) 
+}, {
+	"name": "WeightComponent",
+	"properties": {
+		"weight": 2.0
+	}
+}] 

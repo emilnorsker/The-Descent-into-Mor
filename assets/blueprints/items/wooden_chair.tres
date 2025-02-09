@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="EntityBlueprint" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/entity_blueprint.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+entity_name = "Wooden Chair"
+blocks_movement = true
+type = 3  # EntityType.FIXTURE
+key = "wooden_chair"
+components = [{
+	"name": "MaterialComponent",
+	"properties": {
+		"type": "wood",
+		"flammable": true
+	}
+}, {
+	"name": "WeightComponent",
+	"properties": {
+		"weight": 3.0
+	}
+}] 

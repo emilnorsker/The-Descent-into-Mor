@@ -2,6 +2,8 @@ extends GutTest
 
 const MapScene = preload("res://src/Map/Map.tscn")
 const Level = preload("res://src/Map/level.gd")
+const Constants = preload("res://src/constants.gd")
+const ThrowAction = preload("res://src/Actions/throw_action.gd")
 
 var test_level: Level
 var attacker: Entity
@@ -19,11 +21,11 @@ func before_each() -> void:
 	attacker.add_component("BodyComponent", {
 		"type": "humanoid",
 		"parts": {
-			BodyPart.HEAD: {"damage": 2, "range": 1, "damage_type": DamageType.BLUNT},
-			BodyPart.LEFT_ARM: {"damage": 1, "range": 1, "damage_type": DamageType.BLUNT},
-			BodyPart.RIGHT_ARM: {"damage": 1, "range": 1, "damage_type": DamageType.BLUNT},
-			BodyPart.LEFT_LEG: {"damage": 2, "range": 1, "damage_type": DamageType.BLUNT},
-			BodyPart.RIGHT_LEG: {"damage": 2, "range": 1, "damage_type": DamageType.BLUNT}
+			Constants.BodyPart.HEAD: {"damage": 2, "range": 1, "damage_type": Constants.DamageType.BLUNT},
+			Constants.BodyPart.LEFT_ARM: {"damage": 1, "range": 1, "damage_type": Constants.DamageType.BLUNT},
+			Constants.BodyPart.RIGHT_ARM: {"damage": 1, "range": 1, "damage_type": Constants.DamageType.BLUNT},
+			Constants.BodyPart.LEFT_LEG: {"damage": 2, "range": 1, "damage_type": Constants.DamageType.BLUNT},
+			Constants.BodyPart.RIGHT_LEG: {"damage": 2, "range": 1, "damage_type": Constants.DamageType.BLUNT}
 		}
 	})
 	attacker.add_component("InventoryComponent")
@@ -33,8 +35,8 @@ func before_each() -> void:
 	target.add_component("BodyComponent", {
 		"type": "humanoid",
 		"parts": {
-			BodyPart.HEAD: {"vital": true},
-			BodyPart.CHEST: {"vital": true},
+			Constants.BodyPart.HEAD: {"vital": true},
+			Constants.BodyPart.CHEST: {"vital": true},
 			# ... other body parts ...
 		}
 	})
@@ -48,51 +50,51 @@ func after_each() -> void:
 # Natural Weapon Tests
 func test_unarmed_attacks() -> void:
 	# Test punch
-	var punch = MeleeAction.new(attacker, target, BodyPart.RIGHT_ARM)
+	var punch = MeleeAction.new(attacker, target, Constants.BodyPart.RIGHT_ARM)
 	var result = punch.perform()
 	
 	assert_true(result, "Punch should succeed")
-	assert_true(target.body_component.has_wound(BodyPart.CHEST), "Punch should cause wound")
-	assert_eq(target.body_component.get_wound_type(BodyPart.CHEST, 0), WoundType.LIGHT, 
+	assert_true(target.body_component.has_wound(Constants.BodyPart.CHEST), "Punch should cause wound")
+	assert_eq(target.body_component.get_wound_type(Constants.BodyPart.CHEST, 0), Constants.WoundType.LIGHT, 
 			"Punch should cause light wound")
 	
 	# Test kick
-	var kick = MeleeAction.new(attacker, target, BodyPart.LEFT_LEG)
+	var kick = MeleeAction.new(attacker, target, Constants.BodyPart.LEFT_LEG)
 	result = kick.perform()
 	
 	assert_true(result, "Kick should succeed")
-	assert_eq(target.body_component.get_wound_type(BodyPart.ABDOMEN, 0), WoundType.MODERATE,
+	assert_eq(target.body_component.get_wound_type(Constants.BodyPart.ABDOMEN, 0), Constants.WoundType.MODERATE,
 			"Kick should cause moderate wound")
 	
 	# Test headbutt
-	var headbutt = MeleeAction.new(attacker, target, BodyPart.HEAD)
+	var headbutt = MeleeAction.new(attacker, target, Constants.BodyPart.HEAD)
 	result = headbutt.perform()
 	
 	assert_true(result, "Headbutt should succeed")
-	assert_true(attacker.body_component.has_wound(BodyPart.HEAD),
+	assert_true(attacker.body_component.has_wound(Constants.BodyPart.HEAD),
 			"Headbutt should also damage attacker")
 
 # Weapon Tests
 func test_weapon_attacks() -> void:
 	var sword = create_weapon_entity([
 		["WeaponComponent", {"damage": 3, "range": 1}],
-		["DamageTypeComponent", {"type": DamageType.SLASH}],
+		["DamageTypeComponent", {"type": Constants.DamageType.SLASH}],
 		["WeightComponent", {"weight": 1.5}]
 	])
 	
 	attacker.equipment_component.equip_weapon(sword)
-	var slash = MeleeAction.new(attacker, target, null, sword)
+	var slash = MeleeAction.new(attacker, target, Constants.BodyPart.CHEST, sword)
 	var result = slash.perform()
 	
 	assert_true(result, "Sword attack should succeed")
-	assert_true(target.body_component.is_bleeding(BodyPart.CHEST),
+	assert_true(target.body_component.is_bleeding(Constants.BodyPart.CHEST),
 			"Slash should cause bleeding")
 
 # Throw Tests
 func test_throw_weapon() -> void:
 	var dagger = create_weapon_entity([
 		["WeaponComponent", {"damage": 2, "range": 1}],
-		["DamageTypeComponent", {"type": DamageType.PIERCE}],
+		["DamageTypeComponent", {"type": Constants.DamageType.PIERCE}],
 		["WeightComponent", {"weight": 0.5}]
 	])
 	
@@ -105,7 +107,7 @@ func test_throw_weapon() -> void:
 	
 	var result = throw.perform()
 	assert_true(result, "Throw should succeed")
-	assert_true(target.body_component.has_wound(BodyPart.CHEST),
+	assert_true(target.body_component.has_wound(Constants.BodyPart.CHEST),
 			"Thrown weapon should cause wound")
 
 func test_throw_generic_item() -> void:
@@ -122,20 +124,20 @@ func test_throw_generic_item() -> void:
 	
 	var result = throw.perform()
 	assert_true(result, "Throw should succeed")
-	assert_true(target.body_component.has_wound(BodyPart.CHEST),
+	assert_true(target.body_component.has_wound(Constants.BodyPart.CHEST),
 			"Thrown item should cause wound")
 
 # Range Tests
 func test_attack_ranges() -> void:
 	# Test out of punch range
 	GameMap.move_entity(target, Vector2i(4, 1))
-	var punch = MeleeAction.new(attacker, target, BodyPart.RIGHT_ARM)
+	var punch = MeleeAction.new(attacker, target, Constants.BodyPart.RIGHT_ARM)
 	assert_false(punch.perform(), "Punch should fail at range 3")
 	
 	# Test weapon range
 	var spear = create_weapon_entity([
 		["WeaponComponent", {"damage": 2, "range": 2}],
-		["DamageTypeComponent", {"type": DamageType.PIERCE}],
+		["DamageTypeComponent", {"type": Constants.DamageType.PIERCE}],
 		["WeightComponent", {"weight": 2.0}]
 	])
 	

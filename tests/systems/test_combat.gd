@@ -2,6 +2,13 @@ extends GutTest
 
 const MapScene = preload("res://src/Map/Map.tscn")
 const Level = preload("res://src/Map/level.gd")
+const Constants = preload("res://src/constants.gd")
+
+var DamageType = Constants.DamageType
+var TargetType = Constants.TargetType
+var WoundType = Constants.WoundType
+var BodyPart = Constants.BodyPart
+var StatusEffect = Constants.StatusEffect
 
 var test_level: Level
 var attacker: Entity  # We'll use this instead of 'player' to be more generic

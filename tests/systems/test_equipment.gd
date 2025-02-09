@@ -1,6 +1,15 @@
 extends GutTest
 
 const MapScene = preload("res://src/Map/Map.tscn")
+const Level = preload("res://src/Map/level.gd")
+const Constants = preload("res://src/constants.gd")
+const BodyComponent = preload("res://src/Components/body_component.gd")
+const ItemAction = preload("res://src/Actions/item_action.gd")
+const EquipAction = preload("res://src/Actions/equip_action.gd")
+const MeleeAction = preload("res://src/Actions/melee_action.gd")
+const Entity = preload("res://src/entity.gd")
+
+var BodyPart = Constants.BodyPart
 
 var entity: Entity
 var equipment: EquipmentComponent
@@ -165,4 +174,69 @@ func create_armor_entity(components: Array) -> Entity:
 	var armor = Entity.new()
 	for component in components:
 		armor.add_component(component[0], component[1])
-	return armor 
+	return armor
+
+func test_component_misuse() -> void:
+	# Test trying to eat armor
+	var metal_plate = create_armor_entity([
+		["ArmorComponent", {
+			"slot": "cuirass",
+			"protection": 3
+		}],
+		["MaterialComponent", {"type": "metal"}]
+	])
+	
+	var item_action = ItemAction.new(entity, metal_plate)
+	var result = item_action.perform()
+	
+	assert_false(result, "Should not be able to consume armor")
+	assert_true(body.has_wound(BodyPart.HEAD), "Should get head wound from biting metal")
+	assert_eq(body.get_wound_type(BodyPart.HEAD, 0), Constants.WoundType.LIGHT, 
+			"Should be light wound from biting metal")
+	
+	# Test trying to equip consumable
+	var potion = Entity.new()
+	potion.add_component("ConsumableComponent")
+	
+	var equip_action = EquipAction.new(entity, potion)
+	result = equip_action.perform()
+	
+	assert_false(result, "Should not be able to equip consumable")
+	assert_true(body.has_wound(BodyPart.RIGHT_ARM), "Should get arm wound from trying to wear potion")
+	
+	# Test improvised weapon damage
+	var bandage = Entity.new()
+	bandage.add_component("ConsumableComponent", {"healing": 5})
+	bandage.add_component("WeightComponent", {"weight": 0.1})
+	bandage.add_component("DamageTypeComponent", {
+		"slash": 0,  # Can't cut with cloth
+		"pierce": 0, # Can't stab with cloth
+		"blunt": 0   # Too light for blunt damage
+	})
+	
+	var attack_action = MeleeAction.new(entity, entity, BodyPart.RIGHT_ARM, bandage)
+	result = attack_action.perform()
+	
+	assert_true(result, "Should be able to attack with any item")
+	# Should do minimal damage due to zero damage stats
+	var target_wounds = entity.get_component("BodyComponent").get_wounds_of_type(Constants.WoundType.LIGHT)
+	assert_eq(target_wounds.size(), 0, "Should do no damage with cloth item")
+	
+	# Test metal armor as weapon
+	var armor_plate = create_armor_entity([
+		["WeightComponent", {"weight": 5.0}],
+		["MaterialComponent", {"type": "metal"}],
+		["DamageTypeComponent", {
+			"slash": 1,  # Sharp edges
+			"pierce": 1, # Points and corners
+			"blunt": 3  # Heavy metal = good blunt
+		}]
+	])
+	
+	attack_action = MeleeAction.new(entity, entity, BodyPart.RIGHT_ARM, armor_plate)
+	result = attack_action.perform()
+	
+	assert_true(result, "Should be able to attack with armor")
+	# Should do significant blunt damage
+	target_wounds = entity.get_component("BodyComponent").get_wounds_of_type(Constants.WoundType.MODERATE)
+	assert_gt(target_wounds.size(), 0, "Should do damage with heavy metal item") 

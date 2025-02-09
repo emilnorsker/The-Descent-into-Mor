@@ -1,26 +1,26 @@
 [gd_resource type="Resource" script_class="EntityBlueprint" load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://src/entity_blueprint.gd" id="1_0"]
-[ext_resource type="Script" path="res://src/Components/Blueprints/weapon_component_blueprint.gd" id="2_0"]
-[ext_resource type="Script" path="res://src/Components/Blueprints/damage_type_component_blueprint.gd" id="3_0"]
-[ext_resource type="Script" path="res://src/Components/Blueprints/weight_component_blueprint.gd" id="4_0"]
+[ext_resource type="Script" path="res://src/Components/Blueprints/armor_component_blueprint.gd" id="2_0"]
+[ext_resource type="Script" path="res://src/Components/Blueprints/weight_component_blueprint.gd" id="3_0"]
+[ext_resource type="Script" path="res://src/Components/Blueprints/material_component_blueprint.gd" id="4_0"]
 
 [sub_resource type="Resource" id="1"]
 script = ExtResource("2_0")
-damage = 3
-range = 1
+slot = "cuirass"
+protection = 4
 
 [sub_resource type="Resource" id="2"]
 script = ExtResource("3_0")
-type = 0  # SLASH
+weight = 8.0
 
 [sub_resource type="Resource" id="3"]
 script = ExtResource("4_0")
-weight = 1.5
+type = "metal"
 
 [resource]
 script = ExtResource("1_0")
-name = "Sword"
+name = "Plate Armor"
 type = 1
 is_blocking_movement = false
 components = [SubResource("1"), SubResource("2"), SubResource("3")] 

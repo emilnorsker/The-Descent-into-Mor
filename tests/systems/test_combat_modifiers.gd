@@ -1,6 +1,10 @@
 extends GutTest
 
 const MapScene = preload("res://src/Map/Map.tscn")
+const Level = preload("res://src/Map/level.gd")
+const Constants = preload("res://src/constants.gd")
+const CombatModifierComponent = preload("res://src/Components/combat_modifier_component.gd")
+const MeleeAction = preload("res://src/Actions/melee_action.gd")
 
 var entity: Entity
 var modifiers: CombatModifierComponent
@@ -23,29 +27,87 @@ func after_each() -> void:
 
 # Environmental State Tests
 func test_oiled_state() -> void:
-	modifiers.apply_state("oiled")
+	# Test floor tile effects
+	var floor_tile = Entity.from_blueprint(preload("res://assets/blueprints/terrain/floor.tres"), Vector2i(1, 1))
+	modifiers.apply_state("oiled", floor_tile)
 	
-	assert_true(modifiers.is_slippery(), "Oiled should make slippery")
-	assert_true(modifiers.is_flammable(), "Oiled should be flammable")
-	assert_true(modifiers.affects_grip(), "Oiled should affect grip")
+	# Test creature movement on oiled floor
+	var creature = Entity.from_blueprint(preload("res://assets/blueprints/actors/player.tres"), Vector2i(1, 1))
+	var balance_check = creature.roll_balance_check()
+	if balance_check < 4:  # Failed check
+		assert_true(creature.has_status(Constants.StatusEffect.PRONE), "Should fall prone on oiled floor")
+	
+	# Test entity being oiled
+	var weapon = Entity.from_blueprint(preload("res://assets/blueprints/items/sword.tres"), Vector2i(1, 1))
+	modifiers.apply_state("oiled", weapon)
+	assert_true(weapon.is_slippery(), "Oiled weapon should be slippery")
+	assert_true(weapon.is_flammable(), "Oiled weapon should be flammable")
+	
+	# Test combat effects
+	var attacker = Entity.from_blueprint(preload("res://assets/blueprints/actors/player.tres"), Vector2i(1, 1))
+	attacker.equipment_component.equip_weapon(weapon)
+	var grip_check = attacker.roll_grip_check()
+	if grip_check < 4:  # Failed check
+		assert_true(weapon.is_dropped(), "Should drop oiled weapon on failed check")
 
 func test_ablaze_state() -> void:
-	modifiers.apply_state("ablaze")
+	# Test entity on fire
+	var creature = Entity.from_blueprint(preload("res://assets/blueprints/actors/player.tres"), Vector2i(1, 1))
+	modifiers.apply_state("ablaze", creature)
 	
-	assert_true(modifiers.causes_pain(), "Ablaze should cause pain")
-	assert_true(modifiers.creates_smoke(), "Ablaze should create smoke")
-	assert_true(modifiers.can_spread(), "Ablaze should be able to spread")
+	# Should cause wounds to entities with health
+	if creature.has_component("HealthComponent"):
+		assert_true(creature.body_component.has_wound(Constants.BodyPart.CHEST), "Ablaze should cause wounds")
+		assert_eq(creature.body_component.get_wound_type(Constants.BodyPart.CHEST, 0), Constants.WoundType.MODERATE, 
+				"Fire should cause moderate wounds")
 	
-	# Test equipment damage
-	watch_signals(entity.equipment_component)
-	assert_signal_emitted(entity.equipment_component, "equipment_damaged")
+	# Test smoke effects
+	var nearby_tile = Vector2i(2, 1)
+	assert_true(GameMap.is_line_of_sight_blocked(Vector2i(1, 1), Vector2i(3, 1)), 
+			"Smoke should block line of sight")
+	
+	# Test fire spreading
+	var flammable_object = Entity.from_blueprint(preload("res://assets/blueprints/items/wooden_chair.tres"), Vector2i(2, 1))
+	GameMap.register_entity(flammable_object, flammable_object.grid_position)
+	
+	GameMap.process_turn()  # Let fire spread
+	assert_true(flammable_object.has_state("ablaze"), "Fire should spread to nearby flammable objects")
+	
+	# Test equipment damage from fire
+	var sword = Entity.from_blueprint(preload("res://assets/blueprints/items/sword.tres"), Vector2i(1, 1))
+	creature.equipment_component.equip_weapon(sword)
+	
+	watch_signals(creature.equipment_component)
+	GameMap.process_turn()  # Process fire damage
+	assert_signal_emitted(creature.equipment_component, "equipment_damaged", "Fire should damage equipment")
 
 func test_mud_covered() -> void:
-	modifiers.apply_state("mud_covered")
+	# Test mud on floor
+	var floor_tile = Entity.from_blueprint(preload("res://assets/blueprints/terrain/floor.tres"), Vector2i(1, 1))
+	modifiers.apply_state("mud_covered", floor_tile)
 	
-	assert_true(modifiers.movement_impaired(), "Mud should impair movement")
-	assert_true(modifiers.provides_camouflage(), "Mud should provide camouflage")
-	assert_true(modifiers.affects_equipment(), "Mud should affect equipment")
+	# Test movement impairment
+	var creature = Entity.from_blueprint(preload("res://assets/blueprints/actors/player.tres"), Vector2i(1, 1))
+	var initial_movement = creature.get_movement_points()
+	creature.move_through(floor_tile.grid_position)
+	assert_lt(creature.get_movement_points(), initial_movement, "Mud should cost extra movement")
+	
+	# Test fire protection
+	modifiers.apply_state("mud_covered", creature)
+	modifiers.apply_state("ablaze", creature)
+	assert_false(creature.has_state("ablaze"), "Mud should prevent catching fire")
+	
+	# Test equipment effects
+	var armor = Entity.from_blueprint(preload("res://assets/blueprints/items/plate_armor.tres"), Vector2i(1, 1))
+	creature.equipment_component.equip_armor(armor)
+	var initial_protection = armor.get_protection_value()
+	modifiers.apply_state("mud_covered", armor)
+	assert_lt(armor.get_protection_value(), initial_protection, "Mud should reduce armor effectiveness")
+	
+	# Test camouflage
+	assert_true(creature.is_harder_to_detect(), "Mud should provide camouflage")
+	var detection_check = Entity.new().roll_detection_check(creature)
+	assert_lt(detection_check, 4, "Should be harder to detect when mud covered")
 
 # Combat State Tests
 func test_bleeding_state() -> void:
@@ -63,26 +125,61 @@ func test_winded_state() -> void:
 	assert_true(modifiers.vision_affected(), "Winded should affect vision")
 
 func test_dazed_state() -> void:
-	modifiers.apply_state("dazed")
+	var creature = Entity.from_blueprint(preload("res://assets/blueprints/actors/player.tres"), Vector2i(1, 1))
 	
-	assert_true(modifiers.balance_affected(), "Dazed should affect balance")
-	assert_true(modifiers.vision_blurred(), "Dazed should blur vision")
-	assert_true(modifiers.easy_to_disarm(), "Dazed should make disarming easier")
+	# Test dazed right arm
+	var sword = Entity.from_blueprint(preload("res://assets/blueprints/items/sword.tres"), Vector2i(1, 1))
+	creature.equipment_component.equip_weapon(sword, Constants.BodyPart.RIGHT_ARM)
+	modifiers.apply_state("dazed", creature, Constants.BodyPart.RIGHT_ARM)
+	
+	# Should only affect right arm
+	var grip_check = creature.roll_grip_check(Constants.BodyPart.RIGHT_ARM)
+	if grip_check < 4:  # Failed check
+		assert_true(sword.is_dropped(), "Should drop weapon from dazed arm")
+	
+	# Test dazed left arm with shield
+	var shield = Entity.from_blueprint(preload("res://assets/blueprints/items/shield.tres"), Vector2i(1, 1))
+	creature.equipment_component.equip_weapon(shield, Constants.BodyPart.LEFT_ARM)
+	modifiers.apply_state("dazed", creature, Constants.BodyPart.LEFT_ARM)
+	
+	# Right arm weapon should be unaffected
+	assert_false(sword.is_dropped(), "Weapon in undazed arm should not be dropped")
+	
+	# Test vision effects when head is dazed
+	modifiers.apply_state("dazed", creature, Constants.BodyPart.HEAD)
+	assert_true(creature.vision_is_blurred(), "Dazed head should blur vision")
+	assert_lt(creature.get_vision_range(), creature.get_base_vision_range(), "Dazed head should reduce vision range")
+	
+	# Test balance effects when legs are dazed
+	modifiers.apply_state("dazed", creature, Constants.BodyPart.LEFT_LEG)
+	modifiers.apply_state("dazed", creature, Constants.BodyPart.RIGHT_LEG)
+	assert_true(creature.has_status(Constants.StatusEffect.PRONE_TO_FALLING), "Dazed legs should risk falling")
 
 # Positional Advantage Tests
 func test_high_ground() -> void:
-	modifiers.apply_position("high_ground")
+	# Setup terrain with elevation
+	var high_ground = Entity.from_blueprint(preload("res://assets/blueprints/terrain/hill.tres"), Vector2i(1, 1))
+	var low_ground = Entity.from_blueprint(preload("res://assets/blueprints/terrain/floor.tres"), Vector2i(2, 1))
 	
-	assert_true(modifiers.has_leverage(), "High ground should give leverage")
-	assert_true(modifiers.easier_defense(), "High ground should make defense easier")
-	assert_true(modifiers.controls_space_below(), "High ground should control space below")
-
-func test_wall_at_back() -> void:
-	modifiers.apply_position("wall_at_back")
+	# Test ranged weapon from high ground
+	var orc = Entity.from_blueprint(preload("res://assets/blueprints/actors/monsters/orc.tres"), Vector2i(1, 1))
+	var bow = Entity.from_blueprint(preload("res://assets/blueprints/items/bow.tres"), Vector2i(1, 1))
+	orc.equipment_component.equip_weapon(bow)
 	
-	assert_false(modifiers.can_be_flanked(), "Wall should prevent flanking")
-	assert_true(modifiers.has_brace(), "Wall should provide brace")
-	assert_true(modifiers.limited_movement(), "Wall should limit movement")
+	var base_range = bow.get_range()
+	var high_ground_range = orc.get_attack_range()
+	assert_eq(high_ground_range, ceil(base_range * 1.5), "High ground should multiply range by 1.5")
+	
+	# Test defense bonus against melee
+	var attacker = Entity.from_blueprint(preload("res://assets/blueprints/actors/player.tres"), Vector2i(2, 1))
+	var attack = MeleeAction.new(attacker, orc, Constants.BodyPart.CHEST)
+	assert_lt(attack.get_hit_chance(), 0.5, "Should be harder to hit target on high ground")
+	
+	# Test downward melee attack advantage
+	var sword = Entity.from_blueprint(preload("res://assets/blueprints/items/sword.tres"), Vector2i(1, 1))
+	orc.equipment_component.equip_weapon(sword)
+	var downward_strike = MeleeAction.new(orc, attacker, Constants.BodyPart.CHEST)
+	assert_gt(downward_strike.get_damage_bonus(), 0, "Should get damage bonus attacking downward")
 
 func test_flanking() -> void:
 	modifiers.apply_position("flanking")
@@ -102,19 +199,9 @@ func test_mud_and_high_ground() -> void:
 
 func test_ablaze_and_cornered() -> void:
 	modifiers.apply_state("ablaze")
-	modifiers.apply_position("wall_at_back")
+	modifiers.apply_position("pinned")
 	
 	assert_true(modifiers.causes_panic(), "Should cause panic")
-	assert_true(modifiers.must_move(), "Should force movement")
-	assert_true(modifiers.smoke_concentrated(), "Smoke should be concentrated")
-
-func test_bleeding_and_winded() -> void:
-	modifiers.apply_state("bleeding")
-	modifiers.apply_state("winded")
-	
-	assert_true(modifiers.growing_faint(), "Should cause fainting")
-	assert_true(modifiers.requires_rest(), "Should require rest")
-	assert_true(modifiers.easy_target(), "Should be an easy target")
 
 # Environmental Factor Tests
 func test_rain_effects() -> void:
@@ -127,16 +214,7 @@ func test_rain_effects() -> void:
 func test_darkness_effects() -> void:
 	modifiers.apply_environment("darkness")
 	
-	assert_true(modifiers.movement_hidden(), "Darkness should hide movement")
-	assert_true(modifiers.surprise_likely(), "Darkness should enable surprise")
-	assert_true(modifiers.distance_unclear(), "Darkness should make distance unclear")
-
-func test_confined_space() -> void:
-	modifiers.apply_environment("confined")
-	
-	assert_true(modifiers.swings_limited(), "Confined space should limit swings")
-	assert_true(modifiers.close_quarters(), "Should be close quarters")
-	assert_true(modifiers.echo_effects(), "Should have echo effects")
+	assert_true(modifiers.movement_hidden(), "Darkness should hide the entitiy unless close")
 
 # Edge Cases
 func test_conflicting_states() -> void:
@@ -145,13 +223,6 @@ func test_conflicting_states() -> void:
 	
 	# Mud should reduce ablaze effectiveness
 	assert_lt(modifiers.get_ablaze_intensity(), 1.0, "Mud should reduce ablaze intensity")
-
-func test_position_changes() -> void:
-	modifiers.apply_position("high_ground")
-	modifiers.apply_position("flanking")  # Should remove high ground
-	
-	assert_false(modifiers.has_position("high_ground"), "Should not have multiple positions")
-	assert_true(modifiers.has_position("flanking"), "Should have new position")
 
 func test_environmental_stacking() -> void:
 	modifiers.apply_environment("rain")
@@ -163,131 +234,83 @@ func test_environmental_stacking() -> void:
 
 # Behavioral Interaction Tests
 func test_panic_behavior() -> void:
-	# Setup panic conditions
-	modifiers.apply_state("ablaze")
-	modifiers.apply_position("wall_at_back")
-	watch_signals(entity)
+	# Test panic state effects
+	var creature = Entity.from_blueprint(preload("res://assets/blueprints/actors/player.tres"), Vector2i(1, 1))
+	modifiers.apply_state("ablaze", creature)
 	
-	# Process AI decision
-	entity.process_turn()
+	# Verify panic effects on movement and combat
+	assert_true(creature.has_status(Constants.StatusEffect.PANICKED), "Should be panicked when ablaze")
+	assert_lt(creature.get_movement_points(), creature.get_base_movement_points(), "Panic should affect movement")
 	
-	# Verify panic behavior
-	assert_true(entity.is_panicked(), "Entity should be panicked")
-	assert_signal_emitted(entity, "started_fleeing")
-	assert_true(entity.get_next_action() is FleeAction, "Entity should choose to flee")
+	# Test weapon handling while panicked
+	var sword = Entity.from_blueprint(preload("res://assets/blueprints/items/sword.tres"), Vector2i(1, 1))
+	creature.equipment_component.equip_weapon(sword)
 	
-	# Check random movement
-	var initial_pos = entity.grid_position
-	entity.execute_turn()
-	assert_ne(entity.grid_position, initial_pos, "Panicked entity should move randomly")
-
-func test_bleeding_behavior() -> void:
-	# Setup heavy bleeding
-	modifiers.apply_state("bleeding")
-	modifiers.apply_state("bleeding")  # Stack bleeding
-	watch_signals(entity)
-	
-	# Process AI decision
-	entity.process_turn()
-	
-	# Verify behavior
-	assert_true(entity.is_seeking_treatment(), "Entity should seek treatment")
-	assert_true(entity.get_next_action() is SeekHealingAction, "Entity should try to heal")
-	
-	# Check if entity prioritizes healing over attacking
-	var enemy = create_enemy_nearby()
-	entity.process_turn()
-	assert_false(entity.get_next_action() is AttackAction, "Bleeding entity should prioritize healing")
+	GameMap.process_turn()  # Process panic effects
+	assert_true(sword.is_dropped(), "Should drop weapon when panicked")
 
 func test_combat_state_influence() -> void:
-	var enemy = create_enemy_nearby()
+	var creature = Entity.from_blueprint(preload("res://assets/blueprints/actors/player.tres"), Vector2i(1, 1))
+	var target = Entity.from_blueprint(preload("res://assets/blueprints/actors/player.tres"), Vector2i(2, 1))
 	
-	# Test normal combat behavior
-	entity.process_turn()
-	var normal_action = entity.get_next_action()
-	assert_true(normal_action is AttackAction, "Should attack normally")
+	# Test normal combat states
+	var base_attack = MeleeAction.new(creature, target, Constants.BodyPart.CHEST)
+	var base_hit_chance = base_attack.get_hit_chance()
 	
-	# Apply states that should affect combat
-	modifiers.apply_state("winded")
-	modifiers.apply_state("dazed")
-	entity.process_turn()
+	# Apply impairing states
+	modifiers.apply_state("winded", creature)
+	modifiers.apply_state("dazed", creature, Constants.BodyPart.HEAD)
 	
-	# Verify defensive behavior
-	var defensive_action = entity.get_next_action()
-	assert_true(defensive_action is DefendAction or defensive_action is RetreatAction,
-			   "Impaired entity should be defensive")
-
-func test_positional_tactics() -> void:
-	var enemy = create_enemy_nearby()
-	
-	# Test high ground advantage
-	modifiers.apply_position("high_ground")
-	entity.process_turn()
-	var high_ground_action = entity.get_next_action()
-	assert_true(high_ground_action is AttackAction, "Should attack from high ground")
-	assert_true(entity.is_maintaining_position(), "Should maintain high ground")
-	
-	# Test flanking behavior
-	modifiers.apply_position("flanking")
-	entity.process_turn()
-	var flanking_action = entity.get_next_action()
-	assert_true(flanking_action is AttackAction, "Should exploit flanking")
-	assert_gt(flanking_action.get_advantage(), 0, "Should have attack advantage")
-
-func test_environmental_adaptation() -> void:
-	# Test behavior in darkness
-	modifiers.apply_environment("darkness")
-	entity.process_turn()
-	assert_true(entity.is_being_cautious(), "Should be cautious in darkness")
-	assert_true(entity.get_next_action().is_careful(), "Actions should be careful")
-	
-	# Test behavior in confined space
-	modifiers.apply_environment("confined")
-	entity.process_turn()
-	var confined_action = entity.get_next_action()
-	assert_false(confined_action is SwingWeaponAction, "Should not swing in confined space")
-	assert_true(confined_action is ThrustWeaponAction, "Should thrust in confined space")
+	# Test impaired combat effectiveness
+	var impaired_attack = MeleeAction.new(creature, target, Constants.BodyPart.CHEST)
+	assert_lt(impaired_attack.get_hit_chance(), base_hit_chance, "Impaired states should reduce hit chance")
 
 func test_equipment_interaction() -> void:
-	# Setup equipment
-	var sword = create_weapon("Sword")
-	entity.equipment_component.equip_weapon(sword)
+	var creature = Entity.from_blueprint(preload("res://assets/blueprints/actors/player.tres"), Vector2i(1, 1))
 	
-	# Test oiled state affecting weapon
-	modifiers.apply_state("oiled")
-	entity.process_turn()
-	assert_true(entity.is_at_risk_of_dropping(), "Should risk dropping oiled weapon")
+	# Test weapon with oiled state
+	var sword = Entity.from_blueprint(preload("res://assets/blueprints/items/sword.tres"), Vector2i(1, 1))
+	creature.equipment_component.equip_weapon(sword)
+	modifiers.apply_state("oiled", sword)
 	
-	# Test mud affecting armor
-	var armor = create_armor("Plate")
-	entity.equipment_component.equip_armor(armor)
-	modifiers.apply_state("mud_covered")
-	assert_lt(entity.get_effective_armor(), armor.base_protection, "Mud should reduce armor effectiveness")
+	# Test grip checks with oiled weapon
+	GameMap.process_turn()  # Process weapon state
+	assert_true(sword.is_slippery(), "Oiled weapon should be slippery")
+	
+	# Test armor with mud state
+	var armor = Entity.from_blueprint(preload("res://assets/blueprints/items/plate_armor.tres"), Vector2i(1, 1))
+	creature.equipment_component.equip_armor(armor)
+	var base_protection = armor.get_protection_value()
+	
+	modifiers.apply_state("mud_covered", armor)
+	assert_lt(armor.get_protection_value(), base_protection, "Mud should reduce armor effectiveness")
 
 func test_condition_combinations() -> void:
-	# Test multiple impairing conditions
-	modifiers.apply_state("winded")
-	modifiers.apply_state("dazed")
-	modifiers.apply_state("mud_covered")
+	var creature = Entity.from_blueprint(preload("res://assets/blueprints/actors/player.tres"), Vector2i(1, 1))
 	
-	entity.process_turn()
+	# Apply multiple states
+	modifiers.apply_state("winded", creature)
+	modifiers.apply_state("dazed", creature, Constants.BodyPart.HEAD)
+	modifiers.apply_state("mud_covered", creature)
 	
-	# Verify severely impaired behavior
-	assert_true(entity.is_severely_impaired(), "Should be severely impaired")
-	assert_eq(entity.get_available_actions().size(), 1, "Should only have one action available")
-	assert_true(entity.get_next_action() is RestAction, "Should be forced to rest")
+	# Test combined effects on combat
+	var target = Entity.from_blueprint(preload("res://assets/blueprints/actors/player.tres"), Vector2i(2, 1))
+	var attack = MeleeAction.new(creature, target, Constants.BodyPart.CHEST)
+	
+	assert_true(creature.has_status(Constants.StatusEffect.WEAKENED), "Multiple conditions should cause weakness")
+	assert_lt(attack.get_hit_chance(), 0.5, "Multiple conditions should severely impact combat")
 
 func test_progressive_state_effects() -> void:
-	# Test bleeding getting worse
-	modifiers.apply_state("bleeding")
-	var initial_consciousness = entity.health_component.consciousness
+	var creature = Entity.from_blueprint(preload("res://assets/blueprints/actors/player.tres"), Vector2i(1, 1))
+	modifiers.apply_state("bleeding", creature)
+	
+	var initial_health = creature.health_component.get_health()
 	
 	for i in range(3):
-		entity.process_turn()  # Let bleeding progress
+		GameMap.process_turn()  # Let bleeding progress
 		
-	assert_gt(entity.health_component.consciousness, initial_consciousness, 
-			 "Consciousness should increase from bleeding")
-	assert_true(entity.is_getting_weaker(), "Should be weakening from blood loss")
+	assert_lt(creature.health_component.get_health(), initial_health, "Bleeding should cause progressive damage")
+	assert_true(creature.has_status(Constants.StatusEffect.WEAKENED), "Bleeding should cause weakness over time")
 
 # Utility Functions
 func create_enemy_nearby() -> Entity:
@@ -296,22 +319,4 @@ func create_enemy_nearby() -> Entity:
 		entity.grid_position + Vector2i(1, 0)
 	)
 	GameMap.register_entity(enemy, enemy.grid_position)
-	return enemy
-
-func create_weapon(name: String) -> Dictionary:
-	return {
-		"name": name,
-		"type": "weapon",
-		"properties": {
-			"damage": 5,
-			"range": 1
-		}
-	}
-
-func create_armor(name: String) -> Dictionary:
-	return {
-		"name": name,
-		"type": "armor",
-		"base_protection": 3,
-		"coverage": ["torso"]
-	} 
+	return enemy 

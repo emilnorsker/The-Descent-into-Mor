@@ -1,6 +1,14 @@
 extends GutTest
 
 const MapScene = preload("res://src/Map/Map.tscn")
+const Level = preload("res://src/Map/level.gd")
+const Constants = preload("res://src/constants.gd")
+
+var BodyPart = Constants.BodyPart
+var WoundType = Constants.WoundType
+var WoundEffect = Constants.WoundEffect
+var StatusEffect = Constants.StatusEffect
+var TreatmentType = Constants.TreatmentType
 
 var entity: Entity
 var body: BodyComponent
