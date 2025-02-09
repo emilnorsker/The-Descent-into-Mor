@@ -88,12 +88,23 @@ func register_entity(entity: Entity, position: Vector2i) -> void:
 		# Sort entities by type to maintain correct stacking order
 		# Order: TERRAIN (floor) -> TERRAIN (surface) -> FIXTURE -> ITEM -> ACTOR
 		_entities.sort_custom(func(a: Entity, b: Entity) -> bool:
-			if a.type != b.type:
-				return a.type < b.type
-			# For same type (TERRAIN), maintain floor -> surface order
-			if a.type == Entity.EntityType.TERRAIN and b.type == Entity.EntityType.TERRAIN:
-				return a.get_parent() == floor_layer
-			return false
+			# Helper function to get sort weight for entity types
+			var get_type_weight = func(e: Entity) -> int:
+				match e.type:
+					Entity.EntityType.TERRAIN:
+						return 0 if e.get_parent() == floor_layer else 1
+					Entity.EntityType.FIXTURE:
+						return 2
+					Entity.EntityType.ITEM:
+						return 3
+					Entity.EntityType.ACTOR:
+						return 4
+					_:  # CORPSE or any other type
+						return 5
+			
+			var a_weight = get_type_weight.call(a)
+			var b_weight = get_type_weight.call(b)
+			return a_weight < b_weight
 		)
 		
 	if entity.is_blocking_movement():
