@@ -104,7 +104,7 @@ func distance(other_position: Vector2i) -> int:
 	return maxi(abs(relative.x), abs(relative.y))
 
 func is_blocking_movement() -> bool:
-	return blocks_movement
+	return blocks_movement or (type == EntityType.ACTOR)
 
 func get_entity_name() -> String:
 	return entity_name
