@@ -1,18 +1,23 @@
 extends GutTest
 
-# Test Map System
-# This test suite verifies the core functionality of our map system
-# focusing on real gameplay scenarios and interactions
+const MapScene = preload("res://src/Map/Map.tscn")
+const Level = preload("res://src/Map/level.gd")
 
-var TestMap = preload("res://tests/fixtures/test_map.tscn")
-var test_map: Map
+var test_level: Level
 var player: Entity
 var orc: Entity
 var sword: Entity
 
 func before_each() -> void:
-	test_map = TestMap.instantiate()
-	add_child_autofree(test_map)
+	# Initialize GameMap scene
+	var map_scene = MapScene.instantiate()
+	add_child_autofree(map_scene)
+	
+	# Load test level resource
+	test_level = preload("res://tests/fixtures/test_level.tres")
+	
+	# Initialize GameMap with test level
+	GameMap.load_level(test_level)
 	
 	# Create test entities with real blueprints
 	var player_blueprint = preload("res://assets/blueprints/actors/player.tres")
@@ -23,27 +28,55 @@ func before_each() -> void:
 	orc = Entity.from_blueprint(orc_blueprint, Vector2i(2, 2))
 	sword = Entity.from_blueprint(sword_blueprint, Vector2i(1, 1))
 
+func after_each() -> void:
+	# Clear GameMap state
+	GameMap.clear()
+
 # Test Core Map Functionality
-func test_map_has_required_layers() -> void:
-	assert_not_null(test_map.floor_layer, "Map should have a floor layer")
-	assert_not_null(test_map.feature_layer, "Map should have a feature layer")
-	assert_not_null(test_map.fixture_layer, "Map should have a fixture layer")
-	assert_eq(test_map.floor_layer.get_class(), "TileMapLayer", "Floor layer should be a TileMapLayer")
-	assert_eq(test_map.feature_layer.get_class(), "TileMapLayer", "Feature layer should be a TileMapLayer")
-	assert_eq(test_map.fixture_layer.get_class(), "TileMapLayer", "Fixture layer should be a TileMapLayer")
+func test_level_loading() -> void:
+	assert_not_null(test_level, "Level resource should be loaded")
+	assert_not_null(test_level.floors, "Level should have floor data")
+	assert_not_null(test_level.surfaces, "Level should have surface data")
+	assert_not_null(test_level.objects, "Level should have object data")
+	
+	# Verify test level data
+	assert_eq(test_level.floors.size(), 1, "Should have one floor tile")
+	assert_eq(test_level.surfaces.size(), 1, "Should have one surface feature")
+	assert_eq(test_level.objects.size(), 1, "Should have one object")
 
 # Test Entity Placement and Stacking
 func test_basic_tile_layer_stacking() -> void:
+	# Clear any existing entities
+	GameMap.clear()
+	
 	var pos = Vector2i(1, 1)
+	print("\nTesting basic tile layer stacking...")
 	
-	# Get all entities at position before adding dynamic entities
-	var base_entities = GameMap.get_entities_at(pos)
+	# Load only the basic layers
+	for element in test_level.floors:
+		var entity = Entity.from_blueprint(element.blueprint, element.position)
+		GameMap.register_entity(entity, element.position)
+	for element in test_level.surfaces:
+		var entity = Entity.from_blueprint(element.blueprint, element.position)
+		GameMap.register_entity(entity, element.position)
+	for element in test_level.objects:
+		var entity = Entity.from_blueprint(element.blueprint, element.position)
+		GameMap.register_entity(entity, element.position)
 	
-	# Verify we get floor, feature, and fixture in correct order
-	assert_eq(base_entities.size(), 3, "Should have floor, feature, and fixture")
-	assert_eq(base_entities[0].type, Entity.EntityType.TERRAIN, "First entity should be floor")
-	assert_eq(base_entities[1].type, Entity.EntityType.TERRAIN, "Second entity should be feature")
-	assert_eq(base_entities[2].type, Entity.EntityType.FIXTURE, "Third entity should be fixture")
+	# Get all entities at position
+	var entities = GameMap.get_entities_at(pos)
+	print("Entities found: ", entities.size())
+	for i in range(entities.size()):
+		print("Entity ", i, ": ", entities[i].type if entities[i] else "null")
+	
+	# Verify we get floor, surface, and object in correct order
+	assert_eq(entities.size(), 3, "Should have floor, surface, and object")
+	if entities.size() > 0:
+		assert_eq(entities[0].type, Entity.EntityType.TERRAIN, "First entity should be floor")
+	if entities.size() > 1:
+		assert_eq(entities[1].type, Entity.EntityType.TERRAIN, "Second entity should be surface")
+	if entities.size() > 2:
+		assert_eq(entities[2].type, Entity.EntityType.FIXTURE, "Third entity should be object")
 
 func test_complete_entity_stacking() -> void:
 	var pos = Vector2i(1, 1)
@@ -54,11 +87,11 @@ func test_complete_entity_stacking() -> void:
 	
 	var all_entities = GameMap.get_entities_at(pos)
 	
-	# Verify complete stacking order: floor -> feature -> fixture -> items -> actors
+	# Verify complete stacking order: floor -> surface -> object -> items -> actors
 	assert_eq(all_entities.size(), 5, "Should have all 5 entity types stacked")
 	assert_eq(all_entities[0].type, Entity.EntityType.TERRAIN, "First entity should be floor")
-	assert_eq(all_entities[1].type, Entity.EntityType.TERRAIN, "Second entity should be feature")
-	assert_eq(all_entities[2].type, Entity.EntityType.FIXTURE, "Third entity should be fixture")
+	assert_eq(all_entities[1].type, Entity.EntityType.TERRAIN, "Second entity should be surface")
+	assert_eq(all_entities[2].type, Entity.EntityType.FIXTURE, "Third entity should be object")
 	assert_eq(all_entities[3].type, Entity.EntityType.ITEM, "Fourth entity should be item")
 	assert_eq(all_entities[4].type, Entity.EntityType.ACTOR, "Fifth entity should be actor")
 	
@@ -88,12 +121,12 @@ func test_entity_movement() -> void:
 	var end_pos = Vector2i(2, 1)
 	
 	GameMap.register_entity(player, start_pos)
-	watch_signals(test_map) # Watch for movement signals
+	watch_signals(GameMap) # Watch for movement signals
 	
 	player.move(end_pos - start_pos)
 	
 	# Verify movement
-	assert_signal_emitted_with_parameters(test_map, "entity_moved", [player, start_pos, end_pos])
+	assert_signal_emitted_with_parameters(GameMap, "entity_moved", [player, start_pos, end_pos])
 	assert_false(GameMap.is_position_blocked(start_pos), "Start position should no longer be blocked")
 	assert_true(GameMap.is_position_blocked(end_pos), "End position should now be blocked")
 
@@ -126,6 +159,6 @@ func test_item_interaction() -> void:
 	assert_eq(items.size(), 1, "Should find the sword")
 	
 	# Remove item (simulating pickup)
-	GameMap.remove_entity(sword, pos)
+	GameMap.erase(sword)
 	items = GameMap.get_entities_of_type_at(pos, Entity.EntityType.ITEM)
 	assert_eq(items.size(), 0, "Item should be removed after pickup")

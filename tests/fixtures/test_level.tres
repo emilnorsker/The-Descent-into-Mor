@@ -1,0 +1,42 @@
+[gd_resource type="Resource" script_class="Level" load_steps=12 format=3]
+
+[ext_resource type="Script" path="res://src/Map/level.gd" id="1_0"]
+[ext_resource type="Script" path="res://src/Map/level_element.gd" id="2_0"]
+[ext_resource type="Resource" path="res://assets/blueprints/tiles/floor.tres" id="3_0"]
+[ext_resource type="Resource" path="res://assets/blueprints/tiles/feature.tres" id="4_0"]
+[ext_resource type="Resource" path="res://assets/blueprints/tiles/fixture.tres" id="5_0"]
+[ext_resource type="Resource" path="res://assets/blueprints/items/weapons/sword.tres" id="6_0"]
+[ext_resource type="Resource" path="res://assets/blueprints/actors/monsters/orc.tres" id="7_0"]
+
+[sub_resource type="Resource" id="floor_1"]
+script = ExtResource("2_0")
+position = Vector2i(1, 1)
+blueprint = ExtResource("3_0")
+
+[sub_resource type="Resource" id="surface_1"]
+script = ExtResource("2_0")
+position = Vector2i(1, 1)
+blueprint = ExtResource("4_0")
+
+[sub_resource type="Resource" id="object_1"]
+script = ExtResource("2_0")
+position = Vector2i(1, 1)
+blueprint = ExtResource("5_0")
+
+[sub_resource type="Resource" id="item_1"]
+script = ExtResource("2_0")
+position = Vector2i(1, 1)
+blueprint = ExtResource("6_0")
+
+[sub_resource type="Resource" id="entity_1"]
+script = ExtResource("2_0")
+position = Vector2i(2, 2)
+blueprint = ExtResource("7_0")
+
+[resource]
+script = ExtResource("1_0")
+floors = [SubResource("floor_1")]
+surfaces = [SubResource("surface_1")]
+objects = [SubResource("object_1")]
+items = [SubResource("item_1")]
+entities = [SubResource("entity_1")] 

@@ -1,0 +1,16 @@
+[gd_resource type="TileSet" load_steps=2 format=3]
+
+[sub_resource type="TileSetAtlasSource" id="1"]
+texture_region_size = Vector2i(32, 32)
+0/name = "floor"
+0/texture_origin = Vector2i(0, 0)
+0/modulate = Color(1, 1, 1, 1)
+0/custom_data_0 = "res://assets/blueprints/tiles/floor.tres"
+0/0 = 0
+0/0/custom_data_0 = "res://assets/blueprints/tiles/floor.tres"
+
+[resource]
+tile_size = Vector2i(32, 32)
+custom_data_layer_0/name = "blueprint_path"
+custom_data_layer_0/type = 4
+sources/0 = SubResource("1") 

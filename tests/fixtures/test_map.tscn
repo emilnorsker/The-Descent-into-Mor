@@ -1,15 +1,27 @@
-[gd_scene load_steps=2 format=3 uid="uid://b4e2mhx6m8ut"]
+[gd_scene load_steps=5 format=3]
 
-[ext_resource type="Script" path="res://src/Map/game_map.gd" id="1_map"]
+[ext_resource type="Script" path="res://src/Map/game_map.gd" id="1_0"]
+[ext_resource type="TileSet" path="res://assets/tilesets/floor_tileset.tres" id="2_0"]
+[ext_resource type="TileSet" path="res://assets/tilesets/feature_tileset.tres" id="3_0"]
+[ext_resource type="TileSet" path="res://assets/tilesets/fixture_tileset.tres" id="4_0"]
 
-[node name="Map" type="Node"]
-script = ExtResource("1_map")
+[node name="TestMap" type="Node"]
+script = ExtResource("1_0")
 
 [node name="Floor" type="TileMapLayer" parent="."]
 z_index = 0
+tile_set = ExtResource("2_0")
+format = 2
+layer_0/tile_data = PackedInt32Array(65537, 0, 0)
 
 [node name="Features" type="TileMapLayer" parent="."]
 z_index = 1
+tile_set = ExtResource("3_0")
+format = 2
+layer_0/tile_data = PackedInt32Array(65537, 0, 0)
 
 [node name="Fixtures" type="TileMapLayer" parent="."]
-z_index = 2 
+z_index = 2
+tile_set = ExtResource("4_0")
+format = 2
+layer_0/tile_data = PackedInt32Array(65537, 0, 0) 

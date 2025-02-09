@@ -1,0 +1,14 @@
+Never use TileMap. Use TileMapLayer instead.
+
+- TileMapLayer is a single layer of tiles
+- TileMap is a container for multiple TileMapLayers
+- TileMapLayer is more lightweight and focused
+- TileMap handles coordination between layers
+- TileMapLayer provides cleaner access to tile data
+- TileMapLayer.get_used_cells() returns cells in this layer only
+- TileMapLayer.get_cell_tile_data() is more direct
+
+this mean the correct way to use get used cells at is this:
+
+	var used_cells = floor_layer.get_used_cells()
+    

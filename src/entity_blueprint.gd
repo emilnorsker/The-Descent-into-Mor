@@ -1,6 +1,6 @@
 @tool
-class_name EntityBlueprint
 extends Resource
+class_name EntityBlueprint
 
 @export var name: String = ""
 @export var texture: AtlasTexture

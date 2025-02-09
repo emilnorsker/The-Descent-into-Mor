@@ -109,10 +109,11 @@ func process_action_queue() -> bool:
 	action_queue.clear()
 	return false
 
-func move(move_offset: Vector2i) -> void:
-	GameMap.move_entity(self, grid_position, grid_position + move_offset)
-	grid_position += move_offset
-	visible = true
+func move(offset: Vector2i) -> void:
+	var from_pos = grid_position
+	var to_pos = grid_position + offset
+	grid_position = to_pos
+	GameMap.move_entity(self, from_pos, to_pos)
 
 func distance(other_position: Vector2i) -> int:
 	var relative: Vector2i = other_position - grid_position

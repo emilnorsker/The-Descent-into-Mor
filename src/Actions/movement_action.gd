@@ -7,5 +7,6 @@ func perform() -> bool:
 	
 	if not GameMap.get_blocking_entity_at_location(destination):
 		entity.move(offset)
-	return true
+		return true
+	return false
 	
