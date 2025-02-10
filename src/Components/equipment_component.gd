@@ -2,25 +2,30 @@
 class_name EquipmentComponent
 extends Component
 
+# The equipment component is used to equip items to an entity.
+# It also tracks the total defense and power bonuses of the equipped items.
+# it is not a single item, but rather the interface to the items equipped on the body.
+
+
 signal equipment_changed
 
 var slots := {}
 
 var _defense_bonus: int = 0
-var defense_bonus: int:
+var total_defense_bonus: int:
     set(value):
         _defense_bonus = value
         equipment_changed.emit()
     get:
-        return get_defense_bonus()
+        return _get_defense_bonus()
 
 var _power_bonus: int = 0
-var power_bonus: int:
+var total_power_bonus: int:
     set(value):
         _power_bonus = value
         equipment_changed.emit()
     get:
-        return get_power_bonus()
+        return _get_power_bonus()
 
 func _init() -> void:
     super()
@@ -29,32 +34,29 @@ func setup_from_blueprint(blueprint: Resource) -> EquipmentComponent:
     if not blueprint:
         push_error("Invalid blueprint provided to EquipmentComponent.setup_from_blueprint")
         return self
-
-    defense_bonus = blueprint.defense_bonus
-    power_bonus = blueprint.power_bonus
     slots = blueprint.slots
-
     return self
 
-func get_defense_bonus() -> int:
+func _get_defense_bonus() -> int:
     var bonus = 0
     
     for item in entity.components.equipment.slots.values():
-        if item.components.item:
-            bonus += item.components.item.defense_bonus()
+        item = item as ItemComponent
+        if item:
+            bonus += item.defense_bonus
     
     return bonus
 
 
-func get_power_bonus() -> int:
+func _get_power_bonus() -> int:
     var bonus = 0
     
     for item in slots.values():
-        if item.components.item:
-            bonus += item.components.item.power_bonus()
+        item = item as ItemComponent
+        if item:
+            bonus += item.power_bonus
     
     return bonus
-
 
 
 func is_item_equipped(item: Entity) -> bool:

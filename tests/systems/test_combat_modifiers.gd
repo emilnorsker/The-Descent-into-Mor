@@ -66,8 +66,8 @@ func test_oiled_state() -> void:
     
     if attacker.components.body:
         attacker.components.body.equip_to_slot(weapon)
-        var grip_check = attacker.roll_grip_check()
-        if grip_check <= 3:  # Failed check (1-3 fails, 4-6 succeeds)
+        var grip_check = attacker.components.combat.roll(3)
+        if grip_check:  # Failed check (1-3 fails, 4-6 succeeds)
             assert_true(weapon.has_status(Constants.StatusEffect.DISARMED), "Should drop oiled weapon on failed check")
 
 func test_ablaze_state() -> void:
@@ -119,10 +119,10 @@ func test_mud_covered() -> void:
     
     # Test equipment effects
     var armor = Entity.new().setup_from_blueprint(preload("res://assets/blueprints/items/plate_armor.tres"), Vector2i(1, 1))
-    creature.components.equipment.equip_armor(armor)
-    var initial_protection = armor.get_protection_value()
+    creature.components.body.equip_to_slot(armor, Constants.BodyPart.CHEST)
+    var initial_protection = armor.components.item.defense_bonus
     entity.components.combat_modifier.apply_state(Constants.StatusEffect.MUD_COVERED, armor)
-    assert_lt(armor.get_protection_value(), initial_protection, "Mud should reduce armor effectiveness")
+    assert_lt(armor.components.item.defense_bonus, initial_protection, "Mud should reduce armor effectiveness")
     
 # Combat State Tests
 func test_bleeding_state() -> void:
@@ -140,8 +140,8 @@ func test_dazed_state() -> void:
     entity.components.combat_modifier.apply_state(Constants.StatusEffect.DAZED, creature, Constants.BodyPart.RIGHT_ARM)
     
     # Should only affect right arm
-    var grip_check = creature.roll_grip_check(Constants.BodyPart.RIGHT_ARM)
-    if grip_check < 4:  # Failed check
+    var grip_check = creature.components.combat.roll(3)
+    if grip_check:  # Failed check
         pass #assert_true(sword.is_dropped(), "Should drop weapon from dazed arm")
     
     # Test dazed left arm with shield

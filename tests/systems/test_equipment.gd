@@ -137,49 +137,6 @@ func test_equipment_wound_interaction() -> void:
     entity.components.body.apply_wound(Constants.WoundType.LIGHT, BodyPart.CHEST)
     assert_eq(entity.components.body.consciousness, 0, "Should still be unconscious after light wound")
 
-# Utility Functions
-func create_armor_entity(components: Array) -> Entity:
-    # Create a temporary blueprint
-    var blueprint = EntityBlueprint.new()
-    blueprint.entity_name = "Test Armor"
-    blueprint.type = Entity.EntityType.ITEM
-    blueprint.blocks_movement = false
-    
-    # Create equipment blueprint (always needed for armor)
-    var equipment_blueprint = EquipmentComponentBlueprint.new()
-    blueprint.equipment_blueprint = equipment_blueprint
-    
-    # Convert the test components to our blueprint system
-    for component_data in components:
-        var type = component_data[0]
-        var data = component_data[1]
-        
-        match type:
-            "ArmorComponent":
-                # Add to equipment blueprint
-                equipment_blueprint.slots[data.get("slot", Constants.BodyPart.CHEST)] = true
-                equipment_blueprint.defense_bonus = data.get("protection", 0)
-                
-            "MaterialComponent":
-                var material_blueprint = MaterialComponentBlueprint.new()
-                material_blueprint.material_type = "metal"
-                material_blueprint.is_flammable = false
-                blueprint.material_blueprint = material_blueprint
-                
-            "WeightComponent":
-                var weight_blueprint = WeightComponentBlueprint.new()
-                weight_blueprint.weight = data.get("weight", 1.0)
-                blueprint.weight_blueprint = weight_blueprint
-                
-            "ResistanceComponent":
-                # Add resistance data to material blueprint if it exists
-                if blueprint.material_blueprint:
-                    blueprint.material_blueprint.slash_resistance = data.get("slash", 0)
-                    blueprint.material_blueprint.pierce_resistance = data.get("pierce", 0)
-                    blueprint.material_blueprint.blunt_resistance = data.get("blunt", 0)
-    
-    # Create entity from blueprint
-    return Entity.new().setup_from_blueprint(blueprint, Vector2i.ZERO) 
 
 func test_component_misuse() -> void:
     # Test trying to eat armor
@@ -266,3 +223,37 @@ func test_wound_effects() -> void:
     entity.body.apply_wound(Constants.BodyPart.HEAD, Constants.WoundType.MODERATE)
     target_wounds = entity.body.get_wounds_of_type(Constants.WoundType.MODERATE)
     assert_eq(target_wounds.size(), 1, "Should have one moderate wound") 
+
+
+# Utility Functions
+func create_armor_entity(components: Array) -> Entity:
+    # Create a temporary blueprint
+    var blueprint = ItemBlueprint.new()
+    blueprint.entity_name = "Test Armor"
+    blueprint.type = Entity.EntityType.ITEM
+    blueprint.blocks_movement = false
+        
+    # Convert the test components to our blueprint system
+    for component_data in components:
+        var type = component_data[0]
+        var data = component_data[1]
+        
+        match type:
+            "ArmorComponent":
+                # Add to equipment blueprint
+                blueprint.slots[data.get("slot", Constants.BodyPart.CHEST)] = true
+                blueprint.defense_bonus = data.get("protection", 0)
+                
+            "MaterialComponent":
+                var material_blueprint = MaterialComponentBlueprint.new()
+                material_blueprint.material_type = data.get("type", "cloth")
+                material_blueprint.is_flammable = data.get("flammable", false)
+                blueprint.components.material_blueprint = material_blueprint
+                
+            "WeightComponent":
+                var weight_blueprint = WeightComponentBlueprint.new()
+                weight_blueprint.weight = data.get("weight", 1.0)
+                blueprint.components.weight_blueprint = weight_blueprint
+    
+    # Create entity from blueprint
+    return Entity.new().setup_from_blueprint(blueprint, Vector2i.ZERO) 

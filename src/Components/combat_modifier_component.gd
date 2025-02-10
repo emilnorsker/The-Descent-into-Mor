@@ -35,8 +35,8 @@ func apply_state(state: Constants.StatusEffect, target: Entity = null, body_part
             if target and target.components.material:
                 var material = target.components.material
                 # Store the balance check result for this target
-                material.is_slippery = true
-                material.is_flammable = true
+                material.set_is_slippery(true)
+                material.set_is_flammable(true)
         Constants.StatusEffect.BLEEDING:
             if target and target.components.body:
                 # Apply bleeding wound

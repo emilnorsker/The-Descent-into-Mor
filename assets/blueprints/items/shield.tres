@@ -6,11 +6,6 @@
 [ext_resource type="Script" path="res://src/Components/Blueprints/weight_component_blueprint.gd" id="4_weight"]
 [ext_resource type="Script" path="res://src/Components/Blueprints/item_component_blueprint.gd" id="5_item"]
 
-[sub_resource type="Resource" id="shield_equip"]
-script = ExtResource("2_equip")
-slot = "shield"
-power_bonus = 0
-defense_bonus = 2
 
 [sub_resource type="Resource" id="shield_material"]
 script = ExtResource("3_material")
@@ -26,9 +21,9 @@ balance_penalty = 1.5
 
 [sub_resource type="Resource" id="shield_item"]
 script = ExtResource("5_item")
-value = 40
-stackable = false
-max_stack = 1
+power_bonus = 0
+defense_bonus = 2
+
 
 [resource]
 script = ExtResource("1_script")
@@ -37,7 +32,6 @@ blocks_movement = false
 type = 1
 key = "shield"
 components = {
-"equipment": SubResource("shield_equip"),
 "item": SubResource("shield_item"),
 "material": SubResource("shield_material"),
 "weight": SubResource("shield_weight")

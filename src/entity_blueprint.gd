@@ -9,7 +9,6 @@ class_name EntityBlueprint
 
 @export_category("Components")
 @export var components: Dictionary = {}
-
 @export var combat_blueprint: Resource
 @export var inventory_blueprint: Resource
 @export var equipment_blueprint: Resource
@@ -17,6 +16,7 @@ class_name EntityBlueprint
 @export var consumable_blueprint: Resource
 @export var light_blueprint: Resource
 @export var material_blueprint: Resource
+@export var weight_blueprint: Resource
 @export var combat_modifier_blueprint: Resource
 @export var terrain_blueprint: Resource
 @export var ai_blueprint: Resource

@@ -94,17 +94,16 @@ func get_current_hp() -> int:
     return hp
 
 func get_defense() -> int:
-    return defense + get_defense_bonus()
+    return defense + get_parent().components.equipment.get_all_defense_bonus()
 
 func get_power() -> int:
     return power + get_power_bonus()
 
-func get_defense_bonus() -> int:
-    if get_parent().components.equipment:
-        return get_parent().components.equipment.defense_bonus()
-    return 0
-
 func get_power_bonus() -> int:
     if get_parent().components.equipment:
-        return get_parent().components.equipment.power_bonus()
+        return get_parent().components.equipment.power_bonus
     return 0
+
+
+func roll(difficulty: int) -> bool:
+    return randi() % 6 + 1 >= difficulty

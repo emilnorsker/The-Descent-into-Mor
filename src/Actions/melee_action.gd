@@ -51,9 +51,10 @@ func get_damage_bonus() -> int:
             bonus += 2  # +2 damage when attacking from high ground
     
     # State modifiers
-    if performer.has_state(Constants.StatusEffect.WINDED):
-        bonus -= 1  # Less power when winded
-    if target.has_state(Constants.StatusEffect.DAZED):
+    if performer.components.combat_modifier:
+        if performer.components.combat_modifier.has_state(Constants.StatusEffect.WINDED):
+            bonus -= 1  # Less power when winded
+    if target.components.combat_modifier.has_state(Constants.StatusEffect.DAZED):
         bonus += 1  # More damage against dazed targets
     
     return bonus

@@ -9,6 +9,7 @@ enum EquipmentType {
 }
 
 var equipment_type: EquipmentType = EquipmentType.WEAPON
+# TODO: Add getter and setters to check for potewntial modifiers
 var power_bonus: int = 0
 var defense_bonus: int = 0
 var slot: Constants.BodyPart = Constants.BodyPart.RIGHT_HAND
