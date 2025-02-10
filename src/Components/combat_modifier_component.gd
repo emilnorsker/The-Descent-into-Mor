@@ -24,21 +24,35 @@ func apply_state(state: Constants.StatusEffect, target: Entity = null, body_part
     # Handle state-specific effects
     match state:
         Constants.StatusEffect.ABLAZE:
-            if target and target.material:
-                if target.material.get_is_flammable():
-                    target.add_state(Constants.StatusEffect.ABLAZE)
+            if target and target.components.material:
+                if target.components.material.get_is_flammable():
+                    target.components.material.add_state(Constants.StatusEffect.ABLAZE)
         Constants.StatusEffect.MUD_COVERED:
-            if target and target.has_state(Constants.StatusEffect.ABLAZE):
-                target.remove_state(Constants.StatusEffect.ABLAZE)
-        Constants.StatusEffect.OILED:
-            if target and target.material:
-                var material = target.material
-                # Store the balance check result for this target
-                _balance_check_results[target] = roll_balance_check()
-                # Apply effects through the setters
-                material.set_is_slippery(true)
-                material.set_is_flammable(true)
+            if target and target.components.combat_modifier:
+                target.components.combat_modifier.remove_state(Constants.StatusEffect.ABLAZE)
 
+        Constants.StatusEffect.OILED:
+            if target and target.components.material:
+                var material = target.components.material
+                # Store the balance check result for this target
+                material.is_slippery = true
+                material.is_flammable = true
+        Constants.StatusEffect.BLEEDING:
+            if target and target.components.body:
+                # Apply bleeding wound
+                target.components.body.apply_wound(Constants.WoundType.MODERATE, Constants.BodyPart.CHEST)
+                target.components.body.add_consciousness(2)  # Bleeding causes consciousness loss
+
+func process_turn() -> void:
+    var parent = get_parent() as Entity
+    if not parent: return
+    
+    # Process bleeding
+    if has_state(Constants.StatusEffect.BLEEDING) and parent.components.body:
+        parent.components.body.add_consciousness(2)  # Bleeding causes consciousness loss per turn
+
+    if has_state(Constants.StatusEffect.ABLAZE) and parent.components.body:
+        parent.components.body.apply_wound(Constants.WoundType.MODERATE, Constants.BodyPart.CHEST)
 
 func has_state(state: Constants.StatusEffect) -> bool:
     return state in states
@@ -46,32 +60,11 @@ func has_state(state: Constants.StatusEffect) -> bool:
 func get_states() -> Array[Constants.StatusEffect]:
     return states
 
-func leaves_trail() -> bool:
-    return has_state(Constants.StatusEffect.BLEEDING)
-
-func causes_weakness() -> bool:
-    return has_state(Constants.StatusEffect.BLEEDING) or has_state(Constants.StatusEffect.WINDED)
-
-func attracts_predators() -> bool:
-    return has_state(Constants.StatusEffect.BLEEDING)
-
-func needs_recovery() -> bool:
-    return has_state(Constants.StatusEffect.WINDED)
-
-func affects_reactions() -> bool:
-    return has_state(Constants.StatusEffect.WINDED)
-
 func vision_affected() -> bool:
     return has_state(Constants.StatusEffect.WINDED) or has_state(Constants.StatusEffect.DAZED)
 
-func is_treacherous() -> bool:
-    return has_state(Constants.StatusEffect.MUD_COVERED) and has_state(Constants.StatusEffect.PRONE)
-
-func can_cause_slides() -> bool:
-    return is_treacherous()
-
 func causes_panic() -> bool:
-    return has_state(Constants.StatusEffect.ABLAZE) and has_state(Constants.StatusEffect.PRONE)
+    return has_state(Constants.StatusEffect.ABLAZE) and has_state(Constants.StatusEffect.PINNED)
 
 func get_vision_range() -> float:
     var base_range = 8.0  # Default vision range
@@ -82,28 +75,22 @@ func get_vision_range() -> float:
 func vision_is_blurred() -> bool:
     return has_state(Constants.StatusEffect.DAZED)
 
-func roll_detection_check(target: Entity) -> int:
-    var base_roll = randi() % 6 + 1
-    if target.combat_modifier and target.combat_modifier.is_harder_to_detect():
-        base_roll -= 2
-    return base_roll
-
 func has_status(status: Constants.StatusEffect) -> bool:
     match status:
-        Constants.StatusEffect.PRONE:
-            if has_state(Constants.StatusEffect.OILED):
-                var check_result = _balance_check_results.get(get_parent(), roll_balance_check())
-                return check_result < 4
+        Constants.StatusEffect.PINNED:
+            if has_state(Constants.StatusEffect.OILED): # TODO: this is bad fix, we dont want to reroll evertime we check.
+                return roll(4)
+                
         Constants.StatusEffect.PRONE_TO_FALLING:
             return has_state(Constants.StatusEffect.DAZED)
         Constants.StatusEffect.PANICKED:
             return has_state(Constants.StatusEffect.ABLAZE)
-        Constants.StatusEffect.WEAKENED:
-            return causes_weakness()
+        Constants.StatusEffect.BLEEDING:
+            return has_state(Constants.StatusEffect.BLEEDING)
     return false
 
-func roll_balance_check() -> int:
-    return randi() % 6 + 1
-
-func roll_grip_check(body_part: int = 0) -> int:
-    return randi() % 6 + 1  # Simple d6 roll 
+func roll(check: int, modifiers: Array[int] = []) -> bool:
+    var dice = randi() % 6 + 1
+    for modifier in modifiers:
+        dice += modifier
+    return dice >= check

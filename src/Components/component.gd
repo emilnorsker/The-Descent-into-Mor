@@ -10,6 +10,3 @@ func _init() -> void:
 
 func setup_from_blueprint(blueprint: Resource) -> Component:
     return self
-
-func get_action(actor: Entity) -> Action:
-    return null

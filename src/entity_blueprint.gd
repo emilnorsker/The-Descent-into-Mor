@@ -8,6 +8,8 @@ class_name EntityBlueprint
 @export var key: String = ""
 
 @export_category("Components")
+@export var components: Dictionary = {}
+
 @export var combat_blueprint: Resource
 @export var inventory_blueprint: Resource
 @export var equipment_blueprint: Resource

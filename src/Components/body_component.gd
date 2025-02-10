@@ -35,7 +35,6 @@ enum WoundEffect {
 var parts: Dictionary = {}
 var wounds = {}  # Dictionary of BodyPart -> Array of Wound
 var consciousness = 0
-var conditions = []
 var is_dead = false
 
 class Wound:
@@ -87,7 +86,6 @@ func setup_from_blueprint(blueprint: Resource) -> BodyComponent:
 
     wounds = blueprint.wounds
     consciousness = blueprint.consciousness
-    conditions = blueprint.conditions
     is_dead = blueprint.is_dead
     parts = blueprint.parts
 
@@ -133,7 +131,7 @@ func check_consciousness() -> void:
         var roll = randi() % 6 + 1
         if roll < 4:  # Need 4+ to stay conscious
             emit_signal("consciousness_check_failed")
-            apply_condition("unconscious")
+            die()
 
 func process_bleeding() -> void:
     var total_bleeding = 0
@@ -155,17 +153,6 @@ func treat_wound(body_part: int, wound_index: int, treatment_level: int) -> void
         # Reduce bleeding based on treatment
         if treatment_level > 0 and WoundEffect.BLEEDING in wound.effects:
             wound.bleeding_rate = max(0, wound.bleeding_rate - treatment_level)
-
-func apply_condition(condition: String) -> void:
-    if not condition in conditions:
-        conditions.append(condition)
-        emit_signal("condition_applied", condition)
-
-func remove_condition(condition: String) -> void:
-    conditions.erase(condition)
-
-func has_condition(condition: String) -> bool:
-    return condition in conditions
 
 func is_limb_impaired(body_part: int) -> bool:
     for wound in wounds[body_part]:
@@ -194,14 +181,15 @@ func get_wounds_of_type(type: int) -> Array:
     return result
 
 func equip_to_slot(item: Entity, body_part: Constants.BodyPart = Constants.BodyPart.RIGHT_HAND) -> void:
-    if not entity.components.equipment: return
+    var parent = get_parent() as Entity
+    if not parent or not parent.components.equipment: return
     
-    var slot = body_part if body_part != Constants.BodyPart.RIGHT_HAND else entity.components.equipment.default_slot
+    var slot = body_part if body_part != Constants.BodyPart.RIGHT_HAND else parent.components.equipment.default_slot
     if is_limb_impaired(slot):
-        SignalBus.message_sent.emit(entity.entity_name + " is unable to equip the %s." % item.get_entity_name(), Color.RED)
+        SignalBus.message_sent.emit(parent.entity_name + " is unable to equip the %s." % item.get_entity_name(), Color.RED)
         return
     
-    entity.components.equipment.equip(item, slot)
+    parent.components.equipment.equip(item, slot)
 
 func process_recovery() -> void:
     # Natural consciousness recovery

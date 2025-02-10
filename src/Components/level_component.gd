@@ -11,7 +11,7 @@ func _init() -> void:
 
 func setup_from_blueprint(blueprint: Resource) -> ProgressionComponent:
     if blueprint:
-        _level = blueprint.level
+        _level = blueprint.current_level
         _current_xp = blueprint.current_xp
         _level_up_base = blueprint.level_up_base
         _level_up_factor = blueprint.level_up_factor

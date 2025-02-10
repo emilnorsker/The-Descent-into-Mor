@@ -42,12 +42,12 @@ func test_slash_damage() -> void:
         "target_position": target.grid_position
     })
     
-    var initial_consciousness = target.compoents.body.consciousness
+    var initial_consciousness = target.components.body.consciousness
     var result = slash_action.perform()
         
     assert_true(result, "Slash action should succeed")
-    assert_lt(target.compoents.body.consciousness, initial_consciousness, "Target should take slash damage")
-    assert_true(target.compoents.body.has_wound(WoundType.BLEEDING), "Slash should cause bleeding")
+    assert_lt(target.components.body.consciousness, initial_consciousness, "Target should take slash damage")
+    assert_true(target.components.body.has_wound(WoundType.BLEEDING), "Slash should cause bleeding")
     assert_true(target.has_status(StatusEffect.BLEEDING), "Slash should cause wound")
 
 func test_pierce_damage() -> void:
@@ -58,12 +58,12 @@ func test_pierce_damage() -> void:
         "target_body_part": BodyPart.CHEST
     })
     
-    var initial_consciousness = target.compoents.body.consciousness
+    var initial_consciousness = target.components.body.consciousness
     var result = pierce_action.perform()
     
     assert_true(result, "Pierce action should succeed")
-    assert_lt(target.compoents.body.consciousness, initial_consciousness, "Target should take pierce damage")
-    assert_true(target.compoents.body.has_wound(WoundType.DEEP), "Pierce should cause deep wound")
+    assert_lt(target.components.body.consciousness, initial_consciousness, "Target should take pierce damage")
+    assert_true(target.components.body.has_wound(WoundType.DEEP), "Pierce should cause deep wound")
 
 func test_blunt_damage() -> void:
     var blunt_action = CombatAction.new(attacker, {
@@ -90,8 +90,8 @@ func test_line_attack() -> void:
     var result = line_action.perform()
     
     assert_true(result, "Line attack should succeed")
-    assert_true(target.compoents.body.is_damaged(), "First target should be hit")
-    assert_true(bystander.compoents.body.is_damaged(), "Second target should be hit")
+    assert_true(target.components.body.is_damaged(), "First target should be hit")
+    assert_true(bystander.components.body.is_damaged(), "Second target should be hit")
 
 func test_cone_attack() -> void:
     var cone_action = CombatAction.new(attacker, {
@@ -117,7 +117,7 @@ func test_cleave_attack() -> void:
     var result = cleave_action.perform()
     
     assert_true(result, "Cleave attack should succeed")
-    assert_true(target.compoents.body.is_damaged(), "Primary target should be hit")
+    assert_true(target.components.body.is_damaged(), "Primary target should be hit")
     # Check adjacent tiles for cleave damage
 
 # Test Status Effects
@@ -162,7 +162,7 @@ func test_targeted_attack() -> void:
     var result = head_attack.perform()
     
     assert_true(result, "Targeted attack should succeed")
-    assert_true(target.compoents.body.get_body_part_damage(BodyPart.HEAD) > 0, "Head should take damage")
+    assert_true(target.components.body.get_body_part_damage(BodyPart.HEAD) > 0, "Head should take damage")
     # Test for specific head injury effects
 
 # Test Health System
@@ -177,7 +177,7 @@ func test_wound_system() -> void:
     var result = deep_wound.perform()
     
     assert_true(result, "Deep wound attack should succeed")
-    var wounds = target.compoents.body.get_wounds()
+    var wounds = target.components.body.get_wounds()
     assert_true(wounds.has(WoundType.DEEP), "Should have deep wound")
     assert_true(target.components.combat_modifier.has_status(StatusEffect.BLEEDING), "Deep wound should cause bleeding")
 
@@ -193,5 +193,5 @@ func test_critical_hit() -> void:
     var result = vital_strike.perform()
     
     assert_true(result, "Critical hit should succeed")
-    assert_true(target.compoents.body.is_critical(), "Target should be in critical condition")
+    assert_true(target.components.body.is_critical(), "Target should be in critical condition")
     # Test for death if not treated 

@@ -54,8 +54,8 @@ func test_unarmed_attacks() -> void:
     var result = punch.perform()
     
     assert_true(result, "Punch should succeed")
-    assert_true(target.body_component.has_wound(Constants.BodyPart.CHEST), "Punch should cause wound")
-    assert_eq(target.body_component.get_wound_type(Constants.BodyPart.CHEST, 0), Constants.WoundType.LIGHT, 
+    assert_true(target.components.body.has_wound(Constants.BodyPart.CHEST), "Punch should cause wound")
+    assert_eq(target.components.body.get_wound_type(Constants.BodyPart.CHEST, 0), Constants.WoundType.LIGHT, 
             "Punch should cause light wound")
     
     # Test kick
@@ -63,7 +63,7 @@ func test_unarmed_attacks() -> void:
     result = kick.perform()
     
     assert_true(result, "Kick should succeed")
-    assert_eq(target.body_component.get_wound_type(Constants.BodyPart.ABDOMEN, 0), Constants.WoundType.MODERATE,
+    assert_eq(target.components.body.get_wound_type(Constants.BodyPart.ABDOMEN, 0), Constants.WoundType.MODERATE,
             "Kick should cause moderate wound")
     
     # Test headbutt
@@ -71,7 +71,7 @@ func test_unarmed_attacks() -> void:
     result = headbutt.perform()
     
     assert_true(result, "Headbutt should succeed")
-    assert_true(attacker.body_component.has_wound(Constants.BodyPart.HEAD),
+    assert_true(attacker.components.body.has_wound(Constants.BodyPart.HEAD),
             "Headbutt should also damage attacker")
 
 # Weapon Tests
@@ -87,7 +87,7 @@ func test_weapon_attacks() -> void:
     var result = slash.perform()
     
     assert_true(result, "Sword attack should succeed")
-    assert_true(target.body_component.is_bleeding(Constants.BodyPart.CHEST),
+    assert_true(target.components.body.is_bleeding(Constants.BodyPart.CHEST),
             "Slash should cause bleeding")
 
 # Throw Tests
@@ -107,7 +107,7 @@ func test_throw_weapon() -> void:
     
     var result = throw.perform()
     assert_true(result, "Throw should succeed")
-    assert_true(target.body_component.has_wound(Constants.BodyPart.CHEST),
+    assert_true(target.components.body.has_wound(Constants.BodyPart.CHEST),
             "Thrown weapon should cause wound")
 
 func test_throw_generic_item() -> void:
@@ -124,7 +124,7 @@ func test_throw_generic_item() -> void:
     
     var result = throw.perform()
     assert_true(result, "Throw should succeed")
-    assert_true(target.body_component.has_wound(Constants.BodyPart.CHEST),
+    assert_true(target.components.body.has_wound(Constants.BodyPart.CHEST),
             "Thrown item should cause wound")
 
 # Range Tests

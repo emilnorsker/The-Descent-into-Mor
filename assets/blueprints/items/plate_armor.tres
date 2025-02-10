@@ -36,7 +36,3 @@ entity_name = "Plate Armor"
 blocks_movement = false
 type = 1  # EntityType.ITEM
 key = "plate_armor"
-equipment_blueprint = SubResource("armor_equip")
-material_blueprint = SubResource("armor_material")
-weight_blueprint = SubResource("armor_weight")
-item_blueprint = SubResource("armor_item") 

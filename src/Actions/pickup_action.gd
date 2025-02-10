@@ -8,7 +8,7 @@ func perform() -> bool:
     if not item:
         return false
     
-    if entity.inventory_component.add(item):
+    if entity.components.inventory.add(item):
         SignalBus.message_sent.emit(
             "%s picked up %s" % [entity.get_entity_name(), item.get_entity_name()],
             Color.WHITE

@@ -1,6 +1,6 @@
 @tool
-extends Resource
 class_name TerrainComponentBlueprint
+extends Resource
 
 @export var blocks_sight: bool = false
 @export var movement_cost: int = 1

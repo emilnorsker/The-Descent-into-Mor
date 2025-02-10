@@ -15,8 +15,8 @@ func perform() -> bool:
     var damage = get_damage()
     var damage_type = get_damage_type()
     
-    target.body_component.apply_wound(Constants.BodyPart.CHEST, damage_type, damage)
-    performer.inventory_component.remove_item(item)
+    target.components.body.apply_wound(Constants.BodyPart.CHEST, damage_type, damage)
+    performer.component.inventory.remove_item(item)
     return true
 
 func get_damage_type() -> String:

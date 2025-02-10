@@ -92,7 +92,7 @@ assets/
 
 src/
 ├── Components/
-│   ├── combat_modifier_component.gd
+│   ├── components.combat_modifier.gd
 │   │   ├── states: Array[String]
 │   │   ├── positions: Array[String]
 │   │   ├── environments: Array[String]
@@ -107,7 +107,7 @@ src/
 │   │   ├── get_vision_range()
 │   │   └── has_status()
 │   │
-│   ├── material_component.gd
+│   ├── components.material.gd
 │   │   ├── is_flammable: bool
 │   │   ├── is_slippery: bool
 │   │   ├── material_type: String
@@ -136,7 +136,7 @@ src/
 │   │   ├── get_defense_bonus()
 │   │   └── get_power_bonus()
 │   │
-│   ├── body_component.gd
+│   ├── components.body.gd
 │   │   ├── type: String
 │   │   ├── parts: Dictionary
 │   │   ├── wounds: Dictionary

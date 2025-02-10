@@ -40,8 +40,8 @@ func get_defense_bonus() -> int:
     var bonus = 0
     
     for item in entity.components.equipment.slots.values():
-        if item.item_component:
-            bonus += item.item_component.defense_bonus()
+        if item.components.item:
+            bonus += item.components.item.defense_bonus()
     
     return bonus
 
@@ -50,8 +50,8 @@ func get_power_bonus() -> int:
     var bonus = 0
     
     for item in slots.values():
-        if item.item_component:
-            bonus += item.item_component.power_bonus()
+        if item.components.item:
+            bonus += item.components.item.power_bonus()
     
     return bonus
 

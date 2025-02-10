@@ -1,10 +1,11 @@
-[gd_resource type="Resource" load_steps=8 format=3]
+[gd_resource type="Resource" script_class="EntityBlueprint" load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://src/entity_blueprint.gd" id="1_script"]
 [ext_resource type="Script" path="res://src/Components/Blueprints/combat_component_blueprint.gd" id="2_combat"]
 [ext_resource type="Script" path="res://src/Components/Blueprints/inventory_component_blueprint.gd" id="3_inv"]
 [ext_resource type="Script" path="res://src/Components/Blueprints/body_component_blueprint.gd" id="4_body"]
 [ext_resource type="Script" path="res://src/Components/Blueprints/progression_component_blueprint.gd" id="5_prog"]
+[ext_resource type="Script" path="res://src/Components/Blueprints/combat_modifier_component_blueprint.gd" id="6_combat_mod"]
 
 [sub_resource type="Resource" id="player_combat"]
 script = ExtResource("2_combat")
@@ -40,6 +41,10 @@ xp_given = 100
 current_level = 1
 current_xp = 0
 
+[sub_resource type="Resource" id="player_combat_mod"]
+script = ExtResource("6_combat_mod")
+states = []
+
 [resource]
 script = ExtResource("1_script")
 entity_name = "Player"
@@ -49,6 +54,7 @@ key = "player"
 components = {
 "body": SubResource("player_body"),
 "combat": SubResource("player_combat"),
+"combat_modifier": SubResource("player_combat_mod"),
 "inventory": SubResource("player_inv"),
 "progression": SubResource("player_prog")
 } 

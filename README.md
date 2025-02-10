@@ -212,8 +212,8 @@ add_child(chest)
 ```gdscript
 # Player attacking a monster
 func attack(target: Entity) -> void:
-    var damage = combat_component.power - target.combat_component.defense
-    target.combat_component.take_damage(damage)
+    var damage = components.combat.power - target.components.combat.defense
+    target.components.combat.take_damage(damage)
 ```
 
 ## Future Extensions

@@ -28,14 +28,14 @@ func perform() -> bool:
     return true
 
 func is_valid() -> bool:
-    if not _item.has_component(EquipmentComponent):
+    if not _item.components.equipment:
         return false
     
     # If a specific slot was requested, validate it
     if _target_slot != -1:
-        if not performer.has_component(BodyComponent):
+        if not performer.components.body:
             return false
-        var body = performer.get_component(BodyComponent)
+        var body = performer.components.body
         if not body.get_part_data(_target_slot).has("slots"):
             return false
     

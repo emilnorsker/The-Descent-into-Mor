@@ -1,27 +1,23 @@
-[gd_resource type="Resource" script_class="EntityBlueprint" load_steps=5 format=3]
+[gd_resource type="Resource" load_steps=5 format=3]
 
-[ext_resource type="Script" path="res://src/entity_blueprint.gd" ]
-[ext_resource type="Script" path="res://src/Components/Blueprints/weapon_component_blueprint.gd" ]
-[ext_resource type="Script" path="res://src/Components/Blueprints/damage_type_component_blueprint.gd" ]
-[ext_resource type="Script" path="res://src/Components/Blueprints/weight_component_blueprint.gd" ]
+[ext_resource type="Script" path="res://src/entity_blueprint.gd" id="1_bow"]
+[ext_resource type="Script" path="res://src/Components/Blueprints/weapon_component_blueprint.gd" id="2_bow"]
+[ext_resource type="Script" path="res://src/Components/Blueprints/damage_type_component_blueprint.gd" id="3_bow"]
+[ext_resource type="Script" path="res://src/Components/Blueprints/weight_component_blueprint.gd" id="4_bow"]
 
 [sub_resource type="Resource" ]
-script = ExtResource("2_0")
+script = ExtResource("2_bow")
 damage = 2
 range = 6
 
 [sub_resource type="Resource" ]
-script = ExtResource("3_0")
+script = ExtResource("3_bow")
 type = 1
 
 [sub_resource type="Resource" ]
-script = ExtResource("4_0")
+script = ExtResource("4_bow")
 weight = 1.0
 
 [resource]
-script = ExtResource("")
+script = ExtResource("1_bow")
 entity_name = "Bow"
-blocks_movement = false
-type = 1
-key = "bow"
-components = [SubResource("1"), SubResource("2"), SubResource("3")] 

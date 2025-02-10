@@ -4,9 +4,8 @@ extends Action
 
 
 func perform() -> bool:
-    var destination: Vector2i = get_destination()
     
-    if not GameMap.get_blocking_entity_at_location(destination):
+    if not GameMap.get_blocking_entity_at_location(target.grid_position):
         var offset = target.grid_position - performer.grid_position
         performer.move(offset)
         return true

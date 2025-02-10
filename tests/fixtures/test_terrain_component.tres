@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="TerrainComponentBlueprint" load_steps=2 format=3 uid="uid://test_terrain"]
 
-[ext_resource type="Script" path="res://src/Entities/Terrain/Components/Blueprints/terrain_component_blueprint.gd" id="1_script"]
+[ext_resource type="Script" path="res://src/Components/Blueprints/terrain_component_blueprint.gd" id="1_script"]
 
 [resource]
 script = ExtResource("1_script")

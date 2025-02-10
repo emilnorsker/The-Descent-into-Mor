@@ -23,10 +23,10 @@ func perform() -> bool:
         return false
         
     # Try to use item based on its components
-    if item.item_component:
+    if item.components.item:
         return EquipAction.new(performer, item).perform()
-    elif item.consumable_component:
-        return item.consumable_component.activate(self)
+    elif item.components.consumable:
+        return item.components.consumable.activate(self)
     else:
         # Trying to use an invalid item causes self-damage
         var body = performer.body

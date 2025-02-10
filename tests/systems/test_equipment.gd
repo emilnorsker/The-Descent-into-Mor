@@ -15,7 +15,7 @@ func before_each() -> void:
     body = entity.body
     equipment = entity.equipment
    
-    body = entity.body_component
+    body = entity.components.body
     equipment = entity.components.equipment
     add_child_autofree(equipment)
 

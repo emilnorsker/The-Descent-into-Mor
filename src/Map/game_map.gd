@@ -207,14 +207,20 @@ func get_line(start: Vector2i, end: Vector2i) -> Array[Vector2i]:
     line.append(end)
     return line
 
+
+
+# TODO: This is a temporary function to process the turn. It should be replaced with a more generic system that can handle all the different types of actions.
 func process_turn() -> void:
     for entity in _entities:
+        print("Processing turn for entity: ", entity.entity_name)
         if entity.components.combat_modifier:
+            entity.components.combat_modifier.process_turn()
+            
             if entity.components.combat_modifier.has_state(Constants.StatusEffect.ABLAZE):
-                if entity.components.body.consciousness > 0:
-                    entity.components.body.apply_wound(Constants.BodyPart.CHEST, Constants.WoundType.MODERATE)
-                if entity.status:
-                    entity.components.combat_modifier.add_state(Constants.StatusEffect.PANICKED)
+                if entity.components.body and entity.components.body.consciousness > 0:
+                    entity.components.body.apply_wound(Constants.WoundType.MODERATE, Constants.BodyPart.CHEST)
+                if entity.components.combat_modifier.has_state(Constants.StatusEffect.PANICKED):
+                    entity.components.combat_modifier.apply_state(Constants.StatusEffect.PANICKED)
             if entity.components.combat_modifier.has_state(Constants.StatusEffect.BLEEDING):
-                if entity.components.body.consciousness > 0:
-                    entity.components.body.add_consciousness(1)
+                if entity.components.body and entity.components.body.consciousness > 0:
+                    entity.components.body.add_consciousness(2)
