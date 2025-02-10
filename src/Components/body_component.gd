@@ -33,7 +33,7 @@ enum WoundEffect {
 }
 
 var parts: Dictionary = {}
-var wounds = {}  # Dictionary of BodyPart -> Array of Wound
+var wounds: Dictionary = {}  # Dictionary of BodyPart -> Array of Wound
 var consciousness = 0
 var is_dead = false
 
@@ -43,7 +43,7 @@ class Wound:
     var severity: int  # 1-5
     var bleeding_rate: int
     var treatment_level: int  # 0 = untreated, 1 = bandaged, 2 = stitched
-    
+    var part: BodyPart
     func _init(p_type: int, p_severity: int):
         type = p_type
         severity = p_severity
@@ -172,7 +172,28 @@ func die() -> void:
     is_dead = true
     emit_signal("died")
 
-func get_wounds_of_type(type: int) -> Array:
+
+func has_any_wound(type: WoundType) -> bool:
+    for part in wounds.keys():
+        for wound in wounds[part]:
+            if wound.type == type:
+                return true
+    return false
+
+func get_wounds(part = null) -> Array:
+    if part:
+        assert(part is BodyPart, "ERROR: You must give part a value.");
+
+        return wounds[part]
+    else:
+        var wounds_arr = []
+        for part in wounds.keys():
+            for wound in wounds[part]:
+                wound.part = part
+                wounds_arr.append(wound)
+        return wounds_arr
+
+func get_wounds_of_type(type: WoundType) -> Array:
     var result = []
     for part in wounds.keys():
         for wound in wounds[part]:

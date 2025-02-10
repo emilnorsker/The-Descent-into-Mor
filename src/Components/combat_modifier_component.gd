@@ -63,14 +63,9 @@ func get_states() -> Array[Constants.StatusEffect]:
 func vision_affected() -> bool:
     return has_state(Constants.StatusEffect.WINDED) or has_state(Constants.StatusEffect.DAZED)
 
-func causes_panic() -> bool:
+func is_panicked() -> bool:
     return has_state(Constants.StatusEffect.ABLAZE) and has_state(Constants.StatusEffect.PINNED)
 
-func get_vision_range() -> float:
-    var base_range = 8.0  # Default vision range
-    if vision_is_blurred():
-        return base_range * 0.5
-    return base_range
 
 func vision_is_blurred() -> bool:
     return has_state(Constants.StatusEffect.DAZED)

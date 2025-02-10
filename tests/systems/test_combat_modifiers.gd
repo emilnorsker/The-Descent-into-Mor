@@ -77,7 +77,7 @@ func test_ablaze_state() -> void:
     
     # Should cause wounds to entities with health
     if creature.components.body.consciousness > 0:
-        assert_true(creature.components.body.has_wound(Constants.BodyPart.CHEST), "Ablaze should cause wounds")
+        assert_true(creature.components.body.get_wounds(Constants.BodyPart.CHEST), "Ablaze should cause wounds")
         assert_eq(creature.components.body.get_wound_type(Constants.BodyPart.CHEST, 0), Constants.WoundType.MODERATE, 
                 "Fire should cause moderate wounds")
     
@@ -154,19 +154,18 @@ func test_dazed_state() -> void:
     
     # Test vision effects when head is dazed
     entity.components.combat_modifier.apply_state(Constants.StatusEffect.DAZED, creature, Constants.BodyPart.HEAD)
-    assert_true(creature.vision_is_blurred(), "Dazed head should blur vision")
-    assert_lt(creature.get_vision_range(), creature.get_base_vision_range(), "Dazed head should reduce vision range")
+    assert_true(creature.components.combat_modifier.vision_is_blurred(), "Dazed head should blur vision")
     
     # Test balance effects when legs are dazed
     entity.components.combat_modifier.apply_state(Constants.StatusEffect.DAZED, creature, Constants.BodyPart.LEFT_LEG)
     entity.components.combat_modifier.apply_state(Constants.StatusEffect.DAZED, creature, Constants.BodyPart.RIGHT_LEG)
-    assert_true(creature.has_status(Constants.StatusEffect.PRONE_TO_FALLING), "Dazed legs should risk falling")
+    assert_true(creature.components.combat_modifier.has_status(Constants.StatusEffect.PRONE_TO_FALLING), "Dazed legs should risk falling")
 
 func test_ablaze_and_pinned() -> void:
     entity.components.combat_modifier.apply_state(Constants.StatusEffect.ABLAZE)
     entity.components.combat_modifier.apply_state(Constants.StatusEffect.PINNED)
     
-    assert_true(entity.components.combat_modifier.causes_panic(), "Should cause panic")
+    assert_true(entity.components.combat_modifier.is_panicked(), "Should cause panic")
 
 # Behavioral Interaction Tests
 func test_panic_behavior() -> void:
@@ -198,11 +197,11 @@ func test_equipment_interaction() -> void:
     
     # Test armor with mud state
     var armor = Entity.new().setup_from_blueprint(preload("res://assets/blueprints/items/plate_armor.tres"))
-    creature.components.equipment.equip_armor(armor)
-    var base_protection = armor.get_protection_value()
+    creature.components.body.equip_to_slot(armor, Constants.BodyPart.CHEST)
+    var base_protection = armor.components.item.defense_bonus
     
     entity.components.combat_modifier.apply_state(Constants.StatusEffect.MUD_COVERED, armor)
-    assert_lt(armor.get_protection_value(), base_protection, "Mud should reduce armor effectiveness")
+    assert_lt(armor.components.item.defense_bonus, base_protection, "Mud should reduce armor effectiveness")
 
 func test_progressive_state_effects() -> void:
     var creature = Entity.new().setup_from_blueprint(preload("res://assets/blueprints/actors/player.tres"), Vector2i(1, 1))

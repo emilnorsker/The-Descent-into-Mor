@@ -152,7 +152,7 @@ func test_component_misuse() -> void:
     var result = item_action.perform()
     
     assert_false(result, "Should not be able to consume armor")
-    assert_true(body.has_wound(BodyPart.HEAD), "Should get head wound from biting metal")
+    assert_true(body.get_wounds(BodyPart.HEAD), "Should get head wound from biting metal")
     assert_eq(body.get_wound_type(BodyPart.HEAD, 0), Constants.WoundType.LIGHT, 
             "Should be light wound from biting metal")
     
@@ -164,7 +164,7 @@ func test_component_misuse() -> void:
     result = equip_action.perform()
     
     assert_false(result, "Should not be able to equip consumable")
-    assert_true(body.has_wound(BodyPart.RIGHT_ARM), "Should get arm wound from trying to wear potion")
+    assert_true(body.get_wounds(BodyPart.RIGHT_ARM), "Should get arm wound from trying to wear potion")
     
     # Test improvised weapon damage
     var bandage = Entity.new()

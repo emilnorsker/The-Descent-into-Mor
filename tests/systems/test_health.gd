@@ -84,9 +84,9 @@ func after_each() -> void:
 func test_apply_wound() -> void:
     body.apply_wound(BodyPart.LEFT_ARM, WoundType.LIGHT)
     
-    assert_true(body.has_wound(BodyPart.LEFT_ARM), "Left arm should be wounded")
-    assert_eq(body.get_wound_count(BodyPart.LEFT_ARM), 1, "Should have one wound")
-    assert_eq(body.get_wound_type(BodyPart.LEFT_ARM, 0), WoundType.LIGHT, "Should be light wound")
+    assert_true(body.get_wounds(BodyPart.LEFT_ARM), "Left arm should be wounded")
+    assert_eq(body.get_wounds(BodyPart.LEFT_ARM).size(), 1, "Should have one wound")
+    assert_eq(body.get_wounds(BodyPart.LEFT_ARM)[0].type, WoundType.LIGHT, "Should be light wound")
 
 func test_vital_hit() -> void:
     watch_signals(body)
@@ -156,7 +156,7 @@ func test_natural_healing() -> void:
     for i in range(5):
         body.process_recovery()
     
-    assert_false(body.has_wound(BodyPart.LEFT_LEG), "Light wound should heal naturally")
+    assert_false(body.get_wounds(BodyPart.LEFT_LEG), "Light wound should heal naturally")
 
 func test_severe_wound_recovery() -> void:
     body.apply_wound(BodyPart.CHEST, WoundType.SEVERE)

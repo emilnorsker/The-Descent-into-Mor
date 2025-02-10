@@ -40,7 +40,7 @@ func test_slash_damage() -> void:
         
     assert_true(result, "Slash action should succeed")
     assert_lt(target.components.body.consciousness, initial_consciousness, "Target should take slash damage")
-    assert_true(target.components.body.has_wound(WoundType.BLEEDING), "Slash should cause bleeding")
+    assert_true(target.components.body.get_wounds(WoundType.BLEEDING), "Slash should cause bleeding")
     assert_true(target.has_status(StatusEffect.BLEEDING), "Slash should cause wound")
 
 func test_pierce_damage() -> void:
@@ -56,7 +56,7 @@ func test_pierce_damage() -> void:
     
     assert_true(result, "Pierce action should succeed")
     assert_lt(target.components.body.consciousness, initial_consciousness, "Target should take pierce damage")
-    assert_true(target.components.body.has_wound(WoundType.DEEP), "Pierce should cause deep wound")
+    assert_true(target.components.body.get_wounds(WoundType.DEEP), "Pierce should cause deep wound")
 
 func test_blunt_damage() -> void:
     var blunt_action = CombatAction.new(attacker, {
