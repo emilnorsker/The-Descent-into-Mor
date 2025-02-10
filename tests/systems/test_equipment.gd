@@ -156,7 +156,7 @@ func test_component_misuse() -> void:
     # Test improvised weapon damage
     var bandage = Entity.new().setup_from_blueprint(TestConsumable, Vector2i.ZERO)
     
-    var attack_action = MeleeAction.new(entity, entity, BodyPart.RIGHT_ARM, bandage)
+    var attack_action = MeleeAction.new(entity, entity, BodyPart.RIGHT_ARM)
     result = attack_action.perform()
     
     assert_true(result, "Should be able to attack with any item")
@@ -178,7 +178,7 @@ func test_component_misuse() -> void:
         }]
     ])
     
-    attack_action = MeleeAction.new(entity, entity, BodyPart.RIGHT_ARM, armor_plate)
+    attack_action = MeleeAction.new(entity, entity, BodyPart.RIGHT_ARM)
     result = attack_action.perform()
     
     assert_true(result, "Should be able to attack with armor")

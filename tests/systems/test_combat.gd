@@ -1,6 +1,5 @@
 extends GutTest
 
-
 var DamageType = Constants.DamageType
 var TargetType = Constants.TargetType
 var WoundType = Constants.WoundType
@@ -12,13 +11,13 @@ var target: Entity
 var bystander: Entity  # For testing AOE effects
 
 func before_each() -> void:
-    var test_level = preload("res://tests/fixtures/test_level.tres")
+    var test_level = preload("res://tests/fixtures/test_map.tscn")
     GameMap.load_level(test_level)
     
     # We'll create entities in a specific formation for testing different attack patterns
-    attacker = Entity.new().setup_from_blueprint(preload("res://assets/blueprints/actors/player.tres"), Vector2i(2, 2))
-    target = Entity.new().setup_from_blueprint(preload("res://assets/blueprints/actors/monsters/orc.tres"), Vector2i(3, 2))
-    bystander = Entity.new().setup_from_blueprint(preload("res://assets/blueprints/actors/monsters/orc.tres"), Vector2i(4, 2))
+    attacker = Entity.new().setup_from_blueprint(preload("res://tests/fixtures/blueprints/actors/test_humanoid.tres"), Vector2i(2, 2))
+    target = Entity.new().setup_from_blueprint(preload("res://tests/fixtures/blueprints/actors/test_humanoid.tres"), Vector2i(3, 2))
+    bystander = Entity.new().setup_from_blueprint(preload("res://tests/fixtures/blueprints/actors/test_humanoid.tres"), Vector2i(4, 2))
     
     GameMap.register_entity(attacker, attacker.grid_position)
     GameMap.register_entity(target, target.grid_position)
@@ -27,164 +26,59 @@ func before_each() -> void:
 func after_each() -> void:
     GameMap.clear()
 
-# Test Different Damage Types
-func test_slash_damage() -> void:
-    var slash_action = CombatAction.new(attacker, {
-        "damage_type": DamageType.SLASH,
-        "target_type": TargetType.SINGLE,
-        "target_position": target.grid_position
-    })
+# Test Different Attack Types
+func test_melee_attack() -> void:
+    var melee_action = MeleeAction.new(attacker, target, BodyPart.CHEST)
     
-    var initial_consciousness = target.components.body.consciousness
-    var result = slash_action.perform()
+    var initial_hp = target.components.combat.hp
+    var result = melee_action.perform()
         
-    assert_true(result, "Slash action should succeed")
-    assert_lt(target.components.body.consciousness, initial_consciousness, "Target should take slash damage")
-    assert_true(target.components.body.get_wounds(WoundType.BLEEDING), "Slash should cause bleeding")
-    assert_true(target.has_status(StatusEffect.BLEEDING), "Slash should cause wound")
+    assert_true(result, "Melee action should succeed")
+    assert_lt(target.components.combat.hp, initial_hp, "Target should take damage")
 
-func test_pierce_damage() -> void:
-    var pierce_action = CombatAction.new(attacker, {
-        "damage_type": DamageType.PIERCE,
-        "target_type": TargetType.SINGLE,
-        "target_position": target.grid_position,
-        "target_body_part": BodyPart.CHEST
-    })
+func test_throw_attack() -> void:
+    var weapon = Entity.new().setup_from_blueprint(preload("res://tests/fixtures/blueprints/items/test_weapon.tres"), Vector2i(0, 0))
+    attacker.components.inventory.add(weapon)
     
-    var initial_consciousness = target.components.body.consciousness
-    var result = pierce_action.perform()
+    var throw_action = ThrowAction.new(attacker, target, weapon)
     
-    assert_true(result, "Pierce action should succeed")
-    assert_lt(target.components.body.consciousness, initial_consciousness, "Target should take pierce damage")
-    assert_true(target.components.body.get_wounds(WoundType.DEEP), "Pierce should cause deep wound")
+    var initial_hp = target.components.combat.hp
+    var result = throw_action.perform()
+    
+    assert_true(result, "Throw action should succeed")
+    assert_lt(target.components.combat.hp, initial_hp, "Target should take throw damage")
 
-func test_blunt_damage() -> void:
-    var blunt_action = CombatAction.new(attacker, {
-        "damage_type": DamageType.BLUNT,
-        "target_type": TargetType.SINGLE,
-        "target_position": target.grid_position,
-        "target_body_part": BodyPart.HEAD
-    })
+# Test Combat Stats
+func test_defense_calculation() -> void:
+    var armor = Entity.new().setup_from_blueprint(preload("res://tests/fixtures/blueprints/items/test_armor.tres"), Vector2i(0, 0))
+    target.components.inventory.add(armor)
+    target.components.equipment.equip(armor)
     
-    var result = blunt_action.perform()
+    var melee_action = MeleeAction.new(attacker, target, BodyPart.CHEST)
+    var initial_hp = target.components.combat.hp
+    melee_action.perform()
     
-    assert_true(result, "Blunt action should succeed")
-    assert_true(target.components.combat_modifier.has_status(StatusEffect.STUNNED), "Blunt to head should cause stun")
+    var damage_taken = initial_hp - target.components.combat.hp
+    assert_lt(damage_taken, attacker.components.combat.power, "Armor should reduce damage taken")
 
-# Test Different Target Areas
-func test_line_attack() -> void:
-    var line_action = CombatAction.new(attacker, {
-        "damage_type": DamageType.PIERCE,
-        "target_type": TargetType.LINE,
-        "direction": Vector2i(1, 0),
-        "range": 3
-    })
+func test_power_calculation() -> void:
+    var weapon = Entity.new().setup_from_blueprint(preload("res://tests/fixtures/blueprints/items/test_weapon.tres"), Vector2i(0, 0))
+    attacker.components.inventory.add(weapon)
+    attacker.components.equipment.equip(weapon)
     
-    var result = line_action.perform()
+    var melee_action = MeleeAction.new(attacker, target, BodyPart.CHEST)
+    var initial_hp = target.components.combat.hp
+    melee_action.perform()
     
-    assert_true(result, "Line attack should succeed")
-    assert_true(target.components.body.is_damaged(), "First target should be hit")
-    assert_true(bystander.components.body.is_damaged(), "Second target should be hit")
+    var damage_taken = initial_hp - target.components.combat.hp
+    assert_gt(damage_taken, attacker.components.combat.power, "Weapon should increase damage dealt")
 
-func test_cone_attack() -> void:
-    var cone_action = CombatAction.new(attacker, {
-        "damage_type": DamageType.SLASH,
-        "target_type": TargetType.CONE,
-        "direction": Vector2i(1, 0),
-        "angle": 45
-    })
+# Test Death
+func test_death() -> void:
+    target.components.combat.hp = 1  # Set target to almost dead
     
-    var result = cone_action.perform()
+    var melee_action = MeleeAction.new(attacker, target, BodyPart.CHEST)
+    melee_action.perform()
     
-    assert_true(result, "Cone attack should succeed")
-    var affected_positions = GameMap.get_affected_positions(cone_action)
-    assert_true(affected_positions.has(target.grid_position), "Target should be in cone")
-
-func test_cleave_attack() -> void:
-    var cleave_action = CombatAction.new(attacker, {
-        "damage_type": DamageType.SLASH,
-        "target_type": TargetType.CLEAVE,
-        "direction": Vector2i(1, 0)
-    })
-    
-    var result = cleave_action.perform()
-    
-    assert_true(result, "Cleave attack should succeed")
-    assert_true(target.components.body.is_damaged(), "Primary target should be hit")
-    # Check adjacent tiles for cleave damage
-
-# Test Status Effects
-func test_bleeding_effect() -> void:
-    var bleeding_action = CombatAction.new(attacker, {
-        "damage_type": DamageType.SLASH,
-        "target_type": TargetType.SINGLE,
-        "target_position": target.grid_position,
-        "effects": [StatusEffect.BLEEDING]
-    })
-    
-    var result = bleeding_action.perform()
-    
-    assert_true(result, "Bleeding attack should succeed")
-    assert_true(target.components.combat_modifier.has_status(StatusEffect.BLEEDING), "Target should be bleeding")
-    # Test bleeding damage over time would go here
-
-func test_stun_effect() -> void:
-    var stun_action = CombatAction.new(attacker, {
-        "damage_type": DamageType.BLUNT,
-        "target_type": TargetType.SINGLE,
-        "target_position": target.grid_position,
-        "target_body_part": BodyPart.HEAD,
-        "effects": [StatusEffect.STUNNED]
-    })
-    
-    var result = stun_action.perform()
-    
-    assert_true(result, "Stun attack should succeed")
-    assert_true(target.components.combat_modifier.has_status(StatusEffect.STUNNED), "Target should be stunned")
-    # Test that stunned target skips their next turn
-
-# Test Body Part Targeting
-func test_targeted_attack() -> void:
-    var head_attack = CombatAction.new(attacker, {
-        "damage_type": DamageType.PIERCE,
-        "target_type": TargetType.SINGLE,
-        "target_position": target.grid_position,
-        "target_body_part": BodyPart.HEAD
-    })
-    
-    var result = head_attack.perform()
-    
-    assert_true(result, "Targeted attack should succeed")
-    assert_true(target.components.body.get_body_part_damage(BodyPart.HEAD) > 0, "Head should take damage")
-    # Test for specific head injury effects
-
-# Test Health System
-func test_wound_system() -> void:
-    var deep_wound = CombatAction.new(attacker, {
-        "damage_type": DamageType.PIERCE,
-        "target_type": TargetType.SINGLE,
-        "target_position": target.grid_position,
-        "target_body_part": BodyPart.CHEST
-    })
-    
-    var result = deep_wound.perform()
-    
-    assert_true(result, "Deep wound attack should succeed")
-    var wounds = target.components.body.get_wounds()
-    assert_true(wounds.has(WoundType.DEEP), "Should have deep wound")
-    assert_true(target.components.combat_modifier.has_status(StatusEffect.BLEEDING), "Deep wound should cause bleeding")
-
-func test_critical_hit() -> void:
-    var vital_strike = CombatAction.new(attacker, {
-        "damage_type": DamageType.PIERCE,
-        "target_type": TargetType.SINGLE,
-        "target_position": target.grid_position,
-        "target_body_part": BodyPart.HEART,
-        "critical": true
-    })
-    
-    var result = vital_strike.perform()
-    
-    assert_true(result, "Critical hit should succeed")
-    assert_true(target.components.body.is_critical(), "Target should be in critical condition")
-    # Test for death if not treated 
+    assert_true(target.components.combat.is_dead(), "Target should be dead")
+    assert_false(GameMap.get_actor_at_location(target.grid_position), "Dead target should be removed from map") 

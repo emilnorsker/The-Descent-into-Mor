@@ -1,6 +1,6 @@
 [gd_resource type="TileSet" load_steps=2 format=3]
 
-[sub_resource type="TileSetAtlasSource" ]
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_feature"]
 texture_region_size = Vector2i(32, 32)
 0/name = "feature"
 0/texture_origin = Vector2i(0, 0)
@@ -13,4 +13,4 @@ texture_region_size = Vector2i(32, 32)
 tile_size = Vector2i(32, 32)
 custom_data_layer_0/name = "blueprint_path"
 custom_data_layer_0/type = 4
-sources/0 = SubResource("1") 
+sources/0 = SubResource("TileSetAtlasSource_feature") 

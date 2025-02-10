@@ -138,7 +138,7 @@ func test_death_conditions() -> void:
     
     # Test death from vital hit
     body.apply_wound(BodyPart.NECK, WoundType.FATAL)
-    assert_true(body.is_dead(), "Fatal neck wound should cause death")
+    assert_true(body.is_dead, "Fatal neck wound should cause death")
     assert_signal_emitted(body, "died")
     
     # Test death from blood loss
@@ -150,7 +150,7 @@ func test_death_conditions() -> void:
     for i in range(10):  # Simulate severe blood loss
         body.process_bleeding()
     
-    assert_true(body.is_dead(), "Excessive blood loss should cause death")
+    assert_true(body.is_dead, "Excessive blood loss should cause death")
 
 # Edge Cases
 func test_wound_on_dead_body() -> void:
