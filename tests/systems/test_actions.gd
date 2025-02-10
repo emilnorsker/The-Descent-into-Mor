@@ -1,19 +1,10 @@
 extends GutTest
 
-const MapScene = preload("res://src/Map/Map.tscn")
-const Level = preload("res://src/Map/level.gd")
-const Constants = preload("res://src/constants.gd")
-const ThrowAction = preload("res://src/Actions/throw_action.gd")
-
-var test_level: Level
 var attacker: Entity
 var target: Entity
 
-func before_each() -> void:
-    var map_scene = MapScene.instantiate()
-    add_child_autofree(map_scene)
-    
-    test_level = preload("res://tests/fixtures/test_level.tres")
+func before_each() -> void:    
+    var test_level = preload("res://tests/fixtures/test_level.tres")
     GameMap.load_level(test_level)
     
     # Create entities with body components

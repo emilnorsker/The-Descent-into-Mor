@@ -7,8 +7,8 @@ var equipment: EquipmentComponent
 var body: BodyComponent
 
 func before_each() -> void:
-    var map_scene = MapScene.instantiate()
-    add_child_autofree(map_scene)
+    var test_level = preload("res://tests/fixtures/test_level.tres")
+    GameMap.load_level(test_level)
     
     # Create test entity with body
     entity = Entity.new().setup_from_blueprint(preload("res://assets/blueprints/actors/player.tres"), Vector2i(1, 1))
@@ -162,8 +162,8 @@ func create_armor_entity(components: Array) -> Entity:
                 
             "MaterialComponent":
                 var material_blueprint = MaterialComponentBlueprint.new()
-                material_blueprint.material_type = data.get("type", "metal")
-                material_blueprint.is_flammable = data.get("flammable", false)
+                material_blueprint.material_type = "metal"
+                material_blueprint.is_flammable = false
                 blueprint.material_blueprint = material_blueprint
                 
             "WeightComponent":

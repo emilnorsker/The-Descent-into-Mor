@@ -1,6 +1,7 @@
 class_name MaterialComponent
 extends Component
 
+# TODO: add getters and setters
 var _is_flammable: bool = false
 var _is_slippery: bool = false
 var material_type: String = "none"
@@ -18,13 +19,13 @@ func setup_from_blueprint(blueprint: Resource) -> Component:
 
     return self
 
-func get_is_flammable() -> bool:
+func is_flammable() -> bool:
     var parent = get_parent() as Entity
     if parent and parent.components.combat_modifier:
         return _is_flammable or parent.components.combat_modifier.has_state(Constants.StatusEffect.OILED)
     return _is_flammable
 
-func get_is_slippery() -> bool:
+func is_slippery() -> bool:
     var parent = get_parent() as Entity
     if parent and parent.components.combat_modifier:
         return _is_slippery or parent.components.combat_modifier.has_state(Constants.StatusEffect.OILED)

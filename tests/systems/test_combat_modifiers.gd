@@ -1,14 +1,12 @@
 extends GutTest
 
-const MapScene = preload("res://src/Map/Map.tscn")
 const Level = preload("res://src/Map/level.gd")
 
 var entity: Entity
-var map_scene: Node
 
 func before_each() -> void:
-    map_scene = MapScene.instantiate()
-    add_child_autofree(map_scene)
+    var test_level = preload("res://tests/fixtures/test_level.tres")
+    GameMap.load_level(test_level)
     
     # Create test entity with combat modifier component
     var blueprint = preload("res://assets/blueprints/actors/player.tres")
@@ -32,6 +30,13 @@ func after_each() -> void:
 func test_oiled_state() -> void:
     # Test floor tile effects
     var floor_tile = Entity.new().setup_from_blueprint(preload("res://assets/blueprints/terrain/floor.tres"), Vector2i(1, 1))
+    GameMap.register_entity(floor_tile, floor_tile.grid_position)
+    
+    if not floor_tile.components.combat_modifier:
+        var combat_modifier = CombatModifierComponent.new()
+        floor_tile.components["combat_modifier"] = combat_modifier
+        floor_tile.add_child(combat_modifier)
+    
     entity.components.combat_modifier.apply_state(Constants.StatusEffect.OILED, floor_tile)
     
     # Test creature movement on oiled floor
@@ -43,7 +48,7 @@ func test_oiled_state() -> void:
     
     
     if creature.roll(3):  # Failed check (1-3 fails, 4-6 succeeds)
-        assert_true(creature.compoents.combat_modifier.has_status(Constants.StatusEffect.PRONE), "Should fall prone on oiled floor")
+        assert_true(creature.components.combat_modifier.has_status(Constants.StatusEffect.PRONE), "Should fall prone on oiled floor")
     
     # Test entity being oiled
     var weapon = Entity.new().setup_from_blueprint(preload("res://assets/blueprints/items/sword.tres"), Vector2i(1, 1))

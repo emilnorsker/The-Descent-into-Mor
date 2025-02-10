@@ -1,8 +1,5 @@
 extends GutTest
 
-const MapScene = preload("res://src/Map/Map.tscn")
-const Level = preload("res://src/Map/level.gd")
-const Constants = preload("res://src/constants.gd")
 
 var DamageType = Constants.DamageType
 var TargetType = Constants.TargetType
@@ -10,16 +7,12 @@ var WoundType = Constants.WoundType
 var BodyPart = Constants.BodyPart
 var StatusEffect = Constants.StatusEffect
 
-var test_level: Level
 var attacker: Entity  # We'll use this instead of 'player' to be more generic
 var target: Entity
 var bystander: Entity  # For testing AOE effects
 
 func before_each() -> void:
-    var map_scene = MapScene.instantiate()
-    add_child_autofree(map_scene)
-    
-    test_level = preload("res://tests/fixtures/test_level.tres")
+    var test_level = preload("res://tests/fixtures/test_level.tres")
     GameMap.load_level(test_level)
     
     # We'll create entities in a specific formation for testing different attack patterns

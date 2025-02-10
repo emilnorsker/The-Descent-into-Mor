@@ -81,7 +81,7 @@ func setup_from_blueprint(blueprint: Resource, position: Vector2i = Vector2i.ZER
                         components.light.setup_from_blueprint(component_blueprint)
                         add_child(components.light)
                     "material":
-                        print(component_blueprint.material)
+                        print(component_blueprint.material_type)
                         components.material = MaterialComponent.new()
                         components.material.setup_from_blueprint(component_blueprint)
                         add_child(components.material)

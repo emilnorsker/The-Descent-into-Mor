@@ -1,24 +1,14 @@
 extends GutTest
 
-const MapScene = preload("res://src/Map/Map.tscn")
-const Level = preload("res://src/Map/level.gd")
-
-var test_level: Level
 var player: Entity
 var orc: Entity
 var sword: Entity
 
 func before_each() -> void:
-    # Initialize GameMap scene
-    var map_scene = MapScene.instantiate()
-    add_child_autofree(map_scene)
-    
-    # Load test level resource
-    test_level = preload("res://tests/fixtures/test_level.tres")
-    
-    # Initialize GameMap with test level
+    var test_level = preload("res://tests/fixtures/test_level.tres")
     GameMap.load_level(test_level)
     
+
     # Create test entities with real blueprints
     var player_blueprint = preload("res://assets/blueprints/actors/player.tres")
     var orc_blueprint = preload("res://assets/blueprints/actors/monsters/orc.tres")
@@ -50,7 +40,6 @@ func test_basic_tile_layer_stacking() -> void:
     GameMap.clear()
     
     var pos = Vector2i(1, 1)
-    print("\nTesting basic tile layer stacking...")
     
     # Load only the basic layers
     for element in test_level.floors:

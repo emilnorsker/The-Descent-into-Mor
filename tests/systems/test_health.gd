@@ -1,6 +1,5 @@
 extends GutTest
 
-const MapScene = preload("res://src/Map/Map.tscn")
 const Level = preload("res://src/Map/level.gd")
 const Constants = preload("res://src/constants.gd")
 
@@ -14,8 +13,8 @@ var entity: Entity
 var body: BodyComponent
 
 func before_each() -> void:
-    var map_scene = MapScene.instantiate()
-    add_child_autofree(map_scene)
+    var test_level = preload("res://tests/fixtures/test_level.tres")
+    GameMap.load_level(test_level)
     
     # Create test entity with body
     entity = Entity.new()
