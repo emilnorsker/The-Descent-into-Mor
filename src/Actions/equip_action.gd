@@ -1,12 +1,42 @@
+@tool
 class_name EquipAction
 extends Action
 
 var _item: Entity
+var _target_slot: int = -1  # Default to no specific slot
 
-func _init(entity: Entity, item: Entity) -> void:
-	super._init(entity, entity)  # Both performer and target are the same entity
-	_item = item
+func _init(entity: Entity, item: Entity, target_slot: int = -1) -> void:
+    super(entity, entity)  # Both performer and target are the same entity
+    _item = item
+    _target_slot = target_slot
 
 func perform() -> bool:
-	performer.equipment_component.toggle_equip(_item)
-	return true
+    if not _item.equipment:
+        return false
+    
+    if not performer.body:
+        return false
+    
+    var body = performer.body
+    
+    # Check if item can be equipped to target body part
+    if not body.can_equip(_item, _target_slot):
+        return false
+    
+    # Equip the item
+    performer.equipment.equip(_item, _target_slot)
+    return true
+
+func is_valid() -> bool:
+    if not _item.has_component(EquipmentComponent):
+        return false
+    
+    # If a specific slot was requested, validate it
+    if _target_slot != -1:
+        if not performer.has_component(BodyComponent):
+            return false
+        var body = performer.get_component(BodyComponent)
+        if not body.get_part_data(_target_slot).has("slots"):
+            return false
+    
+    return true

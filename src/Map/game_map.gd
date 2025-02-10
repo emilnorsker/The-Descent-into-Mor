@@ -1,18 +1,14 @@
-@tool
 class_name Map extends Node
-
-const Level = preload("res://src/Map/level.gd")
-const LevelElement = preload("res://src/Map/level_element.gd")
 
 var floor_layer: TileMapLayer
 var feature_layer: TileMapLayer
 var fixture_layer: TileMapLayer
 
-var _entities: Array[Entity] = []
-var active_entities: Array[Entity] = [] # All non-terrain entities
-var _blocking_positions: Dictionary = {} # Vector2i -> Array[Entity]
-var opaque_positions: Dictionary = {} # Vector2i -> bool
-var player: Entity # Reference to the player entity
+var _entities: = []
+var active_entities: = [] 
+var _blocking_positions: Dictionary = {} 
+var opaque_positions: Dictionary = {} 
+var player: Entity
 
 # Signals
 signal entity_added(entity: Entity, pos: Vector2i)
@@ -30,27 +26,27 @@ func load_level(level: Level) -> void:
     
     # Load floors
     for element in level.floors:
-        var entity = Entity.from_blueprint(element.blueprint, element.position)
+        var entity = Entity.new().setup_from_blueprint(element.blueprint, element.position)
         register_entity(entity, element.position)
     
     # Load surfaces
     for element in level.surfaces:
-        var entity = Entity.from_blueprint(element.blueprint, element.position)
+        var entity = Entity.new().setup_from_blueprint(element.blueprint, element.position)
         register_entity(entity, element.position)
     
     # Load objects
     for element in level.objects:
-        var entity = Entity.from_blueprint(element.blueprint, element.position)
+        var entity = Entity.new().setup_from_blueprint(element.blueprint, element.position)
         register_entity(entity, element.position)
     
     # Load items
     for element in level.items:
-        var entity = Entity.from_blueprint(element.blueprint, element.position)
+        var entity = Entity.new().setup_from_blueprint(element.blueprint, element.position)
         register_entity(entity, element.position)
     
     # Load entities
     for element in level.entities:
-        var entity = Entity.from_blueprint(element.blueprint, element.position)
+        var entity = Entity.new().setup_from_blueprint(element.blueprint, element.position)
         register_entity(entity, element.position)
 
 func clear() -> void:
@@ -107,7 +103,7 @@ func register_entity(entity: Entity, position: Vector2i) -> void:
             return a_weight < b_weight
         )
         
-    if entity.is_blocking_movement():
+    if entity.blocks_movement:
         if not position in _blocking_positions:
             _blocking_positions[position] = []
         _blocking_positions[position].append(entity)
@@ -122,7 +118,7 @@ func erase(entity: Entity) -> void:
     
     _entities.erase(entity)
     
-    if entity.is_blocking_movement() and position in _blocking_positions:
+    if entity.blocks_movement and position in _blocking_positions:
         _blocking_positions[position].erase(entity)
         if _blocking_positions[position].is_empty():
             _blocking_positions.erase(position)
@@ -133,9 +129,8 @@ func erase(entity: Entity) -> void:
     entity_removed.emit(entity, position)
     position_contents_changed.emit(position)
 
-func move_entity(entity: Entity, to_pos: Vector2i) -> void:
-    var from_pos = entity.grid_position
-    if entity.is_blocking_movement():
+func move_entity(entity: Entity, from_pos: Vector2i, to_pos: Vector2i) -> void:
+    if entity.blocks_movement:
         if from_pos in _blocking_positions:
             _blocking_positions[from_pos].erase(entity)
             if _blocking_positions[from_pos].is_empty():
@@ -150,13 +145,10 @@ func move_entity(entity: Entity, to_pos: Vector2i) -> void:
     position_contents_changed.emit(to_pos)
 
 func get_entities_at(pos: Vector2i) -> Array[Entity]:
-    print("Getting entities at position: ", pos)
     var entities = _entities.filter(func(e):
         var at_pos = e.grid_position == pos
-        print("Entity ", e, " at ", e.grid_position, " matches ", pos, ": ", at_pos)
         return at_pos
     )
-    print("Found ", entities.size(), " entities at position ", pos)
     return entities
 
 func get_entities_of_type_at(pos: Vector2i, type: Entity.EntityType) -> Array[Entity]:
@@ -178,6 +170,51 @@ func get_movement_cost_at(pos: Vector2i) -> float:
 func get_blocking_entity_at_location(pos: Vector2i) -> Entity:
     var entities = get_entities_at(pos)
     for entity in entities:
-        if entity.is_blocking_movement():
+        if entity.blocks_movement:
             return entity
     return null
+
+func is_line_of_sight_blocked(from_pos: Vector2i, to_pos: Vector2i) -> bool:
+    var line = get_line(from_pos, to_pos)
+    for pos in line:
+        for entity in get_entities_at(pos):
+            if entity.blocks_sight():
+                return true
+    return false
+
+func get_line(start: Vector2i, end: Vector2i) -> Array[Vector2i]:
+    var line: Array[Vector2i] = []
+    var x = start.x
+    var y = start.y
+    var dx = end.x - start.x
+    var dy = end.y - start.y
+    var step_x = 1 if dx > 0 else -1 if dx < 0 else 0
+    var step_y = 1 if dy > 0 else -1 if dy < 0 else 0
+    var longest = abs(dx) if abs(dx) > abs(dy) else abs(dy)
+    var shortest = abs(dy) if abs(dx) > abs(dy) else abs(dx)
+    var error = longest / 2
+    
+    while x != end.x or y != end.y:
+        line.append(Vector2i(x, y))
+        var e2 = error
+        if e2 > -longest:
+            error -= shortest
+            x += step_x
+        if e2 < shortest:
+            error += longest
+            y += step_y
+    
+    line.append(end)
+    return line
+
+func process_turn() -> void:
+    for entity in _entities:
+        if entity.components.combat_modifier:
+            if entity.components.combat_modifier.has_state(Constants.StatusEffect.ABLAZE):
+                if entity.components.body.consciousness > 0:
+                    entity.components.body.apply_wound(Constants.BodyPart.CHEST, Constants.WoundType.MODERATE)
+                if entity.status:
+                    entity.components.combat_modifier.add_state(Constants.StatusEffect.PANICKED)
+            if entity.components.combat_modifier.has_state(Constants.StatusEffect.BLEEDING):
+                if entity.components.body.consciousness > 0:
+                    entity.components.body.add_consciousness(1)

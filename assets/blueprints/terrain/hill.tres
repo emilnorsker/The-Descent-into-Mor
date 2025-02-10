@@ -8,10 +8,3 @@ entity_name = "Hill"
 blocks_movement = false
 type = 3  # EntityType.TERRAIN
 key = "hill"
-components = [{
-	"name": "TerrainComponent",
-	"properties": {
-		"elevation": 1,
-		"movement_cost": 1.5
-	}
-}] 

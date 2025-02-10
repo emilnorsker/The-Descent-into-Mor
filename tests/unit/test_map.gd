@@ -56,7 +56,7 @@ class TestMapInteraction:
     
     func test_blocking_entity_blocks_position() -> void:
         var pos = Vector2i(1, 1)
-        test_entity.is_blocking_movement = func(): return true
+        test_entity.blocks_movement = func(): return true
         
         test_map.register_entity(test_entity, pos)
         assert_true(test_map.is_position_blocked(pos), "Position should be blocked")

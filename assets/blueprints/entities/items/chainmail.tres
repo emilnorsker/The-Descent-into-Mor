@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="EntityBlueprint" load_steps=6 format=3 uid="uid://ckwdkjwfq53rp"]
 
-[ext_resource type="Script" path="res://src/Entities/Actors/Components/Blueprints/equippable_component_blueprint.gd" id="1_4lksx"]
+[ext_resource type="Script" path="res://src/Entities/Actors/Components/Blueprints/item_component_blueprint.gd" id="1_4lksx"]
 [ext_resource type="Script" path="res://src/Entities/entity_blueprint.gd" id="1_a8epg"]
 [ext_resource type="Texture2D" uid="uid://h7i8uiwlysq2" path="res://assets/images/kenney_1-bit-pack/monochrome_packed.png" id="3_m2yff"]
 

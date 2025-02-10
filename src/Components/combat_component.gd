@@ -1,67 +1,110 @@
-class_name CombatComponent
-extends Component
+@tool
+class_name CombatComponent extends Component
 
 signal died
 
+var _max_hp: int = 30
+var _defense: int = 2
+var _power: int = 5
+var _hp: int = _max_hp
+
+@export var max_hp: int:
+    get:
+        return _max_hp
+    set(value):
+        _max_hp = value
+        _hp = mini(_hp, _max_hp)  # Ensure HP doesn't exceed new max
+
+@export var defense: int:
+    get:
+        return _defense
+    set(value):
+        _defense = value
+
+@export var power: int:
+    get:
+        return _power
+    set(value):
+        _power = value
+
+@export var hp: int:
+    get:
+        return _hp
+    set(value):
+        _hp = mini(value, _max_hp)  # Ensure HP doesn't exceed max
+
+func _init() -> void:
+    super()
+    name = "CombatComponent"
+
+func setup_from_blueprint(blueprint: Resource) -> CombatComponent:
+    if blueprint:
+        max_hp = blueprint.max_hp
+        defense = blueprint.defense
+        power = blueprint.power
+        hp = blueprint.max_hp
+
+    return self
+
 func is_dead() -> bool:
-	return data.hp <= 0
+    return hp <= 0
 
 func heal(amount: int) -> void:
-	if is_dead():
-		return
-		
-	var old_hp: int = data.hp
-	data.hp = mini(data.hp + amount, data.max_hp)
-	var amount_recovered: int = data.hp - old_hp
-	
-	if amount_recovered > 0:
-		SignalBus.message_sent.emit(
-			"%s recovers %d HP!" % [entity.get_entity_name(), amount_recovered],
-			Color.GREEN
-		)
+    if is_dead():
+        return
+        
+    var old_hp: int = hp
+    hp = mini(hp + amount, max_hp)
+    var amount_recovered: int = hp - old_hp
+    
+    if amount_recovered > 0:
+        SignalBus.message_sent.emit(
+            "%s recovers %d HP!" % [get_parent().get_entity_name(), amount_recovered],
+            Color.GREEN
+        )
 
 func take_damage(amount: int) -> void:
-	data.hp -= amount
-	SignalBus.message_sent.emit(
-		"%s takes %d damage!" % [entity.get_entity_name(), amount],
-		Color.RED
-	)
-	
-	if is_dead():
-		die()
+    hp -= amount
+    SignalBus.message_sent.emit(
+        "%s takes %d damage!" % [get_parent().get_entity_name(), amount],
+        Color.RED
+    )
+    
+    if is_dead():
+        die()
 
 func die() -> void:
-	if entity.has_component("InventoryComponent"):
-		var inventory: InventoryComponent = entity.inventory_component
-		for item: Entity in inventory.items():
-			inventory.drop(item)
-	
-	GameMap.erase(entity)
-	
-	if entity.has_component("LightComponent"):
-		entity.light_component.queue_free()
-	
-	died.emit()
-	entity.queue_free()
+    var parent = get_parent() as Entity
+    if parent.inventory:
+        for item: Entity in parent.inventory.items():
+            parent.inventory.drop(item)
+    
+    GameMap.erase(parent)
+    
+    if parent.light:
+        parent.light.queue_free()
+    
+    died.emit()
+    parent.queue_free()
 
-func max_hp() -> int:
-	return data.max_hp
+func get_max_hp() -> int:
+    return max_hp
 
-func current_hp() -> int:
-	return data.hp
+func get_current_hp() -> int:
+    return hp
 
-func defense() -> int:
-	return data.defense + defense_bonus()
+func get_defense() -> int:
+    return defense + get_defense_bonus()
 
-func power() -> int:
-	return data.power + power_bonus()
+func get_power() -> int:
+    return power + get_power_bonus()
 
-func defense_bonus() -> int:
-	if entity.equipment_component:
-		return entity.equipment_component.defense_bonus()
-	return 0
+func get_defense_bonus() -> int:
+    if get_parent().components.equipment:
+        return get_parent().components.equipment.defense_bonus()
+    return 0
 
-func power_bonus() -> int:
-	if entity.equipment_component:
-		return entity.equipment_component.power_bonus()
-	return 0
+func get_power_bonus() -> int:
+    if get_parent().components.equipment:
+        return get_parent().components.equipment.power_bonus()
+    return 0

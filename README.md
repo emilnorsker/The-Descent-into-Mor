@@ -48,7 +48,7 @@ Templates are data-only resources that define component initialization:
 ```gdscript
 ItemComponentTemplate
 ├── ConsumableComponentTemplate
-└── EquippableComponentTemplate
+└── ItemComponentTemplate
 
 CombatComponentTemplate
 ProgressionComponentTemplate

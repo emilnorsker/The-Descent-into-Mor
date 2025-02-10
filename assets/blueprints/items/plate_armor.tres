@@ -1,26 +1,42 @@
-[gd_resource type="Resource" script_class="EntityBlueprint" load_steps=5 format=3]
+[gd_resource type="Resource" script_class="EntityBlueprint" load_steps=6 format=3]
 
-[ext_resource type="Script" path="res://src/entity_blueprint.gd" id="1_0"]
-[ext_resource type="Script" path="res://src/Components/Blueprints/armor_component_blueprint.gd" id="2_0"]
-[ext_resource type="Script" path="res://src/Components/Blueprints/weight_component_blueprint.gd" id="3_0"]
-[ext_resource type="Script" path="res://src/Components/Blueprints/material_component_blueprint.gd" id="4_0"]
+[ext_resource type="Script" path="res://src/entity_blueprint.gd" id="1_script"]
+[ext_resource type="Script" path="res://src/Components/Blueprints/equipment_component_blueprint.gd" id="2_equip"]
+[ext_resource type="Script" path="res://src/Components/Blueprints/material_component_blueprint.gd" id="3_material"]
+[ext_resource type="Script" path="res://src/Components/Blueprints/weight_component_blueprint.gd" id="4_weight"]
+[ext_resource type="Script" path="res://src/Components/Blueprints/item_component_blueprint.gd" id="5_item"]
 
 [sub_resource type="Resource" id="1"]
-script = ExtResource("2_0")
-slot = "cuirass"
-protection = 4
+script = ExtResource("2_equip")
+equipment_type = 2  # Armor
+power_bonus = 0
+defense_bonus = 4
 
 [sub_resource type="Resource" id="2"]
-script = ExtResource("3_0")
-weight = 8.0
+script = ExtResource("3_material")
+material_type = "metal"
+is_flammable = false
+is_slippery = false
 
 [sub_resource type="Resource" id="3"]
-script = ExtResource("4_0")
-type = "metal"
+script = ExtResource("4_weight")
+weight = 8.0
+affects_balance = true
+balance_penalty = 2.0
+
+[sub_resource type="Resource" id="4"]
+script = ExtResource("5_item")
+value = 100
+stackable = false
+max_stack = 1
 
 [resource]
-script = ExtResource("1_0")
-name = "Plate Armor"
-type = 1
-is_blocking_movement = false
-components = [SubResource("1"), SubResource("2"), SubResource("3")] 
+script = ExtResource("1_script")
+entity_name = "Plate Armor"
+blocks_movement = false
+type = 1  # EntityType.ITEM
+key = "plate_armor"
+equipment_blueprint = SubResource("1")
+material_blueprint = SubResource("2")
+weight_blueprint = SubResource("3")
+item_blueprint = SubResource("4") 

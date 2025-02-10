@@ -1,17 +1,34 @@
 class_name LightComponent
 extends Component
 
+var _range: int = 5
+var _color: Color = Color.WHITE
+var _angle: float = 0.0
+var _fan_angle: float = 360.0
+
+func _init() -> void:
+    super()
+
 func _ready() -> void:
-	add_to_group("light_sources")
+    add_to_group("light_sources")
 
-func range() -> int:
-	return data.range
+func setup_from_blueprint(blueprint: Resource) -> LightComponent:
+    if blueprint:
+        _range = blueprint.range
+        _color = blueprint.color
+        _angle = blueprint.angle
+        _fan_angle = blueprint.fan_angle
 
-func color() -> Color:
-	return data.color
+    return self
 
-func angle() -> float:
-	return data.angle
+func get_range() -> int:
+    return _range
 
-func fan_angle() -> float:
-	return data.fan_angle 
+func get_color() -> Color:
+    return _color
+
+func get_angle() -> float:
+    return _angle
+
+func get_fan_angle() -> float:
+    return _fan_angle 

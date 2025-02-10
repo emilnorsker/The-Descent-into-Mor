@@ -1,12 +1,15 @@
+@tool
 class_name Component
 extends Node
 
 @onready var entity: Entity = get_parent() as Entity
 
-var data: Resource = null
+func _init() -> void:
+    pass
 
-func _init(blueprint: Resource) -> void:
-	data = blueprint
+
+func setup_from_blueprint(blueprint: Resource) -> Component:
+    return self
 
 func get_action(actor: Entity) -> Action:
-	return null
+    return null

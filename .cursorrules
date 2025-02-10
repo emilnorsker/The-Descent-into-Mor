@@ -1,3 +1,12 @@
+super._init() is invalid syntax.
+initialize the parent class with super()
+
+the only valid syntax for intilization is this:
+
+func _init(<args>) -> void:
+    super()
+
+
 Never use TileMap. Use TileMapLayer instead.
 
 - TileMapLayer is a single layer of tiles
@@ -10,5 +19,156 @@ Never use TileMap. Use TileMapLayer instead.
 
 this mean the correct way to use get used cells at is this:
 
-	var used_cells = floor_layer.get_used_cells()
-    
+    var used_cells = floor_layer.get_used_cells()
+
+
+## Naming conventions
+- {name}Component should have class_name {name}Component, and it should be in a file called {name}_component.gd
+- all files should be snake_case
+- all class_name should be PascalCase
+- all functions should be snake_case
+- all variables should be snake_case
+- all constants should be SCREAMING_SNAKE_CASE
+- all signals should be SCREAMING_SNAKE_CASE
+- the syntax for a class is: class_name {name}Component extends {node}
+
+Working with our Component System
+The system has four main parts:
+1. Component Blueprints define what data a component can have. They live in src/Components/Blueprints/ and are like templates. For example, AIComponentBlueprint says an AI can be "None" or "Hostile".
+Resources are our actual game data, stored in assets/blueprints/. Each .tres file uses our blueprints to create specific entities. Want a tough orc? Create orc.tres and set its combat_blueprint values for high HP and damage. Want a weaker orc? Create weak_orc.tres with lower values.
+Components handle the actual behavior. They get their initial state from the resources, but contain all the logic for how things work. Components can also generate actions through get_action().
+4. Actions are what makes things happen in the game. Components can generate actions (like AI deciding to attack), and actions can modify components (like dealing damage). Every entity has an action queue that processes these actions in order.
+The flow works like this:
+1. Components get their initial data from .tres files
+Components can generate actions (AI decides to attack)
+Actions go into the entity's queue
+When processed, actions can modify components (deal damage)
+Components might generate new actions in response
+Example: An orc attacks a player
+Orc's AI component generates an AttackAction
+AttackAction goes into orc's action queue
+When processed, the action uses orc.combat.power to calculate damage
+Action then calls player.combat.take_damage
+Player's combat component might generate a DeathAction if HP hits 0
+Everything is connected but has clear responsibilities: Blueprints define data, Components handle behavior, Actions make changes happen.
+
+## File structure
+assets/
+├── blueprints/
+│   ├── items/
+│   │   ├── sword.tres
+│   │   │   ├── MaterialComponent
+│   │   │   ├── WeightComponent
+│   │   │   ├── EquipmentComponent
+│   │   │   └── ...
+│   │   ├── shield.tres
+│   │   │   ├── MaterialComponent
+│   │   │   ├── WeightComponent
+│   │   │   ├── EquipmentComponent
+│   │   │   └── ...
+│   │   └── ...
+│   │
+│   ├── actors/
+│   │   ├── player.tres
+│   │   │   ├── BodyComponent
+│   │   │   ├── EquipmentComponent
+│   │   │   └── ...
+│   │   ├── orc.tres
+│   │   │   ├── BodyComponent
+│   │   │   ├── EquipmentComponent
+│   │   │   └── ...
+│   │   └── ...
+│   │
+│   └── terrain/
+│       ├── grass.tres
+│       │   ├── TerrainComponent
+│       │   └── ...
+│       ├── water.tres
+│       │   ├── TerrainComponent
+│       │   └── ...
+│       └── ...
+│
+
+
+src/
+├── Components/
+│   ├── combat_modifier_component.gd
+│   │   ├── states: Array[String]
+│   │   ├── positions: Array[String]
+│   │   ├── environments: Array[String]
+│   │   ├── has_state()
+│   │   ├── has_position()
+│   │   ├── has_environment()
+│   │   ├── apply_state()
+│   │   ├── apply_position()
+│   │   ├── apply_environment()
+│   │   ├── vision_affected()
+│   │   ├── vision_is_blurred()
+│   │   ├── get_vision_range()
+│   │   └── has_status()
+│   │
+│   ├── material_component.gd
+│   │   ├── is_flammable: bool
+│   │   ├── is_slippery: bool
+│   │   ├── material_type: String
+│   │   ├── get_is_flammable()
+│   │   ├── get_is_slippery()
+│   │   └── get_material_type()
+│   │
+│   ├── weight_component.gd
+│   │   ├── weight: float
+│   │   ├── affects_balance: bool
+│   │   ├── balance_penalty: float
+│   │   ├── get_weight()
+│   │   ├── get_affects_balance()
+│   │   ├── get_balance_penalty()
+│   │   └── get_movement_penalty()
+│   │
+│   ├── equipment_component.gd
+│   │   ├── equipped_items: Dictionary
+│   │   ├── dropped_items: Array[Entity]
+│   │   ├── equip_weapon()
+│   │   ├── equip_armor()
+│   │   ├── drop()
+│   │   ├── has_item_in_slot()
+│   │   ├── is_dropped()
+│   │   ├── get_weapon_range()
+│   │   ├── get_defense_bonus()
+│   │   └── get_power_bonus()
+│   │
+│   ├── body_component.gd
+│   │   ├── type: String
+│   │   ├── parts: Dictionary
+│   │   ├── wounds: Dictionary
+│   │   ├── consciousness: float
+│   │   ├── apply_wound()
+│   │   ├── has_wound()
+│   │   ├── get_wound_type()
+│   │   └── get_part_data()
+│   │
+│   └── terrain_component.gd
+│       ├── elevation: int
+│       ├── surface_type: String
+│       ├── blocks_sight: bool
+│       ├── get_elevation()
+│       ├── get_surface_type()
+│       ├── blocks_line_of_sight()
+│       ├── provides_high_ground()
+│       └── get_movement_cost()
+
+src/
+└── entity.gd
+    ├── grid_position: Vector2i
+    ├── entity_name: String
+    ├── blocks_movement: bool
+    ├── type: EntityType
+    ├── key: String
+    ├── components: Dictionary
+    ├── add_component()
+    ├── get_component()
+    ├── has_component()
+    ├── move()
+    ├── distance()
+    └── blocks_movement()
+
+

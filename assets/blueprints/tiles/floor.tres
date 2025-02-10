@@ -9,9 +9,9 @@ blocks_movement = false
 type = 3
 key = "floor"
 components = Array[Dictionary]([{
-	"name": "TerrainComponent",
-	"properties": {
-		"elevation": 0,
-		"movement_cost": 1.0
-	}
+    "name": "TerrainComponent",
+    "properties": {
+        "elevation": 0,
+        "movement_cost": 1.0
+    }
 }]) 

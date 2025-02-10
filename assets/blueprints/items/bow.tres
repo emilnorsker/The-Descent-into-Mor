@@ -12,7 +12,7 @@ range = 6
 
 [sub_resource type="Resource" id="2"]
 script = ExtResource("3_0")
-type = 1  # PIERCE
+type = 1
 
 [sub_resource type="Resource" id="3"]
 script = ExtResource("4_0")
@@ -20,7 +20,8 @@ weight = 1.0
 
 [resource]
 script = ExtResource("1_0")
-name = "Bow"
+entity_name = "Bow"
+blocks_movement = false
 type = 1
-is_blocking_movement = false
+key = "bow"
 components = [SubResource("1"), SubResource("2"), SubResource("3")] 

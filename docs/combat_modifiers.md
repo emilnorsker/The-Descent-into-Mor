@@ -225,3 +225,6 @@ Offensive:
 2. Create environmental threats
 3. Cut off strong positions
 ``` 
+
+# In CombatModifierComponent
+var states: Array[Constants.StatusEffect] = []  # Use enum instead of String

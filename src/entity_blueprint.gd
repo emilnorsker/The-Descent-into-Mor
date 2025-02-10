@@ -8,23 +8,14 @@ class_name EntityBlueprint
 @export var key: String = ""
 
 @export_category("Components")
-@export var components: Array[Dictionary] = []
-
-func get_components() -> Array[Dictionary]:
-	var result: Array[Dictionary] = []
-	
-	# Convert each component blueprint to a dictionary with name and properties
-	for component in components:
-		if component and component.has("name") and component.has("properties"):
-			result.append({
-				"name": component.name,
-				"properties": component.properties
-			})
-	
-	return result
-
-func add_component(name: String, properties: Dictionary = {}) -> void:
-	components.append({
-		"name": name,
-		"properties": properties
-	})
+@export var combat_blueprint: Resource
+@export var inventory_blueprint: Resource
+@export var equipment_blueprint: Resource
+@export var progression_blueprint: Resource
+@export var consumable_blueprint: Resource
+@export var light_blueprint: Resource
+@export var material_blueprint: Resource
+@export var combat_modifier_blueprint: Resource
+@export var terrain_blueprint: Resource
+@export var ai_blueprint: Resource
+@export var body_blueprint: Resource
