@@ -1,3 +1,4 @@
+@tool
 class_name LightComponentBlueprint extends Resource
 
 @export var range: float = 100.0

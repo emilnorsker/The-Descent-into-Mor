@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="EntityBlueprint" load_steps=6 format=3]
+[gd_resource type="Resource" load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://src/entity_blueprint.gd" id="1_script"]
 [ext_resource type="Script" path="res://src/Components/Blueprints/equipment_component_blueprint.gd" id="2_equip"]
@@ -6,25 +6,25 @@
 [ext_resource type="Script" path="res://src/Components/Blueprints/weight_component_blueprint.gd" id="4_weight"]
 [ext_resource type="Script" path="res://src/Components/Blueprints/item_component_blueprint.gd" id="5_item"]
 
-[sub_resource type="Resource" id="1"]
+[sub_resource type="Resource" id="shield_equip"]
 script = ExtResource("2_equip")
-equipment_type = 1  # Shield
+slot = "shield"
 power_bonus = 0
 defense_bonus = 2
 
-[sub_resource type="Resource" id="2"]
+[sub_resource type="Resource" id="shield_material"]
 script = ExtResource("3_material")
 material_type = "metal"
 is_flammable = false
 is_slippery = false
 
-[sub_resource type="Resource" id="3"]
+[sub_resource type="Resource" id="shield_weight"]
 script = ExtResource("4_weight")
 weight = 3.0
 affects_balance = true
 balance_penalty = 1.5
 
-[sub_resource type="Resource" id="4"]
+[sub_resource type="Resource" id="shield_item"]
 script = ExtResource("5_item")
 value = 40
 stackable = false
@@ -34,9 +34,11 @@ max_stack = 1
 script = ExtResource("1_script")
 entity_name = "Shield"
 blocks_movement = false
-type = 1  # EntityType.ITEM
+type = 1
 key = "shield"
-equipment_blueprint = SubResource("1")
-material_blueprint = SubResource("2")
-weight_blueprint = SubResource("3")
-item_blueprint = SubResource("4") 
+components = {
+"equipment": SubResource("shield_equip"),
+"item": SubResource("shield_item"),
+"material": SubResource("shield_material"),
+"weight": SubResource("shield_weight")
+} 

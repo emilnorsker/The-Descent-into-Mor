@@ -1,9 +1,9 @@
 [gd_resource type="Resource" script_class="EntityBlueprint" load_steps=2 format=3]
 
-[ext_resource type="Script" path="res://src/entity_blueprint.gd" id="1_0"]
+[ext_resource type="Script" path="res://src/entity_blueprint.gd" ]
 
 [resource]
-script = ExtResource("1_0")
+script = ExtResource("")
 name = "Feature"
 type = 3
 is_blocking_movment = false 

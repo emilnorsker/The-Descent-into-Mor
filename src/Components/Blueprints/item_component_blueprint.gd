@@ -1,6 +1,5 @@
 @tool
-class_name ItemComponentBlueprint
-extends Resource
+class_name ItemComponentBlueprint extends Resource
 
 @export var equipment_type: ItemComponent.EquipmentType
 @export var power_bonus: int = 0

@@ -1,18 +1,22 @@
-[gd_resource type="Resource" script_class="EntityBlueprint" load_steps=3 format=3]
+[gd_resource type="Resource" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://src/entity_blueprint.gd" id="1_script"]
 [ext_resource type="Script" path="res://src/Components/Blueprints/terrain_component_blueprint.gd" id="2_terrain"]
 
-[sub_resource type="Resource" id="1"]
+[sub_resource type="Resource" id="terrain_floor"]
 script = ExtResource("2_terrain")
 blocks_sight = false
-movement_cost = 1.0
+movement_cost = 1
 terrain_type = "floor"
+elevation = 0
+surface_type = "normal"
 
 [resource]
 script = ExtResource("1_script")
 entity_name = "Floor"
 blocks_movement = false
-type = 3  # EntityType.TERRAIN
+type = 2
 key = "floor"
-terrain_blueprint = SubResource("1") 
+components = {
+"terrain": SubResource("terrain_floor")
+} 

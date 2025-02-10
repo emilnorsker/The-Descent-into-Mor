@@ -1,10 +1,10 @@
 [gd_resource type="Resource" script_class="EntityBlueprint" load_steps=2 format=3]
 
-[ext_resource type="Script" path="res://src/entity_blueprint.gd" id="1_script"]
+[ext_resource type="Script" path="res://src/entity_blueprint.gd" ]
 
 [resource]
-script = ExtResource("1_script")
+script = ExtResource("")
 entity_name = "Hill"
 blocks_movement = false
-type = 3  # EntityType.TERRAIN
+type = 3   
 key = "hill"

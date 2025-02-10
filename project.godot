@@ -18,7 +18,6 @@ config/icon="res://icon.svg"
 
 SignalBus="*res://src/Utils/signal_bus.gd"
 Constants="*res://src/constants.gd"
-
 ColorPallete="*res://src/Utils/colors.gd"
 GameMap="*res://src/Map/Map.tscn"
 

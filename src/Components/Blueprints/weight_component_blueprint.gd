@@ -1,5 +1,5 @@
-extends Resource
-class_name WeightComponentBlueprint
+@tool
+class_name WeightComponentBlueprint extends Resource
 
 @export var weight: float = 1.0
 @export var affects_balance: bool = false

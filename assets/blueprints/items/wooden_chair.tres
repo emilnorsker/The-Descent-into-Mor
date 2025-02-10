@@ -1,26 +1,28 @@
-[gd_resource type="Resource" script_class="EntityBlueprint" load_steps=4 format=3]
+[gd_resource type="Resource" load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://src/entity_blueprint.gd" id="1_script"]
-[ext_resource type="Script" path="res://src/Components/Blueprints/material_component_blueprint.gd" id="2_0"]
-[ext_resource type="Script" path="res://src/Components/Blueprints/weight_component_blueprint.gd" id="3_0"]
+[ext_resource type="Script" path="res://src/Components/Blueprints/material_component_blueprint.gd" id="2_material"]
+[ext_resource type="Script" path="res://src/Components/Blueprints/item_component_blueprint.gd" id="3_item"]
 
-[sub_resource type="Resource" id="1"]
-script = ExtResource("2_0")
+[sub_resource type="Resource" id="chair_material"]
+script = ExtResource("2_material")
 material_type = "wood"
 is_flammable = true
 is_slippery = false
 
-[sub_resource type="Resource" id="2"]
-script = ExtResource("3_0")
-weight = 3.0
-affects_balance = false
-balance_penalty = 0.0
+[sub_resource type="Resource" id="chair_item"]
+script = ExtResource("3_item")
+value = 10
+stackable = false
+max_stack = 1
 
 [resource]
 script = ExtResource("1_script")
 entity_name = "Wooden Chair"
 blocks_movement = true
-type = 3  # EntityType.FIXTURE
+type = 1
 key = "wooden_chair"
-material_blueprint = SubResource("1")
-weight_blueprint = SubResource("2") 
+components = {
+"item": SubResource("chair_item"),
+"material": SubResource("chair_material")
+} 

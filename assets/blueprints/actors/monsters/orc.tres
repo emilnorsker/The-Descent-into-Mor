@@ -1,48 +1,48 @@
-[gd_resource type="Resource" script_class="EntityBlueprint" load_steps=7 format=3]
+[gd_resource type="Resource" load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://src/entity_blueprint.gd" id="1_script"]
 [ext_resource type="Script" path="res://src/Components/Blueprints/combat_component_blueprint.gd" id="2_combat"]
 [ext_resource type="Script" path="res://src/Components/Blueprints/ai_component_blueprint.gd" id="3_ai"]
 [ext_resource type="Script" path="res://src/Components/Blueprints/body_component_blueprint.gd" id="4_body"]
 [ext_resource type="Script" path="res://src/Components/Blueprints/combat_modifier_component_blueprint.gd" id="5_modifier"]
-[ext_resource type="Script" path="res://src/Components/Blueprints/equipment_component_blueprint.gd" id="6_equip"]
 
-[sub_resource type="Resource" id="1"]
+[sub_resource type="Resource" id="orc_combat"]
 script = ExtResource("2_combat")
-max_hp = 10
+health = 10
+max_health = 10
 power = 3
 defense = 0
 
-[sub_resource type="Resource" id="2"]
+[sub_resource type="Resource" id="orc_ai"]
 script = ExtResource("3_ai")
-ai_type = 1  # AIType.HOSTILE
+ai_type = 1
 
-[sub_resource type="Resource" id="3"]
+[sub_resource type="Resource" id="orc_body"]
 script = ExtResource("4_body")
 type = "humanoid"
 parts = {
-    "head": true,
-    "torso": true,
-    "left_arm": true,
-    "right_arm": true,
-    "left_leg": true,
-    "right_leg": true
+"head": true,
+"torso": true,
+"left_arm": true,
+"right_arm": true,
+"left_leg": true,
+"right_leg": true
 }
+consciousness = 100.0
+wounds = {}
 
-[sub_resource type="Resource" id="4"]
+[sub_resource type="Resource" id="orc_modifier"]
 script = ExtResource("5_modifier")
-
-[sub_resource type="Resource" id="5"]
-script = ExtResource("6_equip")
 
 [resource]
 script = ExtResource("1_script")
 entity_name = "Orc"
 blocks_movement = true
-type = 2  # EntityType.ACTOR
+type = 2
 key = "orc"
-combat_blueprint = SubResource("1")
-ai_blueprint = SubResource("2")
-body_blueprint = SubResource("3")
-combat_modifier_blueprint = SubResource("4")
-equipment_blueprint = SubResource("5") 
+components = {
+"ai": SubResource("orc_ai"),
+"body": SubResource("orc_body"),
+"combat": SubResource("orc_combat"),
+"combat_modifier": SubResource("orc_modifier")
+} 

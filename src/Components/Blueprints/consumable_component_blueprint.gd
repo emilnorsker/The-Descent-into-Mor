@@ -1,2 +1,2 @@
-class_name ConsumableComponentBlueprint
-extends ItemComponentBlueprint
+@tool
+class_name ConsumableComponentBlueprint extends ItemComponentBlueprint

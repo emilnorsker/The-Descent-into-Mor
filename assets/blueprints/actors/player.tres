@@ -1,62 +1,54 @@
-[gd_resource type="Resource" script_class="EntityBlueprint" load_steps=9 format=3]
+[gd_resource type="Resource" load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://src/entity_blueprint.gd" id="1_script"]
 [ext_resource type="Script" path="res://src/Components/Blueprints/combat_component_blueprint.gd" id="2_combat"]
 [ext_resource type="Script" path="res://src/Components/Blueprints/inventory_component_blueprint.gd" id="3_inv"]
-[ext_resource type="Script" path="res://src/Components/Blueprints/equipment_component_blueprint.gd" id="4_equip"]
-[ext_resource type="Script" path="res://src/Components/Blueprints/combat_modifier_component_blueprint.gd" id="5_modifier"]
-[ext_resource type="Script" path="res://src/Components/Blueprints/body_component_blueprint.gd" id="6_body"]
-[ext_resource type="Script" path="res://src/Components/Blueprints/light_component_blueprint.gd" id="7_light"]
-[ext_resource type="Script" path="res://src/Components/Blueprints/progression_component_blueprint.gd" id="8_prog"]
+[ext_resource type="Script" path="res://src/Components/Blueprints/body_component_blueprint.gd" id="4_body"]
+[ext_resource type="Script" path="res://src/Components/Blueprints/progression_component_blueprint.gd" id="5_prog"]
 
-[sub_resource type="Resource" id="1"]
+[sub_resource type="Resource" id="player_combat"]
 script = ExtResource("2_combat")
-max_hp = 30
-power = 5
-defense = 2
+health = 100
+max_health = 100
+power = 10
+defense = 5
 
-[sub_resource type="Resource" id="2"]
+[sub_resource type="Resource" id="player_inv"]
 script = ExtResource("3_inv")
-capacity = 26
+capacity = 10
+items = []
 
-[sub_resource type="Resource" id="3"]
-script = ExtResource("4_equip")
-
-[sub_resource type="Resource" id="4"]
-script = ExtResource("5_modifier")
-
-[sub_resource type="Resource" id="5"]
-script = ExtResource("6_body")
+[sub_resource type="Resource" id="player_body"]
+script = ExtResource("4_body")
 type = "humanoid"
 parts = {
-    "head": true,
-    "torso": true,
-    "left_arm": true,
-    "right_arm": true,
-    "left_leg": true,
-    "right_leg": true
+"head": true,
+"left_arm": true,
+"left_leg": true,
+"right_arm": true,
+"right_leg": true,
+"torso": true
 }
+consciousness = 100.0
+wounds = {}
 
-[sub_resource type="Resource" id="6"]
-script = ExtResource("7_light")
-range = 6.0
-color = Color(1.0, 0.9, 0.7, 1.0)
-
-[sub_resource type="Resource" id="7"]
-script = ExtResource("8_prog")
+[sub_resource type="Resource" id="player_prog"]
+script = ExtResource("5_prog")
 level_up_base = 200
 level_up_factor = 150
+xp_given = 100
+current_level = 1
+current_xp = 0
 
 [resource]
 script = ExtResource("1_script")
 entity_name = "Player"
 blocks_movement = true
-type = 2  # EntityType.ACTOR
+type = 0
 key = "player"
-combat_blueprint = SubResource("1")
-inventory_blueprint = SubResource("2")
-equipment_blueprint = SubResource("3")
-combat_modifier_blueprint = SubResource("4")
-body_blueprint = SubResource("5")
-light_blueprint = SubResource("6")
-progression_blueprint = SubResource("7") 
+components = {
+"body": SubResource("player_body"),
+"combat": SubResource("player_combat"),
+"inventory": SubResource("player_inv"),
+"progression": SubResource("player_prog")
+} 
