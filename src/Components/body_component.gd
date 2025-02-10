@@ -36,6 +36,8 @@ var parts: Dictionary = {}
 var wounds: Dictionary = {}  # Dictionary of BodyPart -> Array of Wound
 var consciousness = 0
 var is_dead = false
+var equipment: Dictionary = {}  # Dictionary of slot -> Entity
+var protection: Dictionary = {}  # Dictionary of part -> total protection
 
 class Wound:
     var type: int  # WoundType
@@ -95,6 +97,8 @@ func _ready():
     # Initialize wounds dictionary for each body part
     for part in BodyPart.values():
         wounds[part] = []
+        equipment[part] = null
+        protection[part] = 0
 
 func apply_wound(type: int, body_part: int, severity: int = 1) -> void:
     if is_dead:
@@ -226,3 +230,23 @@ func process_recovery() -> void:
                     wound.severity -= 1
                     if wound.severity == 0:
                         wounds[part].erase(wound) 
+
+func has_equipment_in_slot(part: int, slot_type: String) -> bool:
+    return equipment.has(part) and equipment[part] != null
+
+func get_protection_for_part(part: int) -> int:
+    return protection.get(part, 0)
+
+func get_total_protection_for_part(part: int) -> int:
+    return protection.get(part, 0)
+
+func has_protection(part: int) -> bool:
+    return protection.get(part, 0) > 0
+
+func get_wound_protection(part: int, damage_type: String) -> int:
+    if not equipment.has(part) or not equipment[part]:
+        return 0
+    var item = equipment[part]
+    if not item.components.has("armor"):
+        return 0
+    return item.components.armor.protection 

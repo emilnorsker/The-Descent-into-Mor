@@ -11,7 +11,7 @@ var target: Entity
 var bystander: Entity  # For testing AOE effects
 
 func before_each() -> void:
-    var test_level = preload("res://tests/fixtures/test_map.tscn")
+    var test_level = load("res://tests/fixtures/test_level.tres")
     GameMap.load_level(test_level)
     
     # We'll create entities in a specific formation for testing different attack patterns
@@ -38,7 +38,7 @@ func test_melee_attack() -> void:
 
 func test_throw_attack() -> void:
     var weapon = Entity.new().setup_from_blueprint(preload("res://tests/fixtures/blueprints/items/test_weapon.tres"), Vector2i(0, 0))
-    attacker.components.inventory.add(weapon)
+    attacker.components.inventory.add_item(weapon)
     
     var throw_action = ThrowAction.new(attacker, target, weapon)
     
@@ -51,7 +51,7 @@ func test_throw_attack() -> void:
 # Test Combat Stats
 func test_defense_calculation() -> void:
     var armor = Entity.new().setup_from_blueprint(preload("res://tests/fixtures/blueprints/items/test_armor.tres"), Vector2i(0, 0))
-    target.components.inventory.add(armor)
+    target.components.inventory.add_item(armor)
     target.components.equipment.equip(armor)
     
     var melee_action = MeleeAction.new(attacker, target, BodyPart.CHEST)
@@ -63,7 +63,7 @@ func test_defense_calculation() -> void:
 
 func test_power_calculation() -> void:
     var weapon = Entity.new().setup_from_blueprint(preload("res://tests/fixtures/blueprints/items/test_weapon.tres"), Vector2i(0, 0))
-    attacker.components.inventory.add(weapon)
+    attacker.components.inventory.add_item(weapon)
     attacker.components.equipment.equip(weapon)
     
     var melee_action = MeleeAction.new(attacker, target, BodyPart.CHEST)
@@ -81,4 +81,4 @@ func test_death() -> void:
     melee_action.perform()
     
     assert_true(target.components.combat.is_dead(), "Target should be dead")
-    assert_false(GameMap.get_actor_at_location(target.grid_position), "Dead target should be removed from map") 
+    assert_false(GameMap.get_entities_of_type_at(target.grid_position, Entity.EntityType.ACTOR), "Dead target should be removed from map") 

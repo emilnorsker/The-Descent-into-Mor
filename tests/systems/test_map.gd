@@ -6,7 +6,7 @@ var orc: Entity
 var sword: Entity
 
 func before_each() -> void:
-    test_level = preload("res://tests/fixtures/test_map.tscn")
+    test_level = load("res://tests/fixtures/test_level.tres")
     
     # Create test entities
     var player_blueprint = preload("res://tests/fixtures/blueprints/actors/test_humanoid.tres")

@@ -14,6 +14,7 @@ var grid_position: Vector2i:
 
 var entity_name: String
 var blocks_movement: bool
+var movement_cost: float = 1.0
 var _type: EntityType
 var type: EntityType:
     set(value):
@@ -82,7 +83,6 @@ func setup_from_blueprint(blueprint: Resource, position: Vector2i = Vector2i.ZER
                         components.light.setup_from_blueprint(component_blueprint)
                         add_child(components.light)
                     "material":
-                        print(component_blueprint.material_type)
                         components.material = MaterialComponent.new()
                         components.material.setup_from_blueprint(component_blueprint)
                         add_child(components.material)
@@ -166,3 +166,9 @@ func distance(other_position: Vector2i) -> int:
 
 func is_blocking_movement() -> bool:
     return blocks_movement
+
+func get_movement_cost() -> float:
+    return movement_cost
+
+func has_component(component_name: String) -> bool:
+    return components.has(component_name) and components[component_name] != null

@@ -16,6 +16,7 @@ signal entity_removed(entity: Entity, pos: Vector2i)
 signal entity_moved(entity: Entity, from_pos: Vector2i, to_pos: Vector2i)
 signal position_contents_changed(pos: Vector2i)
 
+
 func _ready() -> void:
     floor_layer = $Floor
     feature_layer = $Features
@@ -140,18 +141,26 @@ func move_entity(entity: Entity, from_pos: Vector2i, to_pos: Vector2i) -> void:
     position_contents_changed.emit(from_pos)
     position_contents_changed.emit(to_pos)
 
-func get_entities_at(pos: Vector2i) -> Array:
-    var entities = _entities.filter(func(e):
-        var at_pos = e.grid_position == pos
-        return at_pos
-    )
+func get_entities_at(pos: Vector2i) -> Array[Entity]:
+    var entities: Array[Entity] = []
+    for e in _entities:
+        if e.grid_position == pos:
+            entities.append(e)
     return entities
 
 func get_entities_of_type_at(pos: Vector2i, type: Entity.EntityType) -> Array[Entity]:
-    return get_entities_at(pos).filter(func(e): return e.type == type)
+    var entities: Array[Entity] = []
+    for e in get_entities_at(pos):
+        if e.type == type:
+            entities.append(e)
+    return entities
 
 func get_entities_in_radius(center: Vector2i, radius: int) -> Array[Entity]:
-    return _entities.filter(func(e): return e.distance(center) <= radius)
+    var entities: Array[Entity] = []
+    for e in _entities:
+        if e.distance(center) <= radius:
+            entities.append(e)
+    return entities
 
 func is_position_blocked(pos: Vector2i) -> bool:
     return pos in _blocking_positions and not _blocking_positions[pos].is_empty()

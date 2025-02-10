@@ -56,7 +56,7 @@ class TestMapInteraction:
     
     func test_blocking_entity_blocks_position() -> void:
         var pos = Vector2i(1, 1)
-        test_entity.blocks_movement = func(): return true
+        test_entity.blocks_movement = true
         
         test_map.register_entity(test_entity, pos)
         assert_true(test_map.is_position_blocked(pos), "Position should be blocked")
@@ -66,10 +66,10 @@ class TestMapInteraction:
         
         # Create two entities with movement costs
         var entity1 = Entity.new()
-        entity1.get_movement_cost = func(): return 2.0
+        entity1.movement_cost = 2.0
         
         var entity2 = Entity.new()
-        entity2.get_movement_cost = func(): return 1.5
+        entity2.movement_cost = 1.5
         
         # Place both entities
         test_map.register_entity(entity1, pos)
@@ -101,8 +101,16 @@ class TestAreaEffects:
                 test_map.register_entity(entity, pos)
                 entities.append(entity)
         
+        # Get affected entities
         var affected = test_map.get_entities_in_radius(center, radius)
-        assert_eq(affected.size(), 13, "Should affect 13 entities in 2-tile radius")
+        
+        # Check that all entities within radius are affected
+        for entity in entities:
+            var distance = entity.grid_position.distance_to(center)
+            if distance <= radius:
+                assert_has(affected, entity, "Entity within radius should be affected")
+            else:
+                assert_does_not_have(affected, entity, "Entity outside radius should not be affected")
     
     func test_rectangular_area_query() -> void:
         var start = Vector2i(1, 1)

@@ -8,8 +8,10 @@ extends Component
 
 
 signal equipment_changed
+signal item_equipped(item: Entity, slot: String)
+signal item_unequipped(item: Entity, slot: String)
 
-var slots := {}
+var _equipped_items: Dictionary = {}
 
 var _defense_bonus: int = 0
 var total_defense_bonus: int:
@@ -31,19 +33,17 @@ func _init() -> void:
     super()
 
 func setup_from_blueprint(blueprint: Resource) -> EquipmentComponent:
-    if not blueprint:
-        push_error("Invalid blueprint provided to EquipmentComponent.setup_from_blueprint")
-        return self
-    slots = blueprint.slots
+    if blueprint:
+        if blueprint.has_method("equipped_items"):
+            _equipped_items = blueprint.equipped_items
     return self
 
 func _get_defense_bonus() -> int:
     var bonus = 0
     
-    for item in entity.components.equipment.slots.values():
-        item = item as ItemComponent
-        if item:
-            bonus += item.defense_bonus
+    for item in _equipped_items.values():
+        if item and item.components.has("armor"):
+            bonus += item.components.armor.protection
     
     return bonus
 
@@ -51,44 +51,76 @@ func _get_defense_bonus() -> int:
 func _get_power_bonus() -> int:
     var bonus = 0
     
-    for item in slots.values():
-        item = item as ItemComponent
-        if item:
-            bonus += item.power_bonus
+    for item in _equipped_items.values():
+        if item and item.components.has("weapon"):
+            bonus += item.components.weapon.power
     
     return bonus
 
 
 func is_item_equipped(item: Entity) -> bool:
-    return item in slots.values()
+    return item in _equipped_items.values()
 
 
-func equip(item: Entity, body_part: int = Constants.BodyPart.RIGHT_HAND) -> void:
-    var current_item = slots.get(body_part)
-    if current_item:
-        _unequip_from_slot(body_part)
-    slots[body_part] = item
+func equip(item: Entity, slot = null) -> void:
+    var parent = get_parent()
+    if not parent or not item:
+        return
+        
+    if not slot:
+        slot = Constants.BodyPart.RIGHT_HAND
     
-    # Add item as child of entity to follow its transforms
-    if item.get_parent():
-        item.get_parent().remove_child(item)
-    entity.add_child(item)
-    item.position = Vector2.ZERO  # Relative to parent
+    # Convert int slot to string if needed
+    var slot_key = str(slot) if typeof(slot) == TYPE_INT else slot
+        
+    # Unequip any existing item in the slot
+    if _equipped_items.has(slot_key) and _equipped_items[slot_key]:
+        _unequip_from_slot(slot_key)
     
-    SignalBus.message_sent.emit(entity.entity_name + " equips the %s." % item.entity_name, Color.WHITE)
+    # Add the item to the slot
+    _equipped_items[slot_key] = item
     
-    equipment_changed.emit()
+    # Update protection if it's armor
+    if item.components.has("armor"):
+        var body = parent.components.body
+        if body:
+            body.protection[slot] = item.components.armor.protection
+    
+    item_equipped.emit(item, slot_key)
 
+func unequip(item: Entity) -> void:
+    for slot in _equipped_items.keys():
+        if _equipped_items[slot] == item:
+            _unequip_from_slot(slot)
+            break
 
-func _unequip_from_slot(slot: int) -> void:
-    var current_item = slots.get(slot)
-    
-    # Remove from entity and reset position
-    if current_item and current_item.get_parent():
-        current_item.get_parent().remove_child(current_item)
+func _unequip_from_slot(slot: String) -> void:
+    var item = _equipped_items[slot]
+    if item:
+        var parent = get_parent()
+        if parent and parent.components.has("inventory"):
+            parent.components.inventory.add_item(item)
+        _equipped_items[slot] = null
+        
+        # Remove protection if it was armor
+        if item.components.has("armor"):
+            var body = parent.components.body
+            if body:
+                body.protection[slot] = 0
+        
+        item_unequipped.emit(item, slot)
 
-    SignalBus.message_sent.emit(entity.entity_name + " removes the %s." % current_item.entity_name, Color.WHITE)
-    
-    slots.erase(slot)
-    
-    equipment_changed.emit()
+func get_equipped_item(slot) -> Entity:
+    var slot_key = str(slot) if typeof(slot) == TYPE_INT else slot
+    return _equipped_items.get(slot_key)
+
+func has_equipped_item(slot) -> bool:
+    var slot_key = str(slot) if typeof(slot) == TYPE_INT else slot
+    return _equipped_items.has(slot_key) and _equipped_items[slot_key] != null
+
+func get_equipped_items() -> Array[Entity]:
+    var items: Array[Entity] = []
+    for item in _equipped_items.values():
+        if item:
+            items.append(item)
+    return items
