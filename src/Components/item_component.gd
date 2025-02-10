@@ -19,6 +19,11 @@ var range: int = 0
 func _init() -> void:
     super()
 
+func get_range() -> int:
+    if get_parent() and get_parent().components.combat:
+        return range + get_parent().components.combat.get_power_bonus()
+    return range
+
 func setup_from_blueprint(blueprint: Resource) -> ItemComponent:
     if blueprint:
         if blueprint.power_bonus:

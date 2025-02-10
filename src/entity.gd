@@ -4,6 +4,9 @@ class_name Entity extends Node2D
 enum AIType {NONE, HOSTILE}
 enum EntityType {CORPSE, ITEM, ACTOR, TERRAIN, FIXTURE}
 
+var test_mode: bool = false
+var next_roll: int = -1
+
 var _grid_position: Vector2i
 var grid_position: Vector2i:
     set(value):
@@ -118,10 +121,49 @@ func setup_from_blueprint(blueprint: Resource, position: Vector2i = Vector2i.ZER
     return self
 
 # Delegate common methods to appropriate components
-func roll(check: int, modifiers: Array[int] = []) -> bool:
-    if not components.combat_modifier: return false
-	
-    return components.combat_modifier.roll(check, modifiers)
+
+
+# Roll a check against a difficulty class (DC)
+# dc: The difficulty class to beat (must roll >= this number)
+# modifiers: Array of integers that modify the roll (can be positive or negative)
+# dice_size: The size of the die to roll (e.g. 6 for d6, 20 for d20). Defaults to 6.
+# Returns: bool - Whether the check succeeded
+func roll(dc: int, modifiers: Array = [], dice_size: int = 6) -> bool:
+    var roll_value: int
+    
+    # If in test mode and next_roll is set, use that
+    if test_mode and next_roll >= 0:
+        roll_value = next_roll
+        next_roll = -1
+    else:
+        # Roll a random number between 1 and dice_size
+        roll_value = (randi() % dice_size) + 1
+    
+    # Apply all modifiers
+    for modifier in modifiers:
+        roll_value += modifier as int
+    
+    # Check if we beat or meet the DC
+    return roll_value >= dc
+
+# Get the raw roll value without checking against DC
+# Useful for damage rolls etc.
+func roll_value(dice_size: int = 6, modifiers: Array = []) -> int:
+    var roll_value: int
+    
+    # If in test mode and next_roll is set, use that
+    if test_mode and next_roll >= 0:
+        roll_value = next_roll
+        next_roll = -1
+    else:
+        # Roll a random number between 1 and dice_size
+        roll_value = (randi() % dice_size) + 1
+    
+    # Apply all modifiers
+    for modifier in modifiers:
+        roll_value += modifier as int
+    
+    return roll_value
 
 func has_state(state: Constants.StatusEffect) -> bool:
     return components.combat_modifier.has_state(state) if components.combat_modifier else false

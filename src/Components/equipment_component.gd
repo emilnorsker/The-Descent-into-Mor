@@ -42,8 +42,8 @@ func _get_defense_bonus() -> int:
     var bonus = 0
     
     for item in _equipped_items.values():
-        if item and item.components.has("armor"):
-            bonus += item.components.armor.protection
+        if item and item.components.has("item"):
+            bonus += item.components.item.defense_bonus
     
     return bonus
 
@@ -52,8 +52,8 @@ func _get_power_bonus() -> int:
     var bonus = 0
     
     for item in _equipped_items.values():
-        if item and item.components.has("weapon"):
-            bonus += item.components.weapon.power
+        if item and item.components.has("item"):
+            bonus += item.components.item.power_bonus
     
     return bonus
 
@@ -81,10 +81,10 @@ func equip(item: Entity, slot = null) -> void:
     _equipped_items[slot_key] = item
     
     # Update protection if it's armor
-    if item.components.has("armor"):
+    if item.components.has("item"):
         var body = parent.components.body
         if body:
-            body.protection[slot] = item.components.armor.protection
+            body.protection[slot] = item.components.item.defense_bonus
     
     item_equipped.emit(item, slot_key)
 
@@ -103,7 +103,7 @@ func _unequip_from_slot(slot: String) -> void:
         _equipped_items[slot] = null
         
         # Remove protection if it was armor
-        if item.components.has("armor"):
+        if item.components.has("item"):
             var body = parent.components.body
             if body:
                 body.protection[slot] = 0

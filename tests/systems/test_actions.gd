@@ -14,6 +14,10 @@ func before_each() -> void:
     attacker = Entity.new().setup_from_blueprint(TestHumanoid, Vector2i(1, 1))
     target = Entity.new().setup_from_blueprint(TestHumanoid, Vector2i(2, 1))
     
+    # Enable test mode for deterministic rolls
+    attacker.test_mode = true
+    target.test_mode = true
+    
     GameMap.register_entity(attacker, Vector2i(1, 1))
     GameMap.register_entity(target, Vector2i(2, 1))
 
@@ -23,7 +27,8 @@ func after_each() -> void:
 # Natural Weapon Tests
 func test_unarmed_attacks() -> void:
     # Test punch
-    var punch = MeleeAction.new(attacker, target, Constants.BodyPart.RIGHT_ARM)
+    attacker.next_roll = 4  # Just enough to hit DC 4
+    var punch = MeleeAction.new(attacker, target, Constants.BodyPart.RIGHT_ARM, Constants.BodyPart.CHEST)
     var result = punch.perform()
     
     assert_true(result, "Punch should succeed")
@@ -34,7 +39,8 @@ func test_unarmed_attacks() -> void:
                 "Punch should cause light wound")
     
     # Test kick
-    var kick = MeleeAction.new(attacker, target, Constants.BodyPart.LEFT_LEG)
+    attacker.next_roll = 4  # Just enough to hit DC 4
+    var kick = MeleeAction.new(attacker, target, Constants.BodyPart.LEFT_LEG, Constants.BodyPart.ABDOMEN)
     result = kick.perform()
     
     assert_true(result, "Kick should succeed")
@@ -45,7 +51,8 @@ func test_unarmed_attacks() -> void:
                 "Kick should cause moderate wound")
     
     # Test headbutt
-    var headbutt = MeleeAction.new(attacker, target, Constants.BodyPart.HEAD)
+    attacker.next_roll = 4  # Just enough to hit DC 4
+    var headbutt = MeleeAction.new(attacker, target, Constants.BodyPart.HEAD, Constants.BodyPart.HEAD)
     result = headbutt.perform()
     
     assert_true(result, "Headbutt should succeed")
@@ -60,7 +67,8 @@ func test_weapon_attacks() -> void:
     var sword = Entity.new().setup_from_blueprint(TestWeapon, Vector2i.ZERO)
     
     attacker.components.body.equip_to_slot(sword)
-    var slash = MeleeAction.new(attacker, target, Constants.BodyPart.CHEST)
+    attacker.next_roll = 4  # Just enough to hit DC 4
+    var slash = MeleeAction.new(attacker, target, Constants.BodyPart.RIGHT_ARM, Constants.BodyPart.CHEST)
     var result = slash.perform()
     
     assert_true(result, "Sword attack should succeed")
@@ -71,10 +79,8 @@ func test_weapon_attacks() -> void:
 
 # Throw Tests
 func test_throw_weapon() -> void:
-    var dagger = create_item_entity([
-        ["WeightComponent", {"weight": 0.5}],
-        ["ItemComponent", {"power_bonus": 1, "defense_bonus": 1}]
-    ])
+    var dagger = Entity.new().setup_from_blueprint(TestWeapon, Vector2i.ZERO)
+    dagger.components.weight.weight = 0.5
     
     attacker.components.body.equip_to_slot(dagger)
     var throw = ThrowAction.new(attacker, target, dagger)
@@ -118,17 +124,17 @@ func test_throw_generic_item() -> void:
 func test_attack_ranges() -> void:
     # Test out of punch range
     target.move(Vector2i(4, 1) - target.grid_position)
-    var punch = MeleeAction.new(attacker, target, Constants.BodyPart.RIGHT_ARM)
+    var punch = MeleeAction.new(attacker, target, Constants.BodyPart.RIGHT_ARM, Constants.BodyPart.CHEST)
     assert_false(punch.perform(), "Punch should fail at range 3")
     
     # Test weapon range
     var spear = create_item_entity([
         ["WeightComponent", {"weight": 2.0}],
-        ["ItemComponent", {"power_bonus": 1, "defense_bonus": 1}]
+        ["ItemComponent", {"power_bonus": 1, "defense_bonus": 1, "range": 2}]
     ])
     
     attacker.components.body.equip_to_slot(spear)
-    var thrust = MeleeAction.new(attacker, target, Constants.BodyPart.RIGHT_ARM)
+    var thrust = MeleeAction.new(attacker, target, Constants.BodyPart.RIGHT_ARM, Constants.BodyPart.CHEST)
     assert_true(thrust.perform(), "Spear should hit at range 2")
 
 # Utility Functions
@@ -145,6 +151,7 @@ func create_item_entity(data: Array) -> Entity:
             "ItemComponent":
                 blueprint.components.item.power_bonus = values.get("power_bonus", 0)
                 blueprint.components.item.defense_bonus = values.get("defense_bonus", 0)
+                blueprint.components.item.range = values.get("range", 1)
             "WeightComponent":
                 var weight_blueprint = blueprint.components.weight
                 weight_blueprint.weight = values.get("weight", 1.5)
