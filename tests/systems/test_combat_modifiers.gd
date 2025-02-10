@@ -22,10 +22,6 @@ func before_each() -> void:
 
 func after_each() -> void:
     GameMap.clear()
-    if map_scene:
-        map_scene.queue_free()
-        map_scene = null
-
 # Environmental State Tests
 func test_oiled_state() -> void:
     # Test floor tile effects

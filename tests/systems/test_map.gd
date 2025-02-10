@@ -12,7 +12,7 @@ func before_each() -> void:
     # Create test entities with real blueprints
     var player_blueprint = preload("res://assets/blueprints/actors/player.tres")
     var orc_blueprint = preload("res://assets/blueprints/actors/monsters/orc.tres")
-    var sword_blueprint = preload("res://assets/blueprints/items/weapons/sword.tres")
+    var sword_blueprint = preload("res://assets/blueprints/items/sword.tres")
     
     player = Entity.new().setup_from_blueprint(player_blueprint, Vector2i(1, 1))
     orc = Entity.new().setup_from_blueprint(orc_blueprint, Vector2i(2, 2))
@@ -147,7 +147,7 @@ func test_area_effects() -> void:
     # Create fresh entities for this test
     var player_blueprint = preload("res://assets/blueprints/actors/player.tres")
     var orc_blueprint = preload("res://assets/blueprints/actors/monsters/orc.tres")
-    var sword_blueprint = preload("res://assets/blueprints/items/weapons/sword.tres")
+    var sword_blueprint = preload("res://assets/blueprints/items/sword.tres")
     
     var test_player = Entity.new().setup_from_blueprint(player_blueprint, Vector2i(2, 2))
     var test_orc = Entity.new().setup_from_blueprint(orc_blueprint, Vector2i(3, 2))
@@ -173,7 +173,7 @@ func test_item_interaction() -> void:
     
     # Create fresh entities for this test
     var player_blueprint = preload("res://assets/blueprints/actors/player.tres")
-    var sword_blueprint = preload("res://assets/blueprints/items/weapons/sword.tres")
+    var sword_blueprint = preload("res://assets/blueprints/items/sword.tres")
     
     var test_player = Entity.new().setup_from_blueprint(player_blueprint, pos)
     var test_sword = Entity.new().setup_from_blueprint(sword_blueprint, pos)

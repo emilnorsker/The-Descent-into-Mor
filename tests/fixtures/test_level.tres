@@ -2,10 +2,10 @@
 
 [ext_resource type="Script" path="res://src/Map/level.gd" id="1_0"]
 [ext_resource type="Script" path="res://src/Map/level_element.gd" id="2_0"]
-[ext_resource type="Resource" path="res://assets/blueprints/tiles/floor.tres" id="3_0"]
-[ext_resource type="Resource" path="res://assets/blueprints/tiles/feature.tres" id="4_0"]
-[ext_resource type="Resource" path="res://assets/blueprints/tiles/fixture.tres" id="5_0"]
-[ext_resource type="Resource" path="res://assets/blueprints/items/weapons/sword.tres" id="6_0"]
+[ext_resource type="Resource" path="res://assets/blueprints/terrain/floor.tres" id="3_0"]
+[ext_resource type="Resource" path="res://assets/blueprints/terrain/feature.tres" id="4_0"]
+[ext_resource type="Resource" path="res://assets/blueprints/terrain/fixture.tres" id="5_0"]
+[ext_resource type="Resource" path="res://assets/blueprints/items/sword.tres" id="6_0"]
 [ext_resource type="Resource" path="res://assets/blueprints/actors/monsters/orc.tres" id="7_0"]
 
 [sub_resource type="Resource" id="floor_1"]
