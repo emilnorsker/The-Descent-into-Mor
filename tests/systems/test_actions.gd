@@ -133,6 +133,9 @@ func test_attack_ranges() -> void:
         ["ItemComponent", {"power_bonus": 1, "defense_bonus": 1, "range": 2}]
     ])
     
+    # Move target to range 2
+    target.move(Vector2i(3, 1) - target.grid_position)
+    
     attacker.components.body.equip_to_slot(spear)
     var thrust = MeleeAction.new(attacker, target, Constants.BodyPart.RIGHT_ARM, Constants.BodyPart.CHEST)
     assert_true(thrust.perform(), "Spear should hit at range 2")

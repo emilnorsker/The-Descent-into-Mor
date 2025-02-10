@@ -46,7 +46,9 @@ items = []
 
 [sub_resource type="Resource" id="test_equip"]
 script = ExtResource("5_equipment_blueprint")
-slots = {}
+slots = {
+"5": null
+}
 
 [resource]
 script = ExtResource("1_entity_blueprint")

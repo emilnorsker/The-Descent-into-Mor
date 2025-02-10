@@ -80,7 +80,7 @@ func get_range() -> int:
     if performer.components.equipment:
         var weapon = performer.components.equipment.get_equipped_item(Constants.BodyPart.RIGHT_HAND)
         if weapon and weapon.components.item:
-            base_range = weapon.components.item.range
+            base_range += weapon.components.item.range - 1  # Subtract 1 since weapon range includes base range
     
     return base_range
 
