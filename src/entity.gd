@@ -37,7 +37,8 @@ var components: Dictionary = {
     "ai": null,
     "consumable": null,
     "item": null,
-    "body": null
+    "body": null,
+    "weight": null
 }
 
 func _init() -> void:
@@ -109,6 +110,10 @@ func setup_from_blueprint(blueprint: Resource, position: Vector2i = Vector2i.ZER
                         components.body = BodyComponent.new()
                         components.body.setup_from_blueprint(component_blueprint)
                         add_child(components.body)
+                    "weight":
+                        components.weight = WeightComponent.new()
+                        components.weight.setup_from_blueprint(component_blueprint)
+                        add_child(components.weight)
     
     return self
 

@@ -59,14 +59,14 @@ func heal(amount: int) -> void:
     
     if amount_recovered > 0:
         SignalBus.message_sent.emit(
-            "%s recovers %d HP!" % [get_parent().get_entity_name(), amount_recovered],
+            "%s recovers %d HP!" % [get_parent().entity_name, amount_recovered],
             Color.GREEN
         )
 
 func take_damage(amount: int) -> void:
     hp -= amount
     SignalBus.message_sent.emit(
-        "%s takes %d damage!" % [get_parent().get_entity_name(), amount],
+        "%s takes %d damage!" % [get_parent().entity_name, amount],
         Color.RED
     )
     
@@ -87,17 +87,11 @@ func die() -> void:
     died.emit()
     parent.queue_free()
 
-func get_max_hp() -> int:
-    return max_hp
-
-func get_current_hp() -> int:
-    return hp
-
 func get_defense() -> int:
-    return defense + get_parent().components.equipment.get_all_defense_bonus()
+    return defense + get_parent().components.equipment.total_defense_bonus
 
 func get_power() -> int:
-    return power + get_power_bonus()
+    return power + get_parent().components.equipment.total_power_bonus
 
 func get_power_bonus() -> int:
     if get_parent().components.equipment:

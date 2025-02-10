@@ -13,28 +13,27 @@ func perform() -> bool:
         return false
         
     var damage = get_damage()
-    var damage_type = get_damage_type()
     
-    target.components.body.apply_wound(Constants.BodyPart.CHEST, damage_type, damage)
-    performer.component.inventory.remove_item(item)
+    target.components.body.apply_wound(Constants.WoundType.LIGHT, Constants.BodyPart.CHEST, damage)
+    performer.components.inventory.remove_item(item)
     return true
 
-func get_damage_type() -> String:
-    var damage_type = "blunt"
-    if item.damage_type:
-        damage_type = item.damage_type.type
-    return damage_type
-
 func get_damage() -> int:
-    if item.weapon:
-        return item.weapon.damage
-    if item.weight:
-        return ceil(item.weight.weight * 0.01)
+    if item.components.item and item.components.item.power_bonus > 0:
+        return performer.components.combat.get_power() + item.components.item.power_bonus
+    if item.components.weight:
+        var weight = item.components.weight.get_weight()
+        return int(ceil(weight * 0.1))  # 50 weight = 5 damage
     return 1
 
 func get_range() -> int:
-    var weight = item.weight.weight if item.weight else 1.0
-    return max(1, 10 - ceil(weight * 2))
+    if item.components.item and item.components.item.range > 0:
+        return item.components.item.range
+    var base_range = 10
+    if item.components.weight:
+        var weight = item.components.weight.get_weight()
+        base_range = int(10 - ceil(weight * 0.5))  # 0.5 weight = 9 range
+    return max(1, base_range)
 
 func is_valid() -> bool:
     if not target or not item:

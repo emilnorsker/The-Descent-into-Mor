@@ -75,7 +75,7 @@ func equip(item: Entity, body_part: int = Constants.BodyPart.RIGHT_HAND) -> void
     entity.add_child(item)
     item.position = Vector2.ZERO  # Relative to parent
     
-    SignalBus.message_sent.emit(entity.entity_name + " equips the %s." % item.get_entity_name(), Color.WHITE)
+    SignalBus.message_sent.emit(entity.entity_name + " equips the %s." % item.entity_name, Color.WHITE)
     
     equipment_changed.emit()
 
@@ -87,7 +87,7 @@ func _unequip_from_slot(slot: int) -> void:
     if current_item and current_item.get_parent():
         current_item.get_parent().remove_child(current_item)
 
-    SignalBus.message_sent.emit(entity.entity_name + " removes the %s." % current_item.get_entity_name(), Color.WHITE)
+    SignalBus.message_sent.emit(entity.entity_name + " removes the %s." % current_item.entity_name, Color.WHITE)
     
     slots.erase(slot)
     

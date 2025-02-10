@@ -20,7 +20,7 @@ func before_each() -> void:
     entity = Entity.new().setup_from_blueprint(TestHumanoid, Vector2i(1, 1))
     GameMap.register_entity(entity, Vector2i(1, 1))
     
-    body = entity.get_component(BodyComponent)
+    body = entity.components.body
     add_child_autofree(body)
 
 func after_each() -> void:

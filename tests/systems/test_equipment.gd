@@ -16,8 +16,8 @@ func before_each() -> void:
     
     # Create test entity using blueprint
     entity = Entity.new().setup_from_blueprint(TestHumanoid, Vector2i(1, 1))
-    body = entity.get_component(BodyComponent)
-    equipment = entity.get_component(EquipmentComponent)
+    body = entity.components.body
+    equipment = entity.components.equipment
     add_child_autofree(equipment)
 
 func after_each() -> void:

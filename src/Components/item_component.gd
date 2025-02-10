@@ -5,7 +5,8 @@ extends Component
 enum EquipmentType {
     WEAPON,
     ARMOR,
-    ACCESSORY
+    ACCESSORY,
+    RANGED
 }
 
 var equipment_type: EquipmentType = EquipmentType.WEAPON
@@ -13,6 +14,7 @@ var equipment_type: EquipmentType = EquipmentType.WEAPON
 var power_bonus: int = 0
 var defense_bonus: int = 0
 var slot: Constants.BodyPart = Constants.BodyPart.RIGHT_HAND
+var range: int = 0
 
 func _init() -> void:
     super()
@@ -25,5 +27,9 @@ func setup_from_blueprint(blueprint: Resource) -> ItemComponent:
             defense_bonus = blueprint.defense_bonus
         if blueprint.slot:
             slot = blueprint.slot
+        if blueprint.equipment_type:
+            equipment_type = blueprint.equipment_type
+        if blueprint.range:
+            range = blueprint.range
 
     return self

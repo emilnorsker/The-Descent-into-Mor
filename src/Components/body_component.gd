@@ -193,7 +193,7 @@ func get_wounds(part = null) -> Array:
                 wounds_arr.append(wound)
         return wounds_arr
 
-func get_wounds_of_type(type: WoundType) -> Array:
+func get_wounds_of_type(type: WoundType) -> Array: 
     var result = []
     for part in wounds.keys():
         for wound in wounds[part]:
@@ -201,13 +201,13 @@ func get_wounds_of_type(type: WoundType) -> Array:
                 result.append({"part": part, "wound": wound})
     return result
 
-func equip_to_slot(item: Entity, body_part: Constants.BodyPart = Constants.BodyPart.RIGHT_HAND) -> void:
+func equip_to_slot(item: Entity, body_part = null) -> void:
     var parent = get_parent() as Entity
     if not parent or not parent.components.equipment: return
     
-    var slot = body_part if body_part != Constants.BodyPart.RIGHT_HAND else parent.components.equipment.default_slot
+    var slot = body_part if body_part else Constants.BodyPart.RIGHT_HAND
     if is_limb_impaired(slot):
-        SignalBus.message_sent.emit(parent.entity_name + " is unable to equip the %s." % item.get_entity_name(), Color.RED)
+        SignalBus.message_sent.emit(parent.entity_name + " is unable to equip the %s." % item.entity_name, Color.RED)
         return
     
     parent.components.equipment.equip(item, slot)

@@ -51,17 +51,16 @@ func get_damage_bonus() -> int:
             bonus += 2  # +2 damage when attacking from high ground
     
     # State modifiers
-    if performer.components.combat_modifier:
-        if performer.components.combat_modifier.has_state(Constants.StatusEffect.WINDED):
-            bonus -= 1  # Less power when winded
-    if target.components.combat_modifier.has_state(Constants.StatusEffect.DAZED):
+    if performer.components.combat_modifier and performer.components.combat_modifier.has_state(Constants.StatusEffect.WINDED):
+        bonus -= 1  # Less power when winded
+    if target.components.combat_modifier and target.components.combat_modifier.has_state(Constants.StatusEffect.DAZED):
         bonus += 1  # More damage against dazed targets
     
     return bonus
 
 func calculate_damage() -> int:
-    var base_damage = performer.components.combat.power()
-    var defense = target.components.combat.defense()
+    var base_damage = performer.components.combat.get_power()
+    var defense = target.components.combat.get_defense()
     var damage = base_damage - defense + get_damage_bonus()
     
     # Critical hits

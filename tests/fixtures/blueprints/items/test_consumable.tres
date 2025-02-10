@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://src/entity_blueprint.gd" id="1_script"]
 [ext_resource type="Script" path="res://src/Components/Blueprints/consumable_component_blueprint.gd" id="2_consumable"]
 [ext_resource type="Script" path="res://src/Components/Blueprints/weight_component_blueprint.gd" id="3_weight"]
-[ext_resource type="Script" path="res://src/Components/Blueprints/damage_type_component_blueprint.gd" id="4_damage"]
+[ext_resource type="Script" path="res://src/Components/Blueprints/material_component_blueprint.gd" id="4_material"]
 
 [sub_resource type="Resource" id="test_consumable"]
 script = ExtResource("2_consumable")
@@ -13,11 +13,9 @@ healing = 5
 script = ExtResource("3_weight")
 weight = 0.1
 
-[sub_resource type="Resource" id="test_damage"]
-script = ExtResource("4_damage")
-slash = 0
-pierce = 0
-blunt = 0
+[sub_resource type="Resource" id="test_material"]
+script = ExtResource("4_material")
+material = "wood"
 
 [resource]
 script = ExtResource("1_script")
@@ -28,5 +26,5 @@ key = "test_consumable"
 components = {
 "consumable": SubResource("test_consumable"),
 "weight": SubResource("test_weight"),
-"damage_type": SubResource("test_damage")
+"material": SubResource("test_material")
 } 

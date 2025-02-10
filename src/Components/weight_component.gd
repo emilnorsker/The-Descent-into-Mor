@@ -1,9 +1,9 @@
 class_name WeightComponent
 extends Component
 
-@export var weight: float = 1.0
-@export var affects_balance: bool = false
-@export var balance_penalty: float = 0.0
+var weight: float = 1.0
+var affects_balance: bool = false
+var balance_penalty: float = 0.0
 
 func _init() -> void:
     super()
@@ -19,8 +19,8 @@ func setup_from_blueprint(blueprint: Resource) -> WeightComponent:
 func get_weight() -> float:
     var base_weight = weight
     var parent = get_parent() as Entity
-    if parent and parent.combat_modifier:
-        if parent.combat_modifier.has_state(Constants.StatusEffect.MUD_COVERED):
+    if parent and parent.components.combat_modifier:
+        if parent.components.combat_modifier.has_state(Constants.StatusEffect.MUD_COVERED):
             base_weight *= 1.5  # Mud increases weight by 50%
     return base_weight
 

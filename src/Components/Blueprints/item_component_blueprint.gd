@@ -5,3 +5,4 @@ class_name ItemComponentBlueprint extends Resource
 @export var power_bonus: int = 0
 @export var defense_bonus: int = 0
 @export var slot: Constants.BodyPart = Constants.BodyPart.RIGHT_HAND
+@export var range: int = 0

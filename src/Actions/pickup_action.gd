@@ -10,7 +10,7 @@ func perform() -> bool:
     
     if entity.components.inventory.add(item):
         SignalBus.message_sent.emit(
-            "%s picked up %s" % [entity.get_entity_name(), item.get_entity_name()],
+            "%s picked up %s" % [entity.entity_name, item.entity_name],
             Color.WHITE
         )
         GameMap.erase(item)
