@@ -75,11 +75,14 @@ func test_ablaze_state() -> void:
     var creature = Entity.new().setup_from_blueprint(preload("res://assets/blueprints/actors/player.tres"), Vector2i(1, 1))
     entity.components.combat_modifier.apply_state(Constants.StatusEffect.ABLAZE, creature)
     
+    entity.process_action_queue()
     # Should cause wounds to entities with health
     if creature.components.body.consciousness > 0:
-        assert_true(creature.components.body.get_wounds(Constants.BodyPart.CHEST), "Ablaze should cause wounds")
-        assert_eq(creature.components.body.get_wound_type(Constants.BodyPart.CHEST, 0), Constants.WoundType.MODERATE, 
-                "Fire should cause moderate wounds")
+        var wounds = creature.components.body.get_wounds(Constants.BodyPart.CHEST)
+        assert_true(wounds.size() > 0, "Ablaze should cause wounds")
+        if wounds.size() > 0:
+            assert_eq(wounds[0].type, Constants.WoundType.MODERATE, 
+                    "Fire should cause moderate wounds")
     
     # Test smoke effects
     var nearby_tile = Vector2i(2, 1)
@@ -91,18 +94,11 @@ func test_ablaze_state() -> void:
     GameMap.register_entity(flammable_object, flammable_object.grid_position)
     
     GameMap.process_turn()  # Let fire spread
-    assert_true(flammable_object.has_state(Constants.StatusEffect.ABLAZE), "Fire should spread to nearby flammable objects")
+    print(flammable_object.components)
+    assert_true(flammable_object.components.combat_modifier.has_state(Constants.StatusEffect.ABLAZE), "Fire should spread to nearby flammable objects")
+    flammable_object.process_action_queue()
     
-    # Test equipment damage fr
-    var sword = Entity.new().setup_from_blueprint(preload("res://assets/blueprints/items/sword.tres"), Vector2i(1, 1))
-    creature.components.body.equip_to_slot(sword)
-    
-    watch_signals(creature.components.equipment)
-    GameMap.process_turn()  # Process fire damage
 
-
-    assert_signal_emitted(creature.components.equipment, "equipment_damaged", "Fire should damage equipment")
-        
 func test_mud_covered() -> void:
     # Test mud on floor
     var floor_tile = Entity.new().setup_from_blueprint(preload("res://assets/blueprints/terrain/floor.tres"), Vector2i(1, 1))

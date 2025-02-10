@@ -1,5 +1,9 @@
 extends GutTest
 
+const TestHumanoid = preload("res://tests/fixtures/blueprints/actors/test_humanoid.tres")
+const TestArmor = preload("res://tests/fixtures/blueprints/items/test_armor.tres")
+const TestConsumable = preload("res://tests/fixtures/blueprints/items/test_consumable.tres")
+
 var BodyPart = Constants.BodyPart
 
 var entity: Entity
@@ -10,13 +14,10 @@ func before_each() -> void:
     var test_level = preload("res://tests/fixtures/test_level.tres")
     GameMap.load_level(test_level)
     
-    # Create test entity with body
-    entity = Entity.new().setup_from_blueprint(preload("res://assets/blueprints/actors/player.tres"), Vector2i(1, 1))
-    body = entity.body
-    equipment = entity.equipment
-   
-    body = entity.components.body
-    equipment = entity.components.equipment
+    # Create test entity using blueprint
+    entity = Entity.new().setup_from_blueprint(TestHumanoid, Vector2i(1, 1))
+    body = entity.get_component(BodyComponent)
+    equipment = entity.get_component(EquipmentComponent)
     add_child_autofree(equipment)
 
 func after_each() -> void:
@@ -26,14 +27,7 @@ func after_each() -> void:
 
 # Body Part Equipment Tests
 func test_body_part_equipment() -> void:
-    var chest_armor = create_armor_entity([
-        ["ArmorComponent", {
-            "slot": Constants.BodyPart.CHEST,
-            "protection": 3
-        }],
-        ["MaterialComponent", {"type": "metal"}],
-        ["WeightComponent", {"weight": 5}]
-    ])
+    var chest_armor = Entity.new().setup_from_blueprint(TestArmor, Vector2i.ZERO)
     
     body.equip_to_slot(chest_armor)
     
@@ -140,25 +134,18 @@ func test_equipment_wound_interaction() -> void:
 
 func test_component_misuse() -> void:
     # Test trying to eat armor
-    var metal_plate = create_armor_entity([
-        ["ArmorComponent", {
-            "slot": Constants.BodyPart.CHEST,
-            "protection": 3
-        }],
-        ["MaterialComponent", {"type": "metal"}]
-    ])
+    var metal_plate = Entity.new().setup_from_blueprint(TestArmor, Vector2i.ZERO)
     
     var item_action = ItemAction.new(entity, metal_plate)
     var result = item_action.perform()
     
     assert_false(result, "Should not be able to consume armor")
     assert_true(body.get_wounds(BodyPart.HEAD), "Should get head wound from biting metal")
-    assert_eq(body.get_wound_type(BodyPart.HEAD, 0), Constants.WoundType.LIGHT, 
+    assert_eq(body.get_wounds(BodyPart.HEAD)[0].type, Constants.WoundType.LIGHT, 
             "Should be light wound from biting metal")
     
     # Test trying to equip consumable
-    var potion = Entity.new()
-    potion.add_component("ConsumableComponent")
+    var potion = Entity.new().setup_from_blueprint(TestConsumable, Vector2i.ZERO)
     
     var equip_action = EquipAction.new(entity, potion)
     result = equip_action.perform()
@@ -167,14 +154,7 @@ func test_component_misuse() -> void:
     assert_true(body.get_wounds(BodyPart.RIGHT_ARM), "Should get arm wound from trying to wear potion")
     
     # Test improvised weapon damage
-    var bandage = Entity.new()
-    bandage.add_component("ConsumableComponent", {"healing": 5})
-    bandage.add_component("WeightComponent", {"weight": 0.1})
-    bandage.add_component("DamageTypeComponent", {
-        "slash": 0,  # Can't cut with cloth
-        "pierce": 0, # Can't stab with cloth
-        "blunt": 0   # Too light for blunt damage
-    })
+    var bandage = Entity.new().setup_from_blueprint(TestConsumable, Vector2i.ZERO)
     
     var attack_action = MeleeAction.new(entity, entity, BodyPart.RIGHT_ARM, bandage)
     result = attack_action.perform()
@@ -226,34 +206,22 @@ func test_wound_effects() -> void:
 
 
 # Utility Functions
-func create_armor_entity(components: Array) -> Entity:
-    # Create a temporary blueprint
-    var blueprint = ItemBlueprint.new()
-    blueprint.entity_name = "Test Armor"
-    blueprint.type = Entity.EntityType.ITEM
-    blueprint.blocks_movement = false
-        
-    # Convert the test components to our blueprint system
-    for component_data in components:
+func create_armor_entity(data: Array) -> Entity:
+    # Create a temporary blueprint based on test armor
+    var blueprint = TestArmor.duplicate()
+    
+    # Modify components based on data
+    for component_data in data:
         var type = component_data[0]
-        var data = component_data[1]
+        var values = component_data[1]
         
         match type:
             "ArmorComponent":
-                # Add to equipment blueprint
-                blueprint.slots[data.get("slot", Constants.BodyPart.CHEST)] = true
-                blueprint.defense_bonus = data.get("protection", 0)
-                
+                blueprint.components.armor.slot = values.get("slot", Constants.BodyPart.CHEST)
+                blueprint.components.armor.protection = values.get("protection", 3)
             "MaterialComponent":
-                var material_blueprint = MaterialComponentBlueprint.new()
-                material_blueprint.material_type = data.get("type", "cloth")
-                material_blueprint.is_flammable = data.get("flammable", false)
-                blueprint.components.material_blueprint = material_blueprint
-                
+                blueprint.components.material.material_type = values.get("type", "metal")
             "WeightComponent":
-                var weight_blueprint = WeightComponentBlueprint.new()
-                weight_blueprint.weight = data.get("weight", 1.0)
-                blueprint.components.weight_blueprint = weight_blueprint
+                blueprint.components.weight.weight = values.get("weight", 5.0)
     
-    # Create entity from blueprint
     return Entity.new().setup_from_blueprint(blueprint, Vector2i.ZERO) 

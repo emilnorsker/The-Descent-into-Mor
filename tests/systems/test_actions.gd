@@ -1,5 +1,8 @@
 extends GutTest
 
+const TestHumanoid = preload("res://tests/fixtures/blueprints/actors/test_humanoid.tres")
+const TestWeapon = preload("res://tests/fixtures/blueprints/items/test_weapon.tres")
+
 var attacker: Entity
 var target: Entity
 
@@ -7,30 +10,9 @@ func before_each() -> void:
     var test_level = preload("res://tests/fixtures/test_level.tres")
     GameMap.load_level(test_level)
     
-    # Create entities with body components
-    attacker = Entity.new()
-    attacker.add_component("BodyComponent", {
-        "type": "humanoid",
-        "parts": {
-            Constants.BodyPart.HEAD: {"damage": 2, "range": 1, "damage_type": Constants.DamageType.BLUNT},
-            Constants.BodyPart.LEFT_ARM: {"damage": 1, "range": 1, "damage_type": Constants.DamageType.BLUNT},
-            Constants.BodyPart.RIGHT_ARM: {"damage": 1, "range": 1, "damage_type": Constants.DamageType.BLUNT},
-            Constants.BodyPart.LEFT_LEG: {"damage": 2, "range": 1, "damage_type": Constants.DamageType.BLUNT},
-            Constants.BodyPart.RIGHT_LEG: {"damage": 2, "range": 1, "damage_type": Constants.DamageType.BLUNT}
-        }
-    })
-    attacker.add_component("InventoryComponent")
-    attacker.add_component("EquipmentComponent")
-    
-    target = Entity.new()
-    target.add_component("BodyComponent", {
-        "type": "humanoid",
-        "parts": {
-            Constants.BodyPart.HEAD: {"vital": true},
-            Constants.BodyPart.CHEST: {"vital": true},
-            # ... other body parts ...
-        }
-    })
+    # Create entities with body components using blueprint
+    attacker = Entity.new().setup_from_blueprint(TestHumanoid, Vector2i(1, 1))
+    target = Entity.new().setup_from_blueprint(TestHumanoid, Vector2i(2, 1))
     
     GameMap.register_entity(attacker, Vector2i(1, 1))
     GameMap.register_entity(target, Vector2i(2, 1))
@@ -46,7 +28,7 @@ func test_unarmed_attacks() -> void:
     
     assert_true(result, "Punch should succeed")
     assert_true(target.components.body.get_wounds(Constants.BodyPart.CHEST), "Punch should cause wound")
-    assert_eq(target.components.body.get_wound_type(Constants.BodyPart.CHEST), Constants.WoundType.LIGHT, 
+    assert_eq(target.components.body.get_wounds(Constants.BodyPart.CHEST)[0].type, Constants.WoundType.LIGHT, 
             "Punch should cause light wound")
     
     # Test kick
@@ -54,7 +36,7 @@ func test_unarmed_attacks() -> void:
     result = kick.perform()
     
     assert_true(result, "Kick should succeed")
-    assert_eq(target.components.body.get_wound_type(Constants.BodyPart.ABDOMEN), Constants.WoundType.MODERATE,
+    assert_eq(target.components.body.get_wounds(Constants.BodyPart.ABDOMEN)[0].type, Constants.WoundType.MODERATE,
             "Kick should cause moderate wound")
     
     # Test headbutt
@@ -67,14 +49,10 @@ func test_unarmed_attacks() -> void:
 
 # Weapon Tests
 func test_weapon_attacks() -> void:
-    var sword = create_weapon_entity([
-        ["WeaponComponent", {"damage": 3, "range": 1}],
-        ["DamageTypeComponent", {"type": Constants.DamageType.SLASH}],
-        ["WeightComponent", {"weight": 1.5}]
-    ])
+    var sword = Entity.new().setup_from_blueprint(TestWeapon, Vector2i.ZERO)
     
     attacker.components.body.equip_to_slot(sword)
-    var slash = MeleeAction.new(attacker, target, Constants.BodyPart.CHEST, sword)
+    var slash = MeleeAction.new(attacker, target, Constants.BodyPart.CHEST)
     var result = slash.perform()
     
     assert_true(result, "Sword attack should succeed")
@@ -121,30 +99,50 @@ func test_throw_generic_item() -> void:
 # Range Tests
 func test_attack_ranges() -> void:
     # Test out of punch range
-    GameMap.move_entity(target, Vector2i(4, 1))
+    target.move(Vector2i(4, 1) - target.grid_position)
     var punch = MeleeAction.new(attacker, target, Constants.BodyPart.RIGHT_ARM)
     assert_false(punch.perform(), "Punch should fail at range 3")
     
     # Test weapon range
     var spear = create_weapon_entity([
-        ["WeaponComponent", {"damage": 2, "range": 2}],
         ["DamageTypeComponent", {"type": Constants.DamageType.PIERCE}],
-        ["WeightComponent", {"weight": 2.0}]
+        ["WeightComponent", {"weight": 2.0}],
+        ["ItemComponent", {"power_bonus": 1, "defense_bonus": 1}]
     ])
     
     attacker.components.body.equip_to_slot(spear)
-    var thrust = MeleeAction.new(attacker, target, null, spear)
+    var thrust = MeleeAction.new(attacker, target, Constants.BodyPart.RIGHT_ARM)
     assert_true(thrust.perform(), "Spear should hit at range 2")
 
 # Utility Functions
-func create_weapon_entity(components: Array) -> Entity:
-    var weapon = Entity.new()
-    for component in components:
-        weapon.add_component(component[0], component[1])
-    return weapon
+func create_weapon_entity(data: Array) -> Entity:
+    # Create a temporary blueprint based on test weapon
+    var blueprint = TestWeapon.duplicate()
+    
+    # Modify components based on data
+    for component_data in data:
+        var type = component_data[0]
+        var values = component_data[1]
+        
+        match type:
+            "WeaponComponent":
+                blueprint.components.item.damage = values.get("damage", 3)
+                blueprint.components.item.range = values.get("range", 1)
+            "WeightComponent":
+                blueprint.components.weight.weight = values.get("weight", 1.5)
+    
+    return Entity.new().setup_from_blueprint(blueprint, Vector2i.ZERO)
 
-func create_item_entity(components: Array) -> Entity:
-    var item = Entity.new()
-    for component in components:
-        item.add_component(component[0], component[1])
-    return item 
+func create_item_entity(data: Array) -> Entity:
+    # Similar to create_weapon_entity but for generic items
+    var blueprint = TestWeapon.duplicate()  # Use weapon as base but modify
+    
+    for component_data in data:
+        var type = component_data[0]
+        var values = component_data[1]
+        
+        match type:
+            "WeightComponent":
+                blueprint.components.weight.weight = values.get("weight", 1.0)
+    
+    return Entity.new().setup_from_blueprint(blueprint, Vector2i.ZERO) 

@@ -60,9 +60,7 @@ func clear() -> void:
     opaque_positions.clear()
     player = null
 
-func register_entity(entity: Entity, position: Vector2i) -> void:
-    print("Registering entity at position: ", position)
-    
+func register_entity(entity: Entity, position: Vector2i) -> void:    
     # Add to correct layer first
     match entity.type:
         Entity.EntityType.CORPSE:
@@ -108,9 +106,7 @@ func register_entity(entity: Entity, position: Vector2i) -> void:
             _blocking_positions[position] = []
         _blocking_positions[position].append(entity)
     
-    entity_added.emit(entity, position)
-    position_contents_changed.emit(position)
-    print("Entity registered successfully")
+    entity_added.emit(entity, position)        
 
 func erase(entity: Entity) -> void:
     assert(entity != null, "Cannot erase null entity")
@@ -144,7 +140,7 @@ func move_entity(entity: Entity, from_pos: Vector2i, to_pos: Vector2i) -> void:
     position_contents_changed.emit(from_pos)
     position_contents_changed.emit(to_pos)
 
-func get_entities_at(pos: Vector2i) -> Array[Entity]:
+func get_entities_at(pos: Vector2i) -> Array:
     var entities = _entities.filter(func(e):
         var at_pos = e.grid_position == pos
         return at_pos
@@ -178,7 +174,7 @@ func is_line_of_sight_blocked(from_pos: Vector2i, to_pos: Vector2i) -> bool:
     var line = get_line(from_pos, to_pos)
     for pos in line:
         for entity in get_entities_at(pos):
-            if entity.blocks_sight():
+            if entity.components.terrain and entity.components.terrain.blocks_sight:
                 return true
     return false
 
@@ -214,7 +210,7 @@ func process_turn() -> void:
     for entity in _entities:
         print("Processing turn for entity: ", entity.entity_name)
         if entity.components.combat_modifier:
-            entity.components.combat_modifier.process_turn()
+            entity.process_action_queue()
             
             if entity.components.combat_modifier.has_state(Constants.StatusEffect.ABLAZE):
                 if entity.components.body and entity.components.body.consciousness > 0:

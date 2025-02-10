@@ -1,6 +1,6 @@
 @tool
-extends Resource
 class_name BodyComponentBlueprint
+extends Resource
 
 @export var type: String = "humanoid"
 @export var parts: Dictionary = {}

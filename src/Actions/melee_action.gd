@@ -1,6 +1,6 @@
 @tool
-extends Action
-class_name MeleeAction
+class_name MeleeAction extends Action
+
 
 var target_body_part: int
 

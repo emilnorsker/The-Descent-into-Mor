@@ -1,0 +1,52 @@
+[gd_resource type="Resource" script_class="EntityBlueprint" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://src/entity_blueprint.gd" id="1_script"]
+[ext_resource type="Script" path="res://src/Components/Blueprints/body_component_blueprint.gd" id="2_body"]
+[ext_resource type="Script" path="res://src/Components/Blueprints/combat_component_blueprint.gd" id="3_combat"]
+[ext_resource type="Script" path="res://src/Components/Blueprints/inventory_component_blueprint.gd" id="4_inv"]
+[ext_resource type="Script" path="res://src/Components/Blueprints/equipment_component_blueprint.gd" id="5_equip"]
+
+[sub_resource type="Resource" id="test_body"]
+script = ExtResource("2_body")
+type = "humanoid"
+parts = {
+"head": true,
+"neck": true,
+"chest": true,
+"abdomen": true,
+"left_arm": true,
+"right_arm": true,
+"left_leg": true,
+"right_leg": true
+}
+consciousness = 0.0
+wounds = {}
+
+[sub_resource type="Resource" id="test_combat"]
+script = ExtResource("3_combat")
+health = 100
+max_health = 100
+power = 10
+defense = 5
+
+[sub_resource type="Resource" id="test_inv"]
+script = ExtResource("4_inv")
+capacity = 10
+items = []
+
+[sub_resource type="Resource" id="test_equip"]
+script = ExtResource("5_equip")
+slots = {}
+
+[resource]
+script = ExtResource("1_script")
+entity_name = "Test Humanoid"
+blocks_movement = true
+type = 0
+key = "test_humanoid"
+components = {
+"body": SubResource("test_body"),
+"combat": SubResource("test_combat"),
+"inventory": SubResource("test_inv"),
+"equipment": SubResource("test_equip")
+} 

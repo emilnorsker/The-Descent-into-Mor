@@ -187,9 +187,9 @@ func get_wounds(part = null) -> Array:
         return wounds[part]
     else:
         var wounds_arr = []
-        for part in wounds.keys():
-            for wound in wounds[part]:
-                wound.part = part
+        for wounded_part in wounds.keys():
+            for wound in wounds[wounded_part]:
+                wound.part = wounded_part
                 wounds_arr.append(wound)
         return wounds_arr
 

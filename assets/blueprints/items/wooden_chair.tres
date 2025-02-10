@@ -3,6 +3,8 @@
 [ext_resource type="Script" path="res://src/entity_blueprint.gd" id="1_script"]
 [ext_resource type="Script" path="res://src/Components/Blueprints/material_component_blueprint.gd" id="2_material"]
 [ext_resource type="Script" path="res://src/Components/Blueprints/item_component_blueprint.gd" id="3_item"]
+[ext_resource type="Script" path="res://src/Components/Blueprints/weight_component_blueprint.gd" id="4_weight"]
+[ext_resource type="Script" path="res://src/Components/Blueprints/combat_modifier_component_blueprint.gd" id="5_modifiers"]
 
 [sub_resource type="Resource" id="chair_material"]
 script = ExtResource("2_material")
@@ -12,9 +14,16 @@ is_slippery = false
 
 [sub_resource type="Resource" id="chair_item"]
 script = ExtResource("3_item")
-value = 10
-stackable = false
-max_stack = 1
+power_bonus = 0
+defense_bonus = 0
+
+[sub_resource type="Resource" id="chair_weight"]
+script = ExtResource("4_weight")
+weight = 1.0
+
+[sub_resource type="Resource" id="chair_modifiers"]
+script = ExtResource("5_modifiers")
+
 
 [resource]
 script = ExtResource("1_script")
@@ -24,5 +33,7 @@ type = 1
 key = "wooden_chair"
 components = {
 "item": SubResource("chair_item"),
-"material": SubResource("chair_material")
+"material": SubResource("chair_material"),
+"weight": SubResource("chair_weight"),
+"combat_modifier": SubResource("chair_modifiers")
 } 

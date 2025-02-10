@@ -1,13 +1,13 @@
 [gd_resource type="Resource" load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://src/entity_blueprint.gd" id="1_script"]
-[ext_resource type="Script" path="res://src/Components/Blueprints/equipment_component_blueprint.gd" id="2_equip"]
+[ext_resource type="Script" path="res://src/Components/Blueprints/item_component_blueprint.gd" id="2_item"]
 [ext_resource type="Script" path="res://src/Components/Blueprints/material_component_blueprint.gd" id="3_material"]
 [ext_resource type="Script" path="res://src/Components/Blueprints/weight_component_blueprint.gd" id="4_weight"]
 
-[sub_resource type="Resource" id="sword_equip"]
-script = ExtResource("2_equip")
-slot = "weapon"
+[sub_resource type="Resource" id="sword_item"]
+script = ExtResource("2_item")
+slot = 5
 power_bonus = 5
 defense_bonus = 0
 
@@ -30,7 +30,7 @@ blocks_movement = false
 type = 1
 key = "sword"
 components = {
-"equipment": SubResource("sword_equip"),
+"item": SubResource("sword_item"),
 "material": SubResource("sword_material"),
 "weight": SubResource("sword_weight")
-} 
+}

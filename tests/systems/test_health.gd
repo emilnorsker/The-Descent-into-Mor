@@ -1,7 +1,7 @@
 extends GutTest
 
-const Level = preload("res://src/Map/level.gd")
-const Constants = preload("res://src/constants.gd")
+const TestHumanoid = preload("res://tests/fixtures/blueprints/actors/test_humanoid.tres")
+const TestWoundedHumanoid = preload("res://tests/fixtures/blueprints/actors/test_wounded_humanoid.tres")
 
 var BodyPart = Constants.BodyPart
 var WoundType = Constants.WoundType
@@ -16,61 +16,8 @@ func before_each() -> void:
     var test_level = preload("res://tests/fixtures/test_level.tres")
     GameMap.load_level(test_level)
     
-    # Create test entity with body
-    entity = Entity.new()
-    entity.add_component("BodyComponent", {
-        "type": "humanoid",
-        "parts": {
-            BodyPart.HEAD: {
-                "vital": true,
-                "consciousness_impact": 2.0,
-                "bleed_rate": 1.5,
-                "max_wounds": 2
-            },
-            BodyPart.NECK: {
-                "vital": true,
-                "consciousness_impact": 1.5,
-                "bleed_rate": 2.0,
-                "max_wounds": 2
-            },
-            BodyPart.CHEST: {
-                "vital": true,
-                "consciousness_impact": 1.25,
-                "bleed_rate": 1.0,
-                "max_wounds": 3
-            },
-            BodyPart.ABDOMEN: {
-                "vital": false,
-                "consciousness_impact": 1.0,
-                "bleed_rate": 1.0,
-                "max_wounds": 3
-            },
-            BodyPart.LEFT_ARM: {
-                "vital": false,
-                "consciousness_impact": 0.5,
-                "bleed_rate": 0.75,
-                "max_wounds": 2
-            },
-            BodyPart.RIGHT_ARM: {
-                "vital": false,
-                "consciousness_impact": 0.5,
-                "bleed_rate": 0.75,
-                "max_wounds": 2
-            },
-            BodyPart.LEFT_LEG: {
-                "vital": false,
-                "consciousness_impact": 0.75,
-                "bleed_rate": 0.75,
-                "max_wounds": 2
-            },
-            BodyPart.RIGHT_LEG: {
-                "vital": false,
-                "consciousness_impact": 0.75,
-                "bleed_rate": 0.75,
-                "max_wounds": 2
-            }
-        }
-    })
+    # Create test entity with body using blueprint
+    entity = Entity.new().setup_from_blueprint(TestHumanoid, Vector2i(1, 1))
     GameMap.register_entity(entity, Vector2i(1, 1))
     
     body = entity.get_component(BodyComponent)
