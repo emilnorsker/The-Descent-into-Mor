@@ -11,20 +11,14 @@ func _init(entity: Entity, item: Entity, target_slot: int = -1) -> void:
     _target_slot = target_slot
 
 func perform() -> bool:
-    if not _item.equipment:
+    if not _item.components.item or _item.components.item.equipment_type == ItemComponent.EquipmentType.NONE:
         return false
     
-    if not performer.body:
+    if not performer.components.body:
         return false
     
-    var body = performer.body
-    
-    # Check if item can be equipped to target body part
-    if not body.can_equip(_item, _target_slot):
-        return false
-    
-    # Equip the item
-    performer.equipment.equip(_item, _target_slot)
+    var body = performer.components.body
+    body.equip_to_slot(_item, _target_slot)
     return true
 
 func is_valid() -> bool:

@@ -212,7 +212,18 @@ func get_line(start: Vector2i, end: Vector2i) -> Array[Vector2i]:
     line.append(end)
     return line
 
-
+func get_entities_in_rect(start: Vector2i, end: Vector2i) -> Array[Entity]:
+    var min_x = mini(start.x, end.x)
+    var max_x = maxi(start.x, end.x)
+    var min_y = mini(start.y, end.y)
+    var max_y = maxi(start.y, end.y)
+    
+    var entities: Array[Entity] = []
+    for x in range(min_x, max_x + 1):
+        for y in range(min_y, max_y + 1):
+            var pos = Vector2i(x, y)
+            entities.append_array(get_entities_at(pos))
+    return entities
 
 # TODO: This is a temporary function to process the turn. It should be replaced with a more generic system that can handle all the different types of actions.
 func process_turn() -> void:

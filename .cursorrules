@@ -1,3 +1,4 @@
+# init and super
 super._init() is invalid syntax.
 initialize the parent class with super()
 
@@ -6,7 +7,7 @@ the only valid syntax for intilization is this:
 func _init(<args>) -> void:
     super()
 
-
+# Tilemap
 Never use TileMap. Use TileMapLayer instead.
 
 - TileMapLayer is a single layer of tiles
@@ -21,6 +22,9 @@ this mean the correct way to use get used cells at is this:
 
     var used_cells = floor_layer.get_used_cells()
 
+
+# Constants
+Always use the global Constants module for determining int or constants that are used to determine types of entities, etc.
 
 ## Naming conventions
 - {name}Component should have class_name {name}Component, and it should be in a file called {name}_component.gd

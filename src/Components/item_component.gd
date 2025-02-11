@@ -3,6 +3,7 @@ class_name ItemComponent
 extends Component
 
 enum EquipmentType {
+    NONE,
     WEAPON,
     ARMOR,
     ACCESSORY,
