@@ -159,7 +159,7 @@ Common actions:
 - `MoveAction`: Grid-based movement
 - `MeleeAction`: Basic combat
 - `InteractAction`: Using fixtures
-- `UseItemAction`: Consuming or equipping items
+- `UseConsumeAction`: Consuming or equipping items
 
 ## Best Practices
 

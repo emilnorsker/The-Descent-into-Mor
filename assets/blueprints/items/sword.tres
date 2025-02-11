@@ -1,4 +1,4 @@
-[gd_resource type="Resource" load_steps=6 format=3]
+[gd_resource type="Resource" script_class="EntityBlueprint" load_steps=8 format=3 uid="uid://cy80mne68c7vf"]
 
 [ext_resource type="Script" path="res://src/entity_blueprint.gd" id="1_script"]
 [ext_resource type="Script" path="res://src/Components/Blueprints/item_component_blueprint.gd" id="2_item"]
@@ -7,15 +7,17 @@
 
 [sub_resource type="Resource" id="sword_item"]
 script = ExtResource("2_item")
-slot = 5
+equipment_type = 0
 power_bonus = 5
 defense_bonus = 0
+slot = 5
+range = 0
 
 [sub_resource type="Resource" id="sword_material"]
 script = ExtResource("3_material")
-material_type = "steel"
 is_flammable = false
 is_slippery = false
+material_type = "steel"
 
 [sub_resource type="Resource" id="sword_weight"]
 script = ExtResource("4_weight")

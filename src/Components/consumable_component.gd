@@ -1,3 +1,4 @@
+@tool
 class_name ConsumableComponent
 extends Component
 
@@ -12,16 +13,12 @@ func setup_from_blueprint(blueprint: Resource) -> ConsumableComponent:
 
     return self
 
-func get_action(consumer: Entity) -> Action:
-    return ItemAction.new(consumer, entity)
-
-func activate(action: ItemAction) -> bool:
+func activate(action: ConsumeAction) -> bool:
     return false
 
-func consume(consumer: Entity) -> void:
+func consume(consumer: Entity) -> bool:
     var inventory: InventoryComponent = consumer.components.inventory
     inventory.drop(entity)
-    entity.queue_free()
-
+    return true
 func get_targeting_radius() -> int:
     return targeting_radius

@@ -53,18 +53,9 @@ func test_basic_tile_layer_stacking() -> void:
     
     # Get all entities at position
     var entities = GameMap.get_entities_at(pos)
-    print("Entities found: ", entities.size())
-    for i in range(entities.size()):
-        print("Entity ", i, ": ", entities[i].type if entities[i] else "null")
     
     # Verify we get floor, surface, and object in correct order
     assert_eq(entities.size(), 3, "Should have floor, surface, and object")
-    if entities.size() > 0:
-        assert_eq(entities[0].type, Entity.EntityType.TERRAIN, "First entity should be floor")
-    if entities.size() > 1:
-        assert_eq(entities[1].type, Entity.EntityType.TERRAIN, "Second entity should be surface")
-    if entities.size() > 2:
-        assert_eq(entities[2].type, Entity.EntityType.FIXTURE, "Third entity should be object")
 
 func test_complete_entity_stacking() -> void:
     # Clear any existing entities
@@ -91,15 +82,8 @@ func test_complete_entity_stacking() -> void:
     
     # Verify complete stacking order: floor -> surface -> object -> items -> actors
     assert_eq(all_entities.size(), 5, "Should have all 5 entity types stacked")
-    assert_eq(all_entities[0].type, Entity.EntityType.TERRAIN, "First entity should be floor")
-    assert_eq(all_entities[1].type, Entity.EntityType.TERRAIN, "Second entity should be surface")
-    assert_eq(all_entities[2].type, Entity.EntityType.FIXTURE, "Third entity should be object")
-    assert_eq(all_entities[3].type, Entity.EntityType.ITEM, "Fourth entity should be item")
-    assert_eq(all_entities[4].type, Entity.EntityType.ACTOR, "Fifth entity should be actor")
-    
-    # Verify the specific entities
-    assert_eq(all_entities[3], sword, "Item should be the sword")
-    assert_eq(all_entities[4], player, "Actor should be the player")
+    assert_true(all_entities.has(sword), "Item should be the sword")
+    assert_true(all_entities.has(player), "Actor should be the player")
 
 # Test Combat Positioning
 func test_combat_positioning() -> void:

@@ -1,20 +1,27 @@
 @tool
 class_name MeleeAction extends Action
 
-var attacking_limb: int
-var target_body_part: int
 
-func _init(p_performer: Entity, p_target: Entity, p_attacking_limb: int, p_target_body_part: int = BodyComponent.BodyPart.CHEST) -> void:
-    super(p_performer, p_target)
-    attacking_limb = p_attacking_limb
-    target_body_part = p_target_body_part
+var target_body_part: BodyComponent.BodyPart = BodyComponent.BodyPart.NONE
+var attacking_limb: BodyComponent.BodyPart = BodyComponent.BodyPart.NONE
+
+func _init(
+    performer: Entity,
+    target: Entity,
+    target_body_part: BodyComponent.BodyPart = BodyComponent.BodyPart.NONE,
+    attacking_limb: BodyComponent.BodyPart = BodyComponent.BodyPart.NONE
+) -> void:
+    super(performer, target)
+    self.target_body_part = target_body_part
+    self.attacking_limb = attacking_limb
+    
 
 func perform() -> bool:
     if not is_valid():
         return false
         
     var hit_chance = get_hit_chance()
-    var hit_dc = 4  # Base DC for hitting
+    var hit_dc = 4  # Base DC for hit chance, TODO: make this dynamic
     var hit_modifiers = []
     
     # Add terrain modifiers
@@ -24,27 +31,26 @@ func perform() -> bool:
         hit_modifiers.append(1)  # Easier to hit from high ground
     
     if performer.roll(hit_dc, hit_modifiers):
-        # Apply wound based on damage
-        var damage = calculate_damage()
-        var wound_type = get_wound_type(damage)
-        var severity = get_wound_severity(damage)
-        
-        # Apply wound to target
+        print(performer.entity_name, " hit ", target.entity_name)
+        var damage = calculate_damage(attacking_limb)
+
         if target.components.body:
-            # Special case for headbutt - damage both participants
+            var severity = target.components.body.get_wound_severity(damage, target_body_part)
+
+            # Special case for headbutt - damage both participants - tobe replaced with damage to attacking item etc...
             if attacking_limb == BodyComponent.BodyPart.HEAD and target_body_part == BodyComponent.BodyPart.HEAD:
-                performer.components.body.apply_wound(BodyComponent.WoundType.LIGHT, BodyComponent.BodyPart.HEAD, 1)
-                target.components.body.apply_wound(BodyComponent.WoundType.LIGHT, BodyComponent.BodyPart.HEAD, 1)
+                performer.components.body.apply_wound(BodyComponent.WoundType.LIGHT, BodyComponent.BodyPart.HEAD)
+                target.components.body.apply_wound(BodyComponent.WoundType.LIGHT, BodyComponent.BodyPart.HEAD)
             else:
-                target.components.body.apply_wound(wound_type, target_body_part, severity)
+                target.components.body.apply_wound(severity, target_body_part)
             
             # Apply bleeding for weapon attacks
             if performer.components.equipment:
-                var weapon = performer.components.equipment.get_equipped_item(BodyComponent.BodyPart.RIGHT_HAND)
+                var weapon = performer.components.equipment.get_equipped_item(BodyComponent.BodyPart.RIGHT_EQUIPMENT)
                 if weapon and weapon.components.item:
                     # Ensure target has modifiers component
                     if not target.components.modifiers:
-                        var modifiers = ModifierComponent.StatusEffect.new()
+                        var modifiers = ModifierComponent.new()
                         target.components["modifiers"] = modifiers
                         target.add_child(modifiers)
                     target.components.modifiers.apply_state(ModifierComponent.StatusEffect.BLEEDING)
@@ -78,7 +84,7 @@ func get_range() -> int:
     
     # Add weapon range if equipped
     if performer.components.equipment:
-        var weapon = performer.components.equipment.get_equipped_item(BodyComponent.BodyPart.RIGHT_HAND)
+        var weapon = performer.components.equipment.get_equipped_item(BodyComponent.BodyPart.RIGHT_EQUIPMENT)
         if weapon and weapon.components.item:
             base_range += weapon.components.item.range - 1  # Subtract 1 since weapon range includes base range
     
@@ -101,66 +107,32 @@ func get_damage_bonus() -> int:
     
     return bonus
 
-func calculate_damage() -> int:
-    var base_damage = performer.roll_value(3)  # Base unarmed damage is d3
+func calculate_damage(attacking_limb: BodyComponent.BodyPart) -> int:
+    var damage = 0
     
-    # Add weapon damage if equipped
-    if performer.components.equipment:
-        var weapon = performer.components.equipment.get_equipped_item(BodyComponent.BodyPart.RIGHT_HAND)
-        if weapon and weapon.components.item:
-            base_damage += performer.roll_value(6)  # Weapon adds d6
-    
-    # Add combat power
-    if performer.components.combat:
-        base_damage += performer.components.combat.power
-    
-    # Subtract defense
-    var defense = 0
-    if target.components.combat:
-        defense = target.components.combat.defense
-    
-    var damage = base_damage - defense + get_damage_bonus()
-    
-    # Critical hits
-    if performer.roll(6, []):  # Roll 6 or higher on d6 for crit
-        damage *= 2
-    
+    # get equipment damage
+    match attacking_limb:
+        BodyComponent.BodyPart.LEFT_EQUIPMENT, BodyComponent.BodyPart.RIGHT_EQUIPMENT:
+            if performer.components.equipment:
+                var weapon = performer.components.equipment.get_equipped_item(attacking_limb)
+                if weapon and weapon.components.item:
+                    if weapon.components.item.equipment_type == ItemComponent.EquipmentType.WEAPON:
+                        damage = performer.roll_value(10)  # Full damage for actual weapons
+                        damage += weapon.components.item.power_bonus
+                    else:
+                        # Improvised weapon damage based on weight
+                        if weapon.components.weight:
+                            damage = ceili(weapon.components.weight.weight)  # Round up weight to nearest int
+        BodyComponent.BodyPart.NONE:
+            if performer.components.equipment:
+                var weapon = performer.components.equipment.get_equipped_item(attacking_limb)
+                if weapon and weapon.components.item:
+                    if weapon.components.item.equipment_type == ItemComponent.EquipmentType.WEAPON:
+                        damage = performer.roll_value(10)  # Full damage for actual weapons
+                        damage += weapon.components.item.power_bonus
+                    else:
+                        # Improvised weapon damage based on weight
+                        if weapon.components.weight:
+                            damage = ceili(weapon.components.weight.weight)  # Round up weight to nearest int
+        
     return maxi(damage, 0)  # Minimum 0 damage
-
-func get_wound_type(damage: int) -> BodyComponent.WoundType:
-    # For unarmed attacks, check the attacking limb
-    if not performer.components.equipment or not performer.components.equipment.get_equipped_item(BodyComponent.BodyPart.RIGHT_HAND):
-        # Kicks do moderate damage
-        if attacking_limb == BodyComponent.BodyPart.LEFT_LEG or attacking_limb == BodyComponent.BodyPart.RIGHT_LEG:
-            return BodyComponent.WoundType.MODERATE
-        # All other unarmed attacks do light damage
-        return BodyComponent.WoundType.LIGHT
-    
-    # For weapon attacks, base it on damage
-    if damage <= 0:
-        return BodyComponent.WoundType.LIGHT
-    elif damage <= 3:
-        return BodyComponent.WoundType.MODERATE
-    elif damage <= 6:
-        return BodyComponent.WoundType.SEVERE
-    elif damage <= 9:
-        return BodyComponent.WoundType.CRITICAL
-    else:
-        return BodyComponent.WoundType.FATAL
-
-func get_wound_severity(damage: int) -> BodyComponent.WoundSeverity:
-    # For unarmed attacks, always return 1
-    if not performer.components.equipment or not performer.components.equipment.get_equipped_item(BodyComponent.BodyPart.RIGHT_HAND):
-        return BodyComponent.WoundSeverity.LIGHT
-    
-    # For weapon attacks, base it on damage
-    if damage <= 0:
-        return BodyComponent.WoundSeverity.LIGHT
-    elif damage <= 3:
-        return BodyComponent.WoundSeverity.MODERATE
-    elif damage <= 6:
-        return BodyComponent.WoundSeverity.SEVERE
-    elif damage <= 9:
-        return BodyComponent.WoundSeverity.CRITICAL
-    else:
-        return BodyComponent.WoundSeverity.FATAL 

@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="EntityBlueprint" load_steps=9 format=3]
+[gd_resource type="Resource" script_class="EntityBlueprint" load_steps=12 format=3 uid="uid://cfc5jb22slcgr"]
 
 [ext_resource type="Script" path="res://src/entity_blueprint.gd" id="1_script"]
 [ext_resource type="Script" path="res://src/Components/Blueprints/combat_component_blueprint.gd" id="2_combat"]
@@ -6,18 +6,6 @@
 [ext_resource type="Script" path="res://src/Components/Blueprints/body_component_blueprint.gd" id="4_body"]
 [ext_resource type="Script" path="res://src/Components/Blueprints/progression_component_blueprint.gd" id="5_prog"]
 [ext_resource type="Script" path="res://src/Components/Blueprints/modifier_component_blueprint.gd" id="6_combat_mod"]
-
-[sub_resource type="Resource" id="player_combat"]
-script = ExtResource("2_combat")
-health = 100
-max_health = 100
-power = 10
-defense = 5
-
-[sub_resource type="Resource" id="player_inv"]
-script = ExtResource("3_inv")
-capacity = 10
-items = []
 
 [sub_resource type="Resource" id="player_body"]
 script = ExtResource("4_body")
@@ -32,6 +20,22 @@ parts = {
 }
 consciousness = 100.0
 wounds = {}
+is_dead = false
+
+[sub_resource type="Resource" id="player_combat"]
+script = ExtResource("2_combat")
+max_hp = 30
+power = 10
+defense = 5
+
+[sub_resource type="Resource" id="player_inv"]
+script = ExtResource("3_inv")
+capacity = 10
+items = Array[ExtResource("1_script")]([])
+
+[sub_resource type="Resource" id="player_combat_mod"]
+script = ExtResource("6_combat_mod")
+states = Array[int]([])
 
 [sub_resource type="Resource" id="player_prog"]
 script = ExtResource("5_prog")
@@ -40,10 +44,6 @@ level_up_factor = 150
 xp_given = 100
 current_level = 1
 current_xp = 0
-
-[sub_resource type="Resource" id="player_combat_mod"]
-script = ExtResource("6_combat_mod")
-states = []
 
 [resource]
 script = ExtResource("1_script")
@@ -54,7 +54,7 @@ key = "player"
 components = {
 "body": SubResource("player_body"),
 "combat": SubResource("player_combat"),
-"modifiers": SubResource("player_combat_mod"),
 "inventory": SubResource("player_inv"),
+"modifiers": SubResource("player_combat_mod"),
 "progression": SubResource("player_prog")
-} 
+}

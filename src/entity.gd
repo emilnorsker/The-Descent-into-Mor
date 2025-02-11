@@ -4,7 +4,6 @@ class_name Entity extends Node2D
 enum AIType {NONE, HOSTILE}
 enum EntityType {CORPSE, ITEM, ACTOR, TERRAIN, FIXTURE}
 
-var test_mode: bool = false
 var next_roll: int = -1
 
 var _grid_position: Vector2i
@@ -132,9 +131,8 @@ func roll(dc: int, modifiers: Array = [], dice_size: int = 6) -> bool:
     var roll_value: int
     
     # If in test mode and next_roll is set, use that
-    if test_mode and next_roll >= 0:
+    if next_roll != -1:
         roll_value = next_roll
-        next_roll = -1
     else:
         # Roll a random number between 1 and dice_size
         roll_value = (randi() % dice_size) + 1
@@ -144,6 +142,7 @@ func roll(dc: int, modifiers: Array = [], dice_size: int = 6) -> bool:
         roll_value += modifier as int
     
     # Check if we beat or meet the DC
+    print(entity_name, " rolled: ", roll_value, " dc: ", dc, " success: ", roll_value >= dc)
     return roll_value >= dc
 
 # Get the raw roll value without checking against DC
@@ -152,9 +151,8 @@ func roll_value(dice_size: int = 6, modifiers: Array = []) -> int:
     var roll_value: int
     
     # If in test mode and next_roll is set, use that
-    if test_mode and next_roll >= 0:
+    if next_roll != -1:
         roll_value = next_roll
-        next_roll = -1
     else:
         # Roll a random number between 1 and dice_size
         roll_value = (randi() % dice_size) + 1
@@ -163,6 +161,7 @@ func roll_value(dice_size: int = 6, modifiers: Array = []) -> int:
     for modifier in modifiers:
         roll_value += modifier as int
     
+    print(entity_name, " rolled value: ", roll_value)
     return roll_value
 
 func has_state(state: ModifierComponent) -> bool:

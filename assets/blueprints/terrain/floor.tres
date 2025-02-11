@@ -1,4 +1,4 @@
-[gd_resource type="Resource" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="EntityBlueprint" load_steps=4 format=3 uid="uid://b00yy3q30s72a"]
 
 [ext_resource type="Script" path="res://src/entity_blueprint.gd" id="1_script"]
 [ext_resource type="Script" path="res://src/Components/Blueprints/terrain_component_blueprint.gd" id="2_terrain"]
@@ -19,4 +19,4 @@ type = 2
 key = "floor"
 components = {
 "terrain": SubResource("terrain_floor")
-} 
+}

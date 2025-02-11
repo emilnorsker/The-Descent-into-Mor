@@ -1,6 +1,6 @@
 @tool
 class_name DropItemAction
-extends ItemAction
+extends Action
 
 
 func perform() -> bool:

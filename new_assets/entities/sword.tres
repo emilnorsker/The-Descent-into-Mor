@@ -1,0 +1,20 @@
+[gd_resource type="Resource" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://src/entity_blueprint.gd" id="1_script"]
+[ext_resource type="Resource" path="res://new_assets/blueprints/materials/metal.tres" id="2_material"]
+[ext_resource type="Resource" path="res://new_assets/blueprints/weights/light.tres" id="3_weight"]
+[ext_resource type="Resource" path="res://new_assets/blueprints/items/basic_sword.tres" id="4_item"]
+[ext_resource type="Resource" path="res://new_assets/blueprints/visual/sword_visual.tres" id="5_visual"]
+
+[resource]
+script = ExtResource("1_script")
+entity_name = "Sword"
+blocks_movement = false
+type = 1
+key = "sword"
+components = {
+"item": ExtResource("4_item"),
+"material": ExtResource("2_material"),
+"visual": ExtResource("5_visual"),
+"weight": ExtResource("3_weight")
+}

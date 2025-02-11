@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="EntityBlueprint" load_steps=7 format=3]
+[gd_resource type="Resource" script_class="EntityBlueprint" load_steps=10 format=3 uid="uid://p62u7m0f5b52"]
 
 [ext_resource type="Script" path="res://src/entity_blueprint.gd" id="1_script"]
 [ext_resource type="Script" path="res://src/Components/Blueprints/body_component_blueprint.gd" id="2_body"]
@@ -10,42 +10,42 @@
 script = ExtResource("2_body")
 type = "humanoid"
 parts = {
-"head": true,
-"neck": true,
-"chest": true,
 "abdomen": true,
+"chest": true,
+"head": true,
 "left_arm": true,
-"right_arm": true,
 "left_leg": true,
+"neck": true,
+"right_arm": true,
 "right_leg": true
 }
 consciousness = 50.0
 wounds = {
 "chest": [{
-    "type": "moderate",
-    "effects": ["bleeding"]
+"effects": ["bleeding"],
+"type": "moderate"
 }],
 "left_arm": [{
-    "type": "light",
-    "effects": []
+"effects": [],
+"type": "light"
 }]
 }
+is_dead = false
 
 [sub_resource type="Resource" id="test_combat"]
 script = ExtResource("3_combat")
-health = 60
-max_health = 100
+max_hp = 30
 power = 8
 defense = 5
-
-[sub_resource type="Resource" id="test_inv"]
-script = ExtResource("4_inv")
-capacity = 10
-items = []
 
 [sub_resource type="Resource" id="test_equip"]
 script = ExtResource("5_equip")
 slots = {}
+
+[sub_resource type="Resource" id="test_inv"]
+script = ExtResource("4_inv")
+capacity = 10
+items = Array[ExtResource("1_script")]([])
 
 [resource]
 script = ExtResource("1_script")
@@ -56,6 +56,6 @@ key = "test_wounded_humanoid"
 components = {
 "body": SubResource("test_body"),
 "combat": SubResource("test_combat"),
-"inventory": SubResource("test_inv"),
-"equipment": SubResource("test_equip")
-} 
+"equipment": SubResource("test_equip"),
+"inventory": SubResource("test_inv")
+}

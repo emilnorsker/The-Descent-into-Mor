@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="EntityBlueprint" load_steps=7 format=3]
+[gd_resource type="Resource" script_class="EntityBlueprint" load_steps=10 format=3 uid="uid://b1g5t3u0krtyj"]
 
 [ext_resource type="Script" path="res://src/entity_blueprint.gd" id="1_script"]
 [ext_resource type="Script" path="res://src/Components/Blueprints/armor_component_blueprint.gd" id="2_armor"]
@@ -8,35 +8,38 @@
 
 [sub_resource type="Resource" id="test_armor"]
 script = ExtResource("2_armor")
-slot = 2  # CHEST
-protection = 3
+slot = 2
+protection = 0
+
+[sub_resource type="Resource" id="test_item"]
+script = ExtResource("5_item")
+equipment_type = 1
+#ARMORpower_bonus = 0
+defense_bonus = 3
+#Matcharmorprotectionslot = 2
+#CHESTrange = 0
 
 [sub_resource type="Resource" id="test_material"]
 script = ExtResource("3_material")
-material_type = "metal"
 is_flammable = false
+is_slippery = false
+material_type = "metal"
 
 [sub_resource type="Resource" id="test_weight"]
 script = ExtResource("4_weight")
 weight = 5.0
-
-[sub_resource type="Resource" id="test_item"]
-script = ExtResource("5_item")
-equipment_type = 1  # ARMOR
-power_bonus = 0
-defense_bonus = 3  # Match armor protection
-slot = 2  # CHEST
-range = 0
+affects_balance = false
+balance_penalty = 0.0
 
 [resource]
 script = ExtResource("1_script")
 entity_name = "Test Armor"
 blocks_movement = false
-type = 1  # ITEM
-key = "test_armor"
+type = 1
+key = ""
 components = {
 "armor": SubResource("test_armor"),
 "item": SubResource("test_item"),
 "material": SubResource("test_material"),
 "weight": SubResource("test_weight")
-} 
+}

@@ -14,13 +14,15 @@ var equipment_type: EquipmentType = EquipmentType.WEAPON
 # TODO: Add getter and setters to check for potewntial modifiers
 var power_bonus: int = 0
 var defense_bonus: int = 0
-var slot: BodyComponent.BodyPart = BodyComponent.BodyPart.RIGHT_HAND
-var range: int = 0
+var slot: BodyComponent.BodyPart = BodyComponent.BodyPart.RIGHT_EQUIPMENT
+var range: int = -1 # -1 means default range
 
 func _init() -> void:
     super()
 
 func get_range() -> int:
+    if range == -1:
+        return 1
     if get_parent() and get_parent().components.combat:
         return range + get_parent().components.combat.get_power_bonus()
     return range

@@ -231,12 +231,3 @@ func process_turn() -> void:
         print("Processing turn for entity: ", entity.entity_name)
         if entity.components.modifiers:
             entity.process_action_queue()
-            
-            if entity.components.modifiers.has_state(ModifierComponent.StatusEffect.ABLAZE):
-                if entity.components.body and entity.components.body.consciousness > 0:
-                    entity.components.body.apply_wound(BodyComponent.WoundType.MODERATE, BodyComponent.BodyPart.CHEST)
-                if entity.components.modifiers.has_state(ModifierComponent.StatusEffect.PANICKED):
-                    entity.components.modifiers.apply_state(ModifierComponent.StatusEffect.PANICKED)
-            if entity.components.modifiers.has_state(ModifierComponent.StatusEffect.BLEEDING):
-                if entity.components.body and entity.components.body.consciousness > 0:
-                    entity.components.body.add_consciousness(2)
