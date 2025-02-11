@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://src/entity_blueprint.gd" id="1_bow_entity"]
 [ext_resource type="Script" path="res://src/Components/Blueprints/item_component_blueprint.gd" id="2_bow_item"]
 [ext_resource type="Script" path="res://src/Components/Blueprints/weight_component_blueprint.gd" id="4_bow_weight"]
-[ext_resource type="Script" path="res://src/Components/Blueprints/combat_modifier_component_blueprint.gd" id="5_bow_modifier"]
+[ext_resource type="Script" path="res://src/Components/Blueprints/modifier_component_blueprint.gd" id="5_bow_modifier"]
 
 [sub_resource type="Resource" ]
 script = ExtResource("2_bow_item")  
@@ -23,5 +23,5 @@ entity_name = "Bow"
 components = {
     "item": SubResource("2_bow_item"),    
     "weight": SubResource("4_bow_weight"),
-    "combat_modifier": SubResource("5_bow_modifier"),
+    "modifiers": SubResource("5_bow_modifier"),
 }

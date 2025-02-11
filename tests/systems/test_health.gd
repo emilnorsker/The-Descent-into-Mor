@@ -6,7 +6,7 @@ const TestWoundedHumanoid = preload("res://tests/fixtures/blueprints/actors/test
 var BodyPart = BodyComponent.BodyPart
 var WoundType = BodyComponent.WoundType
 var WoundEffect = BodyComponent.WoundEffect
-var StatusEffect = Constants.StatusEffect
+var StatusEffect = ModifierComponent.StatusEffect
 var TreatmentType = Constants.TreatmentType
 
 var entity: Entity

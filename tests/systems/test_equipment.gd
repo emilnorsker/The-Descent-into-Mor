@@ -4,7 +4,7 @@ const TestHumanoid = preload("res://tests/fixtures/blueprints/actors/test_humano
 const TestArmor = preload("res://tests/fixtures/blueprints/items/test_armor.tres")
 const TestConsumable = preload("res://tests/fixtures/blueprints/items/test_consumable.tres")
 
-var BodyPart = Constants.BodyPart
+var BodyPart = BodyComponent.BodyPart
 var WoundType = BodyComponent.WoundType
 var WoundEffect = BodyComponent.WoundEffect
 
@@ -192,7 +192,7 @@ func test_quadruped_equipment() -> void:
     # 
     # # Test equipment slots
     # assert_eq(quad_equipment.get_slots().size(), 4, "Quadruped should have 4 equipment slots")
-    # assert_true(quad_body.has_part(Constants.BodyPart.FRONT_LEFT_LEG), "Should have front left leg")
+    # assert_true(quad_body.has_part(BodyComponent.BodyPart.FRONT_LEFT_LEG), "Should have front left leg")
 
 func test_wound_effects() -> void:
     var target_wounds = body.get_wounds_of_type(WoundType.LIGHT)

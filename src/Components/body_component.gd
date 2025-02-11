@@ -7,6 +7,7 @@ signal condition_applied(condition: int)
 signal died
 
 enum BodyPart {
+    NONE,
     HEAD,
     NECK,
     CHEST,
@@ -40,14 +41,16 @@ var equipment: Dictionary = {}  # Dictionary of slot -> Entity
 var protection: Dictionary = {}  # Dictionary of part -> total protection
 
 class Wound:
+    enum TreatmentLevel {
+        UNTREATED,
+        BANDAGED,
+        STITCHED
+    }
+
     var type: int  # WoundType
-    var effects: Array  # Array of WoundEffect
-    var severity: int  # 1-5
-    var bleeding_rate: int
-    var treatment_level: int  # 0 = untreated, 1 = bandaged, 2 = stitched
+    var treatment_level: TreatmentLevel  # 0 = untreated, 1 = bandaged, 2 = stitched
     var part: BodyPart
-    func _init(p_type: int, p_severity: int):
-        type = p_type
+    func _init(p_severity: int):
         severity = p_severity
         effects = []
         bleeding_rate = 0
@@ -100,7 +103,7 @@ func _ready():
         equipment[part] = null
         protection[part] = 0
 
-func apply_wound(type: int, body_part: int, severity: int = 1) -> void:
+func apply_wound(wound: Wound) -> void:
     if is_dead:
         return
         
@@ -159,6 +162,11 @@ func treat_wound(body_part: int, wound_index: int, treatment_level: int) -> void
             wound.bleeding_rate = max(0, wound.bleeding_rate - treatment_level)
 
 func is_limb_impaired(body_part: int) -> bool:
+    # Check if body_part is a valid BodyPart value
+    if not body_part in BodyPart.values():
+        push_warning("Invalid body part %d passed to is_limb_impaired" % body_part)
+        return false
+        
     for wound in wounds[body_part]:
         if WoundEffect.CRIPPLED in wound.effects:
             return true
@@ -209,7 +217,11 @@ func equip_to_slot(item: Entity, body_part = null) -> void:
     var parent = get_parent() as Entity
     if not parent or not parent.components.equipment: return
     
-    var slot = body_part if body_part else Constants.BodyPart.RIGHT_HAND
+    # If no body part specified or invalid (-1), use default right hand
+    var slot = BodyComponent.BodyPart.RIGHT_HAND
+    if body_part != null and body_part in BodyPart.values():
+        slot = body_part
+    
     if is_limb_impaired(slot):
         SignalBus.message_sent.emit(parent.entity_name + " is unable to equip the %s." % item.entity_name, Color.RED)
         return

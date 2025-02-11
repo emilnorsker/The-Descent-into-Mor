@@ -21,14 +21,14 @@ func setup_from_blueprint(blueprint: Resource) -> Component:
 
 func is_flammable() -> bool:
     var parent = get_parent() as Entity
-    if parent and parent.components.combat_modifier:
-        return _is_flammable or parent.components.combat_modifier.has_state(Constants.StatusEffect.OILED)
+    if parent and parent.components.modifiers:
+        return _is_flammable or parent.components.modifiers.has_state(ModifierComponent.StatusEffect.OILED)
     return _is_flammable
 
 func is_slippery() -> bool:
     var parent = get_parent() as Entity
-    if parent and parent.components.combat_modifier:
-        return _is_slippery or parent.components.combat_modifier.has_state(Constants.StatusEffect.OILED)
+    if parent and parent.components.modifiers:
+        return _is_slippery or parent.components.modifiers.has_state(ModifierComponent.StatusEffect.OILED)
     return _is_slippery
 
 func set_is_flammable(value: bool) -> void:

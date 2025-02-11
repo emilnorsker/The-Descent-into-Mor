@@ -4,7 +4,7 @@
 [ext_resource type="Script" path="res://src/Components/Blueprints/material_component_blueprint.gd" id="2_material"]
 [ext_resource type="Script" path="res://src/Components/Blueprints/item_component_blueprint.gd" id="3_item"]
 [ext_resource type="Script" path="res://src/Components/Blueprints/weight_component_blueprint.gd" id="4_weight"]
-[ext_resource type="Script" path="res://src/Components/Blueprints/combat_modifier_component_blueprint.gd" id="5_modifiers"]
+[ext_resource type="Script" path="res://src/Components/Blueprints/modifier_component_blueprint.gd" id="5_modifiers"]
 
 [sub_resource type="Resource" id="chair_material"]
 script = ExtResource("2_material")
@@ -35,5 +35,5 @@ components = {
 "item": SubResource("chair_item"),
 "material": SubResource("chair_material"),
 "weight": SubResource("chair_weight"),
-"combat_modifier": SubResource("chair_modifiers")
+"modifiers": SubResource("chair_modifiers")
 } 

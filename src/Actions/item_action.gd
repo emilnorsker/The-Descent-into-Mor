@@ -22,20 +22,11 @@ func perform() -> bool:
     if item == null:
         return false
         
-    # Try to use item based on its components
-    if item.components.item:
-        return EquipAction.new(performer, item).perform()
-    elif item.components.consumable:
+    # ItemAction is used for consuming items
+    if item.components.consumable:
         return item.components.consumable.activate(self)
-    else:
-        # Trying to use an invalid item causes self-damage
-        var body = performer.body
-        if body and item.material:
-            var material = item.material
-            if material.get_is_slippery():
-                # Roll grip check
-                var grip_check = randi() % 6 + 1
-                if grip_check < 4:  # Failed check
-                    item.drop()
-                    return false
-        return true
+    
+    # If the item is not consumable, trying to consume it causes head damage
+    if performer.components.body:
+        performer.components.body.apply_wound(BodyComponent.WoundType.LIGHT, BodyComponent.BodyPart.HEAD)
+    return false

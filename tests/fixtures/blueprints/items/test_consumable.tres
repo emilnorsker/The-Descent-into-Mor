@@ -1,9 +1,10 @@
-[gd_resource type="Resource" script_class="EntityBlueprint" load_steps=6 format=3]
+[gd_resource type="Resource" script_class="EntityBlueprint" load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://src/entity_blueprint.gd" id="1_script"]
 [ext_resource type="Script" path="res://src/Components/Blueprints/consumable_component_blueprint.gd" id="2_consumable"]
 [ext_resource type="Script" path="res://src/Components/Blueprints/weight_component_blueprint.gd" id="3_weight"]
 [ext_resource type="Script" path="res://src/Components/Blueprints/material_component_blueprint.gd" id="4_material"]
+[ext_resource type="Script" path="res://src/Components/Blueprints/item_component_blueprint.gd" id="5_item"]
 
 [sub_resource type="Resource" id="test_consumable"]
 script = ExtResource("2_consumable")
@@ -17,6 +18,14 @@ weight = 0.1
 script = ExtResource("4_material")
 material = "wood"
 
+[sub_resource type="Resource" id="test_item"]
+script = ExtResource("5_item")
+equipment_type = 0  # NONE
+power_bonus = 0
+defense_bonus = 0
+slot = 5  # RIGHT_HAND
+range = 0
+
 [resource]
 script = ExtResource("1_script")
 entity_name = "Test Consumable"
@@ -26,5 +35,6 @@ key = "test_consumable"
 components = {
 "consumable": SubResource("test_consumable"),
 "weight": SubResource("test_weight"),
-"material": SubResource("test_material")
+"material": SubResource("test_material"),
+"item": SubResource("test_item")
 } 

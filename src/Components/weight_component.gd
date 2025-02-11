@@ -19,8 +19,8 @@ func setup_from_blueprint(blueprint: Resource) -> WeightComponent:
 func get_weight() -> float:
     var base_weight = weight
     var parent = get_parent() as Entity
-    if parent and parent.components.combat_modifier:
-        if parent.components.combat_modifier.has_state(Constants.StatusEffect.MUD_COVERED):
+    if parent and parent.components.modifiers:
+        if parent.components.modifiers.has_state(ModifierComponent.StatusEffect.MUD_COVERED):
             base_weight *= 1.5  # Mud increases weight by 50%
     return base_weight
 
@@ -41,8 +41,8 @@ func get_movement_penalty() -> float:
         base_penalty = (current_weight - 10.0) * 0.1
     
     var parent = get_parent() as Entity
-    if parent and parent.combat_modifier:
-        if parent.combat_modifier.has_state(Constants.StatusEffect.MUD_COVERED):
+    if parent and parent.modifiers:
+        if parent.modifiers.has_state(ModifierComponent.StatusEffect.MUD_COVERED):
             base_penalty *= 1.5  # Mud increases movement penalty
     
     return base_penalty 

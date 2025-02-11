@@ -28,38 +28,38 @@ func after_each() -> void:
 func test_unarmed_attacks() -> void:
     # Test punch
     attacker.next_roll = 4  # Just enough to hit DC 4
-    var punch = MeleeAction.new(attacker, target, Constants.BodyPart.RIGHT_ARM, Constants.BodyPart.CHEST)
+    var punch = MeleeAction.new(attacker, target, BodyComponent.BodyPart.RIGHT_ARM, BodyComponent.BodyPart.CHEST)
     var result = punch.perform()
     
     assert_true(result, "Punch should succeed")
-    var wounds = target.components.body.get_wounds(Constants.BodyPart.CHEST)
+    var wounds = target.components.body.get_wounds(BodyComponent.BodyPart.CHEST)
     assert_true(wounds.size() > 0, "Punch should cause wound")
     if wounds.size() > 0:
-        assert_eq(wounds[0].type, Constants.WoundType.LIGHT, 
+        assert_eq(wounds[0].type, BodyComponent.WoundType.LIGHT, 
                 "Punch should cause light wound")
     
     # Test kick
     attacker.next_roll = 4  # Just enough to hit DC 4
-    var kick = MeleeAction.new(attacker, target, Constants.BodyPart.LEFT_LEG, Constants.BodyPart.ABDOMEN)
+    var kick = MeleeAction.new(attacker, target, BodyComponent.BodyPart.LEFT_LEG, BodyComponent.BodyPart.ABDOMEN)
     result = kick.perform()
     
     assert_true(result, "Kick should succeed")
-    wounds = target.components.body.get_wounds(Constants.BodyPart.ABDOMEN)
+    wounds = target.components.body.get_wounds(BodyComponent.BodyPart.ABDOMEN)
     assert_true(wounds.size() > 0, "Kick should cause wound")
     if wounds.size() > 0:
-        assert_eq(wounds[0].type, Constants.WoundType.MODERATE,
+        assert_eq(wounds[0].type, BodyComponent.WoundType.MODERATE,
                 "Kick should cause moderate wound")
     
     # Test headbutt
     attacker.next_roll = 4  # Just enough to hit DC 4
-    var headbutt = MeleeAction.new(attacker, target, Constants.BodyPart.HEAD, Constants.BodyPart.HEAD)
+    var headbutt = MeleeAction.new(attacker, target, BodyComponent.BodyPart.HEAD, BodyComponent.BodyPart.HEAD)
     result = headbutt.perform()
     
     assert_true(result, "Headbutt should succeed")
-    wounds = attacker.components.body.get_wounds(Constants.BodyPart.HEAD)
+    wounds = attacker.components.body.get_wounds(BodyComponent.BodyPart.HEAD)
     assert_true(wounds.size() > 0, "Headbutt should also damage attacker")
     if wounds.size() > 0:
-        assert_eq(wounds[0].type, Constants.WoundType.LIGHT,
+        assert_eq(wounds[0].type, BodyComponent.WoundType.LIGHT,
                 "Headbutt should also cause light wound")
 
 # Weapon Tests
@@ -68,13 +68,13 @@ func test_weapon_attacks() -> void:
     
     attacker.components.body.equip_to_slot(sword)
     attacker.next_roll = 4  # Just enough to hit DC 4
-    var slash = MeleeAction.new(attacker, target, Constants.BodyPart.RIGHT_ARM, Constants.BodyPart.CHEST)
+    var slash = MeleeAction.new(attacker, target, BodyComponent.BodyPart.RIGHT_ARM, BodyComponent.BodyPart.CHEST)
     var result = slash.perform()
     
     assert_true(result, "Sword attack should succeed")
     assert_true(
-        target.components.combat_modifier and 
-        target.components.combat_modifier.has_state(Constants.StatusEffect.BLEEDING),
+        target.components.modifiers and 
+        target.components.modifiers.has_state(ModifierComponent.StatusEffect.BLEEDING),
             "Slash should cause bleeding")
 
 # Throw Tests
@@ -92,10 +92,10 @@ func test_throw_weapon() -> void:
     
     var result = throw.perform()
     assert_true(result, "Throw should succeed")
-    var wounds = target.components.body.get_wounds(Constants.BodyPart.CHEST)
+    var wounds = target.components.body.get_wounds(BodyComponent.BodyPart.CHEST)
     assert_true(wounds.size() > 0, "Thrown weapon should cause wound")
     if wounds.size() > 0:
-        assert_eq(wounds[0].type, Constants.WoundType.LIGHT,
+        assert_eq(wounds[0].type, BodyComponent.WoundType.LIGHT,
                 "Thrown weapon should cause light wound")
 
 func test_throw_generic_item() -> void:
@@ -114,17 +114,17 @@ func test_throw_generic_item() -> void:
     var result = throw.perform()
     assert_true(result, "Throw should succeed")
     
-    var wounds = target.components.body.get_wounds(Constants.BodyPart.CHEST)
+    var wounds = target.components.body.get_wounds(BodyComponent.BodyPart.CHEST)
     assert_true(wounds.size() > 0, "Thrown item should cause wound")
     if wounds.size() > 0:
-        assert_eq(wounds[0].type, Constants.WoundType.LIGHT,
+        assert_eq(wounds[0].type, BodyComponent.WoundType.LIGHT,
                 "Thrown item should cause light wound")
 
 # Range Tests
 func test_attack_ranges() -> void:
     # Test out of punch range
     target.move(Vector2i(4, 1) - target.grid_position)
-    var punch = MeleeAction.new(attacker, target, Constants.BodyPart.RIGHT_ARM, Constants.BodyPart.CHEST)
+    var punch = MeleeAction.new(attacker, target, BodyComponent.BodyPart.RIGHT_ARM, BodyComponent.BodyPart.CHEST)
     assert_false(punch.perform(), "Punch should fail at range 3")
     
     # Test weapon range
@@ -137,7 +137,7 @@ func test_attack_ranges() -> void:
     target.move(Vector2i(3, 1) - target.grid_position)
     
     attacker.components.body.equip_to_slot(spear)
-    var thrust = MeleeAction.new(attacker, target, Constants.BodyPart.RIGHT_ARM, Constants.BodyPart.CHEST)
+    var thrust = MeleeAction.new(attacker, target, BodyComponent.BodyPart.RIGHT_ARM, BodyComponent.BodyPart.CHEST)
     assert_true(thrust.perform(), "Spear should hit at range 2")
 
 # Utility Functions

@@ -36,7 +36,7 @@ var components: Dictionary = {
     "progression": null,
     "light": null,
     "material": null,
-    "combat_modifier": null,
+    "modifiers": null,
     "terrain": null,
     "ai": null,
     "consumable": null,
@@ -89,10 +89,10 @@ func setup_from_blueprint(blueprint: Resource, position: Vector2i = Vector2i.ZER
                         components.material = MaterialComponent.new()
                         components.material.setup_from_blueprint(component_blueprint)
                         add_child(components.material)
-                    "combat_modifier":
-                        components.combat_modifier = CombatModifierComponent.new()
-                        components.combat_modifier.setup_from_blueprint(component_blueprint)
-                        add_child(components.combat_modifier)
+                    "modifiers":
+                        components.modifiers = ModifierComponent.new()
+                        components.modifiers.setup_from_blueprint(component_blueprint)
+                        add_child(components.modifiers)
                     "terrain":
                         components.terrain = TerrainComponent.new()
                         components.terrain.setup_from_blueprint(component_blueprint)
@@ -165,11 +165,11 @@ func roll_value(dice_size: int = 6, modifiers: Array = []) -> int:
     
     return roll_value
 
-func has_state(state: Constants.StatusEffect) -> bool:
-    return components.combat_modifier.has_state(state) if components.combat_modifier else false
+func has_state(state: ModifierComponent) -> bool:
+    return components.modifiers.has_state(state) if components.modifiers else false
 
-func has_status(status: Constants.StatusEffect) -> bool:
-    return components.combat_modifier.has_status(status) if components.combat_modifier else false
+func has_status(status: ModifierComponent) -> bool:
+    return components.modifiers.has_status(status) if components.modifiers else false
 
 
 func queue_action(action: Action) -> void:

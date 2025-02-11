@@ -68,7 +68,7 @@ func equip(item: Entity, slot = null) -> void:
         return
         
     if not slot:
-        slot = Constants.BodyPart.RIGHT_HAND
+        slot = BodyComponent.BodyPart.RIGHT_HAND
     
     # Convert int slot to string if needed
     var slot_key = str(slot) if typeof(slot) == TYPE_INT else slot

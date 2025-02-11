@@ -229,14 +229,14 @@ func get_entities_in_rect(start: Vector2i, end: Vector2i) -> Array[Entity]:
 func process_turn() -> void:
     for entity in _entities:
         print("Processing turn for entity: ", entity.entity_name)
-        if entity.components.combat_modifier:
+        if entity.components.modifiers:
             entity.process_action_queue()
             
-            if entity.components.combat_modifier.has_state(Constants.StatusEffect.ABLAZE):
+            if entity.components.modifiers.has_state(ModifierComponent.StatusEffect.ABLAZE):
                 if entity.components.body and entity.components.body.consciousness > 0:
-                    entity.components.body.apply_wound(Constants.WoundType.MODERATE, Constants.BodyPart.CHEST)
-                if entity.components.combat_modifier.has_state(Constants.StatusEffect.PANICKED):
-                    entity.components.combat_modifier.apply_state(Constants.StatusEffect.PANICKED)
-            if entity.components.combat_modifier.has_state(Constants.StatusEffect.BLEEDING):
+                    entity.components.body.apply_wound(BodyComponent.WoundType.MODERATE, BodyComponent.BodyPart.CHEST)
+                if entity.components.modifiers.has_state(ModifierComponent.StatusEffect.PANICKED):
+                    entity.components.modifiers.apply_state(ModifierComponent.StatusEffect.PANICKED)
+            if entity.components.modifiers.has_state(ModifierComponent.StatusEffect.BLEEDING):
                 if entity.components.body and entity.components.body.consciousness > 0:
                     entity.components.body.add_consciousness(2)

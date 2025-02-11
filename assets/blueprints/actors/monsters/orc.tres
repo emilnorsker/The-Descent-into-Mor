@@ -4,7 +4,7 @@
 [ext_resource type="Script" path="res://src/Components/Blueprints/combat_component_blueprint.gd" id="2_combat"]
 [ext_resource type="Script" path="res://src/Components/Blueprints/ai_component_blueprint.gd" id="3_ai"]
 [ext_resource type="Script" path="res://src/Components/Blueprints/body_component_blueprint.gd" id="4_body"]
-[ext_resource type="Script" path="res://src/Components/Blueprints/combat_modifier_component_blueprint.gd" id="5_modifier"]
+[ext_resource type="Script" path="res://src/Components/Blueprints/modifier_component_blueprint.gd" id="5_modifier"]
 
 [sub_resource type="Resource" id="orc_combat"]
 script = ExtResource("2_combat")
@@ -44,5 +44,5 @@ components = {
 "ai": SubResource("orc_ai"),
 "body": SubResource("orc_body"),
 "combat": SubResource("orc_combat"),
-"combat_modifier": SubResource("orc_modifier")
+"modifiers": SubResource("orc_modifier")
 } 

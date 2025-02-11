@@ -5,7 +5,7 @@
 [ext_resource type="Script" path="res://src/Components/Blueprints/inventory_component_blueprint.gd" id="3_inv"]
 [ext_resource type="Script" path="res://src/Components/Blueprints/body_component_blueprint.gd" id="4_body"]
 [ext_resource type="Script" path="res://src/Components/Blueprints/progression_component_blueprint.gd" id="5_prog"]
-[ext_resource type="Script" path="res://src/Components/Blueprints/combat_modifier_component_blueprint.gd" id="6_combat_mod"]
+[ext_resource type="Script" path="res://src/Components/Blueprints/modifier_component_blueprint.gd" id="6_combat_mod"]
 
 [sub_resource type="Resource" id="player_combat"]
 script = ExtResource("2_combat")
@@ -54,7 +54,7 @@ key = "player"
 components = {
 "body": SubResource("player_body"),
 "combat": SubResource("player_combat"),
-"combat_modifier": SubResource("player_combat_mod"),
+"modifiers": SubResource("player_combat_mod"),
 "inventory": SubResource("player_inv"),
 "progression": SubResource("player_prog")
 } 

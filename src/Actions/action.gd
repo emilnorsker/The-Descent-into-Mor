@@ -1,6 +1,13 @@
 extends Node
 class_name Action
 
+enum TargetType {
+    SINGLE,
+    LINE,
+    CONE,
+    CLEAVE
+}
+
 var performer: Entity
 var target: Entity
 

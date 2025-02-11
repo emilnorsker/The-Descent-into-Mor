@@ -13,10 +13,10 @@ func before_each() -> void:
     entity = Entity.new().setup_from_blueprint(blueprint, Vector2i(1, 1))
     
     # Add combat modifier component if not present
-    if not entity.components.combat_modifier:
-        var combat_modifier = CombatModifierComponent.new()
-        entity.components["combat_modifier"] = combat_modifier
-        entity.add_child(combat_modifier)
+    if not entity.components.modifiers:
+        var modifiers = ModifierComponent.StatusEffect.new()
+        entity.components["modifiers"] = modifiers
+        entity.add_child(modifiers)
     
     GameMap.register_entity(entity, entity.grid_position)
 
@@ -28,60 +28,60 @@ func test_oiled_state() -> void:
     var floor_tile = Entity.new().setup_from_blueprint(preload("res://assets/blueprints/terrain/floor.tres"), Vector2i(1, 1))
     GameMap.register_entity(floor_tile, floor_tile.grid_position)
     
-    if not floor_tile.components.combat_modifier:
-        var combat_modifier = CombatModifierComponent.new()
-        floor_tile.components["combat_modifier"] = combat_modifier
-        floor_tile.add_child(combat_modifier)
+    if not floor_tile.components.modifiers:
+        var modifiers = ModifierComponent.StatusEffect.new()
+        floor_tile.components["modifiers"] = modifiers
+        floor_tile.add_child(modifiers)
     
-    entity.components.combat_modifier.apply_state(Constants.StatusEffect.OILED, floor_tile)
+    entity.components.modifiers.apply_state(ModifierComponent.StatusEffect.OILED, floor_tile)
     
     # Test creature movement on oiled floor
     var creature = Entity.new().setup_from_blueprint(preload("res://assets/blueprints/actors/player.tres"), Vector2i(1, 1))
-    if not creature.components.combat_modifier:
-        var combat_modifier = CombatModifierComponent.new()
-        creature.components["combat_modifier"] = combat_modifier
-        creature.add_child(combat_modifier)
+    if not creature.components.modifiers:
+        var modifiers = ModifierComponent.StatusEffect.new()
+        creature.components["modifiers"] = modifiers
+        creature.add_child(modifiers)
     
     
     if creature.roll(3):  # Failed check (1-3 fails, 4-6 succeeds)
-        assert_true(creature.components.combat_modifier.has_status(Constants.StatusEffect.PRONE), "Should fall prone on oiled floor")
+        assert_true(creature.components.modifiers.has_status(ModifierComponent.StatusEffect.PRONE), "Should fall prone on oiled floor")
     
     # Test entity being oiled
     var weapon = Entity.new().setup_from_blueprint(preload("res://assets/blueprints/items/sword.tres"), Vector2i(1, 1))
-    if not weapon.components.combat_modifier:
-        var combat_modifier = CombatModifierComponent.new()
-        weapon.components["combat_modifier"] = combat_modifier
-        weapon.add_child(combat_modifier)
+    if not weapon.components.modifiers:
+        var modifiers = ModifierComponent.StatusEffect.new()
+        weapon.components["modifiers"] = modifiers
+        weapon.add_child(modifiers)
     
-    entity.components.combat_modifier.apply_state(Constants.StatusEffect.OILED, weapon)
+    entity.components.modifiers.apply_state(ModifierComponent.StatusEffect.OILED, weapon)
     assert_true(weapon.components.material and weapon.components.material.is_slippery(), "Oiled weapon should be slippery")
     assert_true(weapon.components.material and weapon.components.material.is_flammable(), "Oiled weapon should be flammable")
     
     # Test combat effects
     var attacker = Entity.new().setup_from_blueprint(preload("res://assets/blueprints/actors/player.tres"), Vector2i(1, 1))
-    if not attacker.components.combat_modifier:
-        var combat_modifier = CombatModifierComponent.new()
-        attacker.components["combat_modifier"] = combat_modifier
-        attacker.add_child(combat_modifier)
+    if not attacker.components.modifiers:
+        var modifiers = ModifierComponent.StatusEffect.new()
+        attacker.components["modifiers"] = modifiers
+        attacker.add_child(modifiers)
     
     if attacker.components.body:
         attacker.components.body.equip_to_slot(weapon)
         var grip_check = attacker.components.combat.roll(3)
         if grip_check:  # Failed check (1-3 fails, 4-6 succeeds)
-            assert_true(weapon.has_status(Constants.StatusEffect.DISARMED), "Should drop oiled weapon on failed check")
+            assert_true(weapon.has_status(ModifierComponent.StatusEffect.DISARMED), "Should drop oiled weapon on failed check")
 
 func test_ablaze_state() -> void:
     # Test entity on fire
     var creature = Entity.new().setup_from_blueprint(preload("res://assets/blueprints/actors/player.tres"), Vector2i(1, 1))
-    entity.components.combat_modifier.apply_state(Constants.StatusEffect.ABLAZE, creature)
+    entity.components.modifiers.apply_state(ModifierComponent.StatusEffect.ABLAZE, creature)
     
     entity.process_action_queue()
     # Should cause wounds to entities with health
     if creature.components.body.consciousness > 0:
-        var wounds = creature.components.body.get_wounds(Constants.BodyPart.CHEST)
+        var wounds = creature.components.body.get_wounds(BodyComponent.BodyPart.CHEST)
         assert_true(wounds.size() > 0, "Ablaze should cause wounds")
         if wounds.size() > 0:
-            assert_eq(wounds[0].type, Constants.WoundType.MODERATE, 
+            assert_eq(wounds[0].type, BodyComponent.WoundType.MODERATE, 
                     "Fire should cause moderate wounds")
     
     # Test smoke effects
@@ -95,45 +95,45 @@ func test_ablaze_state() -> void:
     
     GameMap.process_turn()  # Let fire spread
     print(flammable_object.components)
-    assert_true(flammable_object.components.combat_modifier.has_state(Constants.StatusEffect.ABLAZE), "Fire should spread to nearby flammable objects")
+    assert_true(flammable_object.components.modifiers.has_state(ModifierComponent.StatusEffect.ABLAZE), "Fire should spread to nearby flammable objects")
     flammable_object.process_action_queue()
     
 
 func test_mud_covered() -> void:
     # Test mud on floor
     var floor_tile = Entity.new().setup_from_blueprint(preload("res://assets/blueprints/terrain/floor.tres"), Vector2i(1, 1))
-    entity.components.combat_modifier.apply_state(Constants.StatusEffect.MUD_COVERED, floor_tile)
+    entity.components.modifiers.apply_state(ModifierComponent.StatusEffect.MUD_COVERED, floor_tile)
     
     # Test movement impairment
     var creature = Entity.new().setup_from_blueprint(preload("res://assets/blueprints/actors/player.tres"), Vector2i(1, 1))
     creature.action_queue.append( MovementAction.new(creature, floor_tile) )
     creature.process_action_queue()
-    assert_true(creature.has_state(Constants.StatusEffect.MUD_COVERED), "Mud should be applied to prone")
+    assert_true(creature.has_state(ModifierComponent.StatusEffect.MUD_COVERED), "Mud should be applied to prone")
 
-    entity.components.combat_modifier.apply_state(Constants.StatusEffect.ABLAZE, creature)
-    assert_false(creature.has_state(Constants.StatusEffect.ABLAZE), "Mud should prevent catching fire")
+    entity.components.modifiers.apply_state(ModifierComponent.StatusEffect.ABLAZE, creature)
+    assert_false(creature.has_state(ModifierComponent.StatusEffect.ABLAZE), "Mud should prevent catching fire")
     
     # Test equipment effects
     var armor = Entity.new().setup_from_blueprint(preload("res://assets/blueprints/items/plate_armor.tres"), Vector2i(1, 1))
-    creature.components.body.equip_to_slot(armor, Constants.BodyPart.CHEST)
+    creature.components.body.equip_to_slot(armor, BodyComponent.BodyPart.CHEST)
     var initial_protection = armor.components.item.defense_bonus
-    entity.components.combat_modifier.apply_state(Constants.StatusEffect.MUD_COVERED, armor)
+    entity.components.modifiers.apply_state(ModifierComponent.StatusEffect.MUD_COVERED, armor)
     assert_lt(armor.components.item.defense_bonus, initial_protection, "Mud should reduce armor effectiveness")
     
 # Combat State Tests
 func test_bleeding_state() -> void:
     var creature = Entity.new().setup_from_blueprint(preload("res://assets/blueprints/actors/player.tres"), Vector2i(1, 1))
-    creature.components.combat_modifier.apply_state(Constants.StatusEffect.BLEEDING, creature)
+    creature.components.modifiers.apply_state(ModifierComponent.StatusEffect.BLEEDING, creature)
     
-    assert_true(creature.has_state(Constants.StatusEffect.BLEEDING), "Should be bleeding")
+    assert_true(creature.has_state(ModifierComponent.StatusEffect.BLEEDING), "Should be bleeding")
 
 func test_dazed_state() -> void:
     var creature = Entity.new().setup_from_blueprint(preload("res://assets/blueprints/actors/player.tres"), Vector2i(1, 1))
     
     # Test dazed right arm
     var sword = Entity.new().setup_from_blueprint(preload("res://assets/blueprints/items/sword.tres"), Vector2i(1, 1))
-    creature.components.body.equip_to_slot(sword, Constants.BodyPart.RIGHT_ARM)
-    entity.components.combat_modifier.apply_state(Constants.StatusEffect.DAZED, creature, Constants.BodyPart.RIGHT_ARM)
+    creature.components.body.equip_to_slot(sword, BodyComponent.BodyPart.RIGHT_ARM)
+    entity.components.modifiers.apply_state(ModifierComponent.StatusEffect.DAZED, creature, BodyComponent.BodyPart.RIGHT_ARM)
     
     # Should only affect right arm
     var grip_check = creature.components.combat.roll(3)
@@ -142,35 +142,35 @@ func test_dazed_state() -> void:
     
     # Test dazed left arm with shield
     var shield = Entity.new().setup_from_blueprint(preload("res://assets/blueprints/items/shield.tres"), Vector2i(1, 1))
-    creature.components.body.equip_to_slot(shield, Constants.BodyPart.LEFT_ARM)
-    entity.components.combat_modifier.apply_state(Constants.StatusEffect.DAZED, creature, Constants.BodyPart.LEFT_ARM)
+    creature.components.body.equip_to_slot(shield, BodyComponent.BodyPart.LEFT_ARM)
+    entity.components.modifiers.apply_state(ModifierComponent.StatusEffect.DAZED, creature, BodyComponent.BodyPart.LEFT_ARM)
     
     # Right arm weapon should be unaffected
     ##assert_false(sword.is_dropped(), "Weapon in undazed arm should not be dropped")
     
     # Test vision effects when head is dazed
-    entity.components.combat_modifier.apply_state(Constants.StatusEffect.DAZED, creature, Constants.BodyPart.HEAD)
-    assert_true(creature.components.combat_modifier.vision_is_blurred(), "Dazed head should blur vision")
+    entity.components.modifiers.apply_state(ModifierComponent.StatusEffect.DAZED, creature, BodyComponent.BodyPart.HEAD)
+    assert_true(creature.components.modifiers.vision_is_blurred(), "Dazed head should blur vision")
     
     # Test balance effects when legs are dazed
-    entity.components.combat_modifier.apply_state(Constants.StatusEffect.DAZED, creature, Constants.BodyPart.LEFT_LEG)
-    entity.components.combat_modifier.apply_state(Constants.StatusEffect.DAZED, creature, Constants.BodyPart.RIGHT_LEG)
-    assert_true(creature.components.combat_modifier.has_status(Constants.StatusEffect.PRONE_TO_FALLING), "Dazed legs should risk falling")
+    entity.components.modifiers.apply_state(ModifierComponent.StatusEffect.DAZED, creature, BodyComponent.BodyPart.LEFT_LEG)
+    entity.components.modifiers.apply_state(ModifierComponent.StatusEffect.DAZED, creature, BodyComponent.BodyPart.RIGHT_LEG)
+    assert_true(creature.components.modifiers.has_status(ModifierComponent.StatusEffect.PRONE_TO_FALLING), "Dazed legs should risk falling")
 
 func test_ablaze_and_pinned() -> void:
-    entity.components.combat_modifier.apply_state(Constants.StatusEffect.ABLAZE)
-    entity.components.combat_modifier.apply_state(Constants.StatusEffect.PINNED)
+    entity.components.modifiers.apply_state(ModifierComponent.StatusEffect.ABLAZE)
+    entity.components.modifiers.apply_state(ModifierComponent.StatusEffect.PINNED)
     
-    assert_true(entity.components.combat_modifier.is_panicked(), "Should cause panic")
+    assert_true(entity.components.modifiers.is_panicked(), "Should cause panic")
 
 # Behavioral Interaction Tests
 func test_panic_behavior() -> void:
     # Test panic state effects
     var creature = Entity.new().setup_from_blueprint(preload("res://assets/blueprints/actors/player.tres"))
-    entity.components.combat_modifier.apply_state(Constants.StatusEffect.ABLAZE, creature)
+    entity.components.modifiers.apply_state(ModifierComponent.StatusEffect.ABLAZE, creature)
 
     # Test panic state effects
-    assert_true(creature.has_status(Constants.StatusEffect.PANICKED), "Should be panicked when ablaze")
+    assert_true(creature.has_status(ModifierComponent.StatusEffect.PANICKED), "Should be panicked when ablaze")
     
     # Test weapon handling while panicked
     var sword = Entity.new().setup_from_blueprint(preload("res://assets/blueprints/items/sword.tres"))
@@ -185,7 +185,7 @@ func test_equipment_interaction() -> void:
     # Test weapon with oiled state
     var sword = Entity.new().setup_from_blueprint(preload("res://assets/blueprints/items/sword.tres"))
     creature.components.body.equip_to_slot(sword)
-    entity.components.combat_modifier.apply_state(Constants.StatusEffect.OILED, sword)
+    entity.components.modifiers.apply_state(ModifierComponent.StatusEffect.OILED, sword)
     
     # Test grip checks with oiled weapon
     GameMap.process_turn()  # Process weapon state
@@ -193,30 +193,30 @@ func test_equipment_interaction() -> void:
     
     # Test armor with mud state
     var armor = Entity.new().setup_from_blueprint(preload("res://assets/blueprints/items/plate_armor.tres"))
-    creature.components.body.equip_to_slot(armor, Constants.BodyPart.CHEST)
+    creature.components.body.equip_to_slot(armor, BodyComponent.BodyPart.CHEST)
     var base_protection = armor.components.item.defense_bonus
     
-    entity.components.combat_modifier.apply_state(Constants.StatusEffect.MUD_COVERED, armor)
+    entity.components.modifiers.apply_state(ModifierComponent.StatusEffect.MUD_COVERED, armor)
     assert_lt(armor.components.item.defense_bonus, base_protection, "Mud should reduce armor effectiveness")
 
 func test_progressive_state_effects() -> void:
     var creature = Entity.new().setup_from_blueprint(preload("res://assets/blueprints/actors/player.tres"), Vector2i(1, 1))
-    if not creature.components.combat_modifier:
-        var combat_modifier = CombatModifierComponent.new()
-        creature.components["combat_modifier"] = combat_modifier
-        creature.add_child(combat_modifier)
+    if not creature.components.modifiers:
+        var modifiers = ModifierComponent.StatusEffect.new()
+        creature.components["modifiers"] = modifiers
+        creature.add_child(modifiers)
     
-    entity.components.combat_modifier.apply_state(Constants.StatusEffect.BLEEDING, creature)
+    entity.components.modifiers.apply_state(ModifierComponent.StatusEffect.BLEEDING, creature)
     
     var initial_consciousness = creature.components.body.consciousness
     
     for i in range(3):
-        creature.components.combat_modifier.process_turn()
+        creature.components.modifiers.process_turn()
         
     assert_lt(creature.components.body.consciousness, initial_consciousness, "Bleeding should cause progressive damage")
     
-    assert_true(creature.has_status(Constants.StatusEffect.BLEEDING), "Bleeding should cause loss of con over time")
-    assert_true(creature.has_status(Constants.StatusEffect.WEAKENED), "Bleeding should cause weakness over time")
+    assert_true(creature.has_status(ModifierComponent.StatusEffect.BLEEDING), "Bleeding should cause loss of con over time")
+    assert_true(creature.has_status(ModifierComponent.StatusEffect.WEAKENED), "Bleeding should cause weakness over time")
 
 # Utility Functions
 func create_enemy_nearby() -> Entity:

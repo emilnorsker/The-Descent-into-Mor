@@ -15,7 +15,7 @@ func perform() -> bool:
     var damage = get_damage()
     
     # Thrown weapons always cause light wounds
-    target.components.body.apply_wound(Constants.WoundType.LIGHT, Constants.BodyPart.CHEST, 1)
+    target.components.body.apply_wound(BodyComponent.WoundType.LIGHT, BodyComponent.BodyPart.CHEST, 1)
     performer.components.inventory.remove_item(item)
     return true
 
