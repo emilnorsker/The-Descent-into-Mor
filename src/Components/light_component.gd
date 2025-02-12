@@ -12,6 +12,17 @@ func _init() -> void:
 func _ready() -> void:
     add_to_group("light_sources")
 
+func setup_from_dict(data: Dictionary) -> Component:
+    if data.has("range"):
+        _range = data.range
+    if data.has("color"):
+        _color = data.color
+    if data.has("angle"):
+        _angle = data.angle
+    if data.has("fan_angle"):
+        _fan_angle = data.fan_angle
+    return self
+
 func setup_from_blueprint(blueprint: Resource) -> LightComponent:
     if blueprint:
         _range = blueprint.range

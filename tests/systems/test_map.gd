@@ -42,13 +42,13 @@ func test_basic_tile_layer_stacking() -> void:
     
     # Load only the basic layers
     for element in test_level.floors:
-        var entity = Entity.new().setup_from_blueprint(element.blueprint, element.position)
+        var entity = Entity.new(element.blueprint, element.position)
         GameMap.register_entity(entity, element.position)
     for element in test_level.surfaces:
-        var entity = Entity.new().setup_from_blueprint(element.blueprint, element.position)
+        var entity = Entity.new(element.blueprint, element.position)
         GameMap.register_entity(entity, element.position)
     for element in test_level.objects:
-        var entity = Entity.new().setup_from_blueprint(element.blueprint, element.position)
+        var entity = Entity.new(element.blueprint, element.position)
         GameMap.register_entity(entity, element.position)
     
     # Get all entities at position
@@ -65,13 +65,13 @@ func test_complete_entity_stacking() -> void:
     
     # Load basic layers first
     for element in test_level.floors:
-        var entity = Entity.new().setup_from_blueprint(element.blueprint, element.position)
+        var entity = Entity.new(element.blueprint, element.position)
         GameMap.register_entity(entity, element.position)
     for element in test_level.surfaces:
-        var entity = Entity.new().setup_from_blueprint(element.blueprint, element.position)
+        var entity = Entity.new(element.blueprint, element.position)
         GameMap.register_entity(entity, element.position)
     for element in test_level.objects:
-        var entity = Entity.new().setup_from_blueprint(element.blueprint, element.position)
+        var entity = Entity.new(element.blueprint, element.position)
         GameMap.register_entity(entity, element.position)
     
     # Place dynamic entities

@@ -7,9 +7,11 @@
 
 [sub_resource type="Resource" id="test_weapon"]
 script = ExtResource("2_item_blueprint")
-range = 1
+equipment_type = 0
 power_bonus = 15
 defense_bonus = 1
+slot = 8
+range = 1
 
 [sub_resource type="Resource" id="test_material"]
 script = ExtResource("3_material_blueprint")

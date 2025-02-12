@@ -7,6 +7,15 @@ const WaitAction = preload("res://src/Actions/wait_action.gd")
 
 var path: Array = []
 
+func _init() -> void:
+    super()
+    name = "HostileEnemyAIComponent"
+
+func setup_from_dict(data: Dictionary) -> Component:
+    if data.has("path"):
+        path = data.path
+    return self
+
 func perform() -> void:
     var target: Entity = GameMap.player
     var target_grid_position: Vector2i = target.grid_position

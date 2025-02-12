@@ -11,28 +11,28 @@ func _init(entity: Entity, item: Entity, target_slot: BodyComponent.BodyPart = B
     _target_slot = target_slot
 
 func perform() -> bool:
-    if not _item.components.item or _item.components.item.equipment_type == ItemComponent.EquipmentType.NONE:
+    if not _item.item or _item.item.equipment_type == ItemComponent.EquipmentType.NONE:
         # Trying to equip non-equipment items damages the arm
-        if performer.components.body:
-            performer.components.body.apply_wound(BodyComponent.WoundType.LIGHT, BodyComponent.BodyPart.RIGHT_ARM)
+        if performer.body:
+            performer.body.apply_wound(BodyComponent.WoundType.LIGHT, BodyComponent.BodyPart.RIGHT_ARM)
         return false
     
-    if not performer.components.body:
+    if not performer.body:
         return false
     
-    var body = performer.components.body
+    var body = performer.body
     body.equip_to_slot(_item, _target_slot)
     return true
 
 func is_valid() -> bool:
-    if not _item.components.item or _item.components.item.equipment_type == ItemComponent.EquipmentType.NONE:
+    if not _item.item or _item.item.equipment_type == ItemComponent.EquipmentType.NONE:
         return false
     
     # If a specific slot was requested, validate it
     if _target_slot != -1:
-        if not performer.components.body:
+        if not performer.body:
             return false
-        var body = performer.components.body
+        var body = performer.body
         if not body.get_part_data(_target_slot).has("slots"):
             return false
     

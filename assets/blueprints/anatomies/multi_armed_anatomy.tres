@@ -1,0 +1,157 @@
+[gd_resource type="Resource" script_class="AnatomyBlueprint" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/Components/Blueprints/anatomy_blueprint.gd" id="1_u4r3j"]
+
+[resource]
+script = ExtResource("1_u4r3j")
+anatomy_type = "multi_armed"
+nodes = {
+"arm_cluster_left": {
+    "id": "arm_cluster_left",
+    "type": 2,
+    "parent_id": "core",
+    "children": ["arm_upper_left_1", "arm_upper_left_2", "arm_upper_left_3"],
+    "properties": {
+        "vital": false,
+        "symmetrical": true,
+        "count": 3,
+        "damage_multiplier": 0.75
+    }
+},
+"arm_cluster_right": {
+    "id": "arm_cluster_right",
+    "type": 2,
+    "parent_id": "core",
+    "children": ["arm_upper_right_1", "arm_upper_right_2", "arm_upper_right_3"],
+    "properties": {
+        "vital": false,
+        "symmetrical": true,
+        "count": 3,
+        "damage_multiplier": 0.75
+    }
+},
+"arm_upper_left_1": {
+    "id": "arm_upper_left_1",
+    "type": 2,
+    "parent_id": "arm_cluster_left",
+    "children": [],
+    "properties": {
+        "vital": false,
+        "damage_multiplier": 0.5
+    }
+},
+"arm_upper_left_2": {
+    "id": "arm_upper_left_2",
+    "type": 2,
+    "parent_id": "arm_cluster_left",
+    "children": [],
+    "properties": {
+        "vital": false,
+        "damage_multiplier": 0.5
+    }
+},
+"arm_upper_left_3": {
+    "id": "arm_upper_left_3",
+    "type": 2,
+    "parent_id": "arm_cluster_left",
+    "children": [],
+    "properties": {
+        "vital": false,
+        "damage_multiplier": 0.5
+    }
+},
+"arm_upper_right_1": {
+    "id": "arm_upper_right_1",
+    "type": 2,
+    "parent_id": "arm_cluster_right",
+    "children": [],
+    "properties": {
+        "vital": false,
+        "damage_multiplier": 0.5
+    }
+},
+"arm_upper_right_2": {
+    "id": "arm_upper_right_2",
+    "type": 2,
+    "parent_id": "arm_cluster_right",
+    "children": [],
+    "properties": {
+        "vital": false,
+        "damage_multiplier": 0.5
+    }
+},
+"arm_upper_right_3": {
+    "id": "arm_upper_right_3",
+    "type": 2,
+    "parent_id": "arm_cluster_right",
+    "children": [],
+    "properties": {
+        "vital": false,
+        "damage_multiplier": 0.5
+    }
+},
+"core": {
+    "id": "core",
+    "type": 1,
+    "parent_id": "",
+    "children": ["head", "torso", "arm_cluster_left", "arm_cluster_right"],
+    "properties": {
+        "vital": true,
+        "damage_multiplier": 1.0
+    }
+},
+"head": {
+    "id": "head",
+    "type": 0,
+    "parent_id": "core",
+    "children": [],
+    "properties": {
+        "vital": true,
+        "damage_multiplier": 2.0
+    }
+},
+"torso": {
+    "id": "torso",
+    "type": 1,
+    "parent_id": "core",
+    "children": [],
+    "properties": {
+        "vital": true,
+        "damage_multiplier": 1.0
+    }
+}
+}
+root_node = "core"
+mapping_rules = [{
+"source": "wing_left",
+"target": "arm_cluster_left",
+"rule": {
+    "distribution": "multiple",
+    "count": 3,
+    "damage_modifier": 0.33
+}
+}, {
+"source": "wing_right",
+"target": "arm_cluster_right",
+"rule": {
+    "distribution": "multiple",
+    "count": 3,
+    "damage_modifier": 0.33
+}
+}, {
+"source": "right_arm",
+"target": "arm_cluster_right",
+"rule": {
+    "distribution": "multiple",
+    "count": 3,
+    "damage_modifier": 0.33
+}
+}, {
+"source": "left_arm",
+"target": "arm_cluster_left",
+"rule": {
+    "distribution": "multiple",
+    "count": 3,
+    "damage_modifier": 0.33
+}
+}] 

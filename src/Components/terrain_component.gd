@@ -11,6 +11,19 @@ extends Component
 func _init() -> void:
     super()
 
+func setup_from_dict(data: Dictionary) -> Component:
+    if data.has("blocks_sight"):
+        blocks_sight = data.blocks_sight
+    if data.has("movement_cost"):
+        movement_cost = data.movement_cost
+    if data.has("terrain_type"):
+        terrain_type = data.terrain_type
+    if data.has("elevation"):
+        elevation = data.elevation
+    if data.has("surface_type"):
+        surface_type = data.surface_type
+    return self
+
 func setup_from_blueprint(blueprint: Resource) -> Component:
     if blueprint:
         blocks_sight = blueprint.blocks_sight

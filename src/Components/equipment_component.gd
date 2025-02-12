@@ -32,6 +32,15 @@ var total_power_bonus: int:
 func _init() -> void:
     super()
 
+func setup_from_dict(data: Dictionary) -> Component:
+    if data.has("equipped_items"):
+        _equipped_items = data.equipped_items
+    if data.has("defense_bonus"):
+        _defense_bonus = data.defense_bonus
+    if data.has("power_bonus"):
+        _power_bonus = data.power_bonus
+    return self
+
 func setup_from_blueprint(blueprint: Resource) -> EquipmentComponent:
     if blueprint:
         if blueprint.has_method("equipped_items"):
@@ -42,8 +51,8 @@ func _get_defense_bonus() -> int:
     var bonus = 0
     
     for item in _equipped_items.values():
-        if item and item.components.has("item"):
-            bonus += item.components.item.defense_bonus
+        if item and item.has("item"):
+            bonus += item.item.defense_bonus
     
     return bonus
 
@@ -52,8 +61,8 @@ func _get_power_bonus() -> int:
     var bonus = 0
     
     for item in _equipped_items.values():
-        if item and item.components.has("item"):
-            bonus += item.components.item.power_bonus
+        if item and item.has("item"):
+            bonus += item.item.power_bonus
     
     return bonus
 
@@ -81,10 +90,10 @@ func equip(item: Entity, slot = null) -> void:
     _equipped_items[slot_key] = item
     
     # Update protection if it's armor
-    if item.components.has("item"):
-        var body = parent.components.body
+    if item.has("item"):
+        var body = parent.body
         if body:
-            body.protection[slot] = item.components.item.defense_bonus
+            body.protection[slot] = item.item.defense_bonus
     
     item_equipped.emit(item, slot_key)
 
@@ -98,13 +107,13 @@ func _unequip_from_slot(slot: String) -> void:
     var item = _equipped_items[slot]
     if item:
         var parent = get_parent()
-        if parent and parent.components.has("inventory"):
-            parent.components.inventory.add_item(item)
+        if parent and parent.has("inventory"):
+            parent.inventory.add_item(item)
         _equipped_items[slot] = null
         
         # Remove protection if it was armor
-        if item.components.has("item"):
-            var body = parent.components.body
+        if item.has("item"):
+            var body = parent.body
             if body:
                 body.protection[slot] = 0
         

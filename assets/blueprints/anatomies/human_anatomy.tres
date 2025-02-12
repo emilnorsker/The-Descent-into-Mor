@@ -1,0 +1,121 @@
+[gd_resource type="Resource" script_class="AnatomyBlueprint" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/Components/Blueprints/anatomy_blueprint.gd" id="1_u4r3j"]
+
+[resource]
+script = ExtResource("1_u4r3j")
+anatomy_type = "humanoid"
+nodes = {
+"core": {
+    "id": "core",
+    "type": 1,
+    "parent_id": "",
+    "children": ["head", "torso", "left_leg", "right_leg"],
+    "properties": {
+        "vital": true,
+        "damage_multiplier": 1.0
+    }
+},
+"head": {
+    "id": "head",
+    "type": 0,
+    "parent_id": "core",
+    "children": [],
+    "properties": {
+        "vital": true,
+        "damage_multiplier": 2.0
+    }
+},
+"left_arm": {
+    "id": "left_arm",
+    "type": 2,
+    "parent_id": "torso",
+    "children": ["left_hand"],
+    "properties": {
+        "vital": false,
+        "damage_multiplier": 0.75
+    }
+},
+"left_hand": {
+    "id": "left_hand",
+    "type": 2,
+    "parent_id": "left_arm",
+    "children": [],
+    "properties": {
+        "vital": false,
+        "damage_multiplier": 0.5
+    }
+},
+"left_leg": {
+    "id": "left_leg",
+    "type": 2,
+    "parent_id": "core",
+    "children": ["left_foot"],
+    "properties": {
+        "vital": false,
+        "damage_multiplier": 0.75
+    }
+},
+"left_foot": {
+    "id": "left_foot",
+    "type": 2,
+    "parent_id": "left_leg",
+    "children": [],
+    "properties": {
+        "vital": false,
+        "damage_multiplier": 0.5
+    }
+},
+"right_arm": {
+    "id": "right_arm",
+    "type": 2,
+    "parent_id": "torso",
+    "children": ["right_hand"],
+    "properties": {
+        "vital": false,
+        "damage_multiplier": 0.75
+    }
+},
+"right_hand": {
+    "id": "right_hand",
+    "type": 2,
+    "parent_id": "right_arm",
+    "children": [],
+    "properties": {
+        "vital": false,
+        "damage_multiplier": 0.5
+    }
+},
+"right_leg": {
+    "id": "right_leg",
+    "type": 2,
+    "parent_id": "core",
+    "children": ["right_foot"],
+    "properties": {
+        "vital": false,
+        "damage_multiplier": 0.75
+    }
+},
+"right_foot": {
+    "id": "right_foot",
+    "type": 2,
+    "parent_id": "right_leg",
+    "children": [],
+    "properties": {
+        "vital": false,
+        "damage_multiplier": 0.5
+    }
+},
+"torso": {
+    "id": "torso",
+    "type": 1,
+    "parent_id": "core",
+    "children": ["left_arm", "right_arm"],
+    "properties": {
+        "vital": true,
+        "damage_multiplier": 1.0
+    }
+}
+}
+root_node = "core"
+mapping_rules = [] 

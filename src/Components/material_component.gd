@@ -9,6 +9,15 @@ var material_type: String = "none"
 func _init() -> void:
     super()
 
+func setup_from_dict(data: Dictionary) -> Component:
+    if data.has("flammable"):
+        _is_flammable = data.flammable
+    if data.has("slippery"):
+        _is_slippery = data.slippery
+    if data.has("type"):
+        material_type = data.type
+    return self
+
 func setup_from_blueprint(blueprint: Resource) -> Component:
     if not blueprint:
         return self
@@ -21,14 +30,14 @@ func setup_from_blueprint(blueprint: Resource) -> Component:
 
 func is_flammable() -> bool:
     var parent = get_parent() as Entity
-    if parent and parent.components.modifiers:
-        return _is_flammable or parent.components.modifiers.has_state(ModifierComponent.StatusEffect.OILED)
+    if parent and parent.modifiers:
+        return _is_flammable or parent.modifiers.has_state(ModifierComponent.StatusEffect.OILED)
     return _is_flammable
 
 func is_slippery() -> bool:
     var parent = get_parent() as Entity
-    if parent and parent.components.modifiers:
-        return _is_slippery or parent.components.modifiers.has_state(ModifierComponent.StatusEffect.OILED)
+    if parent and parent.modifiers:
+        return _is_slippery or parent.modifiers.has_state(ModifierComponent.StatusEffect.OILED)
     return _is_slippery
 
 func set_is_flammable(value: bool) -> void:

@@ -27,27 +27,27 @@ func load_level(level: Level) -> void:
     
     # Load floors
     for element in level.floors:
-        var entity = Entity.new().setup_from_blueprint(element.blueprint, element.position)
+        var entity = Entity.new(element.blueprint, element.position)
         register_entity(entity, element.position)
     
     # Load surfaces
     for element in level.surfaces:
-        var entity = Entity.new().setup_from_blueprint(element.blueprint, element.position)
+        var entity = Entity.new(element.blueprint, element.position)
         register_entity(entity, element.position)
     
     # Load objects
     for element in level.objects:
-        var entity = Entity.new().setup_from_blueprint(element.blueprint, element.position)
+        var entity = Entity.new(element.blueprint, element.position)
         register_entity(entity, element.position)
     
     # Load items
     for element in level.items:
-        var entity = Entity.new().setup_from_blueprint(element.blueprint, element.position)
+        var entity = Entity.new(element.blueprint, element.position)
         register_entity(entity, element.position)
     
     # Load entities
     for element in level.entities:
-        var entity = Entity.new().setup_from_blueprint(element.blueprint, element.position)
+        var entity = Entity.new(element.blueprint, element.position)
         register_entity(entity, element.position)
 
 func clear() -> void:
@@ -183,7 +183,7 @@ func is_line_of_sight_blocked(from_pos: Vector2i, to_pos: Vector2i) -> bool:
     var line = get_line(from_pos, to_pos)
     for pos in line:
         for entity in get_entities_at(pos):
-            if entity.components.terrain and entity.components.terrain.blocks_sight:
+            if entity.terrain and entity.terrain.blocks_sight:
                 return true
     return false
 
@@ -229,5 +229,5 @@ func get_entities_in_rect(start: Vector2i, end: Vector2i) -> Array[Entity]:
 func process_turn() -> void:
     for entity in _entities:
         print("Processing turn for entity: ", entity.entity_name)
-        if entity.components.modifiers:
+        if entity.modifiers:
             entity.process_action_queue()

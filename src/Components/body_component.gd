@@ -50,7 +50,10 @@ class Wound:
 
 func _init() -> void:
     super()
-    
+    for part in BodyPart.values():
+        wounds[part] = []
+        equipment[part] = null
+        protection[part] = 0
 
 func setup_from_blueprint(blueprint: Resource) -> BodyComponent:
     if not blueprint:
@@ -64,12 +67,18 @@ func setup_from_blueprint(blueprint: Resource) -> BodyComponent:
 
     return self
 
-func _ready():
-    # Initialize wounds dictionary for each body part
-    for part in BodyPart.values():
-        wounds[part] = []
-        equipment[part] = null
-        protection[part] = 0
+func setup_from_dict(data: Dictionary) -> Component:
+    if data.has("parts"):
+        parts = data.parts if data.parts is Dictionary else {}
+    if data.has("wounds"):
+        wounds = data.wounds if data.wounds is Dictionary else {}
+    if data.has("consciousness"):
+        consciousness = data.consciousness
+    if data.has("equipment"):
+        equipment = data.equipment if data.equipment is Dictionary else {}
+    if data.has("protection"):
+        protection = data.protection if data.protection is Dictionary else {}
+    return self
 
 func apply_wound(type: BodyComponent.WoundType, part: BodyComponent.BodyPart = BodyComponent.BodyPart.NONE) -> void:
     if is_dead:
@@ -158,7 +167,7 @@ func get_wound_severity(damage: int, part: BodyPart) -> WoundType:
 
 func equip_to_slot(item: Entity, body_part = null) -> void:
     var parent = get_parent() as Entity
-    if not parent or not parent.components.equipment: return
+    if not parent or not parent.equipment: return
     
     # If no body part specified or invalid (-1), use default right hand
     var slot = BodyPart.RIGHT_EQUIPMENT
@@ -169,7 +178,7 @@ func equip_to_slot(item: Entity, body_part = null) -> void:
         SignalBus.message_sent.emit(parent.entity_name + " is unable to equip the %s." % item.entity_name, Color.RED)
         return
     
-    parent.components.equipment.equip(item, slot)
+    parent.equipment.equip(item, slot)
 
 func process_recovery() -> void:
     # Natural consciousness recovery

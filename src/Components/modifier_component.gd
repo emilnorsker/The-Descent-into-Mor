@@ -31,6 +31,17 @@ var _balance_check_results: Dictionary = {}
 func _init() -> void:
     super()
 
+func setup_from_dict(data: Dictionary) -> Component:
+    if data.has("states"):
+        var raw_states = data.states
+        states.clear()
+        for state in raw_states:
+            if state is int and state >= 0 and state < StatusEffect.size():
+                states.append(state as StatusEffect)
+    if data.has("balance_check_results"):
+        _balance_check_results = data.balance_check_results
+    return self
+
 func setup_from_blueprint(blueprint: Resource) -> ModifierComponent:
     if not blueprint:
         push_error("Invalid blueprint provided to ModifierComponent.StatusEffect.setup_from_blueprint")
@@ -47,35 +58,35 @@ func apply_state(state: ModifierComponent.StatusEffect, target: Entity = null, b
     # Handle state-specific effects
     match state:
         ModifierComponent.StatusEffect.ABLAZE:
-            if target and target.components.material:
-                if target.components.material.get_is_flammable():
-                    target.components.material.add_state(ModifierComponent.StatusEffect.ABLAZE)
+            if target and target.material:
+                if target.material.get_is_flammable():
+                    target.material.add_state(ModifierComponent.StatusEffect.ABLAZE)
         ModifierComponent.StatusEffect.MUD_COVERED:
-            if target and target.components.modifiers:
-                target.components.modifiers.remove_state(ModifierComponent.StatusEffect.ABLAZE)
+            if target and target.modifiers:
+                target.modifiers.remove_state(ModifierComponent.StatusEffect.ABLAZE)
 
         ModifierComponent.StatusEffect.OILED:
-            if target and target.components.material:
-                var material = target.components.material
+            if target and target.material:
+                var material = target.material
                 # Store the balance check result for this target
                 material.set_is_slippery(true)
                 material.set_is_flammable(true)
         ModifierComponent.StatusEffect.BLEEDING:
-            if target and target.components.body:
+            if target and target.body:
                 # Apply bleeding wound
-                target.components.body.apply_wound(BodyComponent.WoundType.MODERATE, BodyComponent.BodyPart.CHEST)
-                target.components.body.consciousness -= 2  # Bleeding causes consciousness loss
+                target.body.apply_wound(BodyComponent.WoundType.MODERATE, BodyComponent.BodyPart.CHEST)
+                target.body.consciousness -= 2  # Bleeding causes consciousness loss
 
 func process_turn() -> void:
     var parent = get_parent() as Entity
     if not parent: return
     
     # Process bleeding
-    if has_state(ModifierComponent.StatusEffect.BLEEDING) and parent.components.body:
-        parent.components.body.consciousness -= 2  # Bleeding causes consciousness loss per turn
+    if has_state(ModifierComponent.StatusEffect.BLEEDING) and parent.body:
+        parent.body.consciousness -= 2  # Bleeding causes consciousness loss per turn
 
-    if has_state(ModifierComponent.StatusEffect.ABLAZE) and parent.components.body:
-        parent.components.body.apply_wound(BodyComponent.WoundType.MODERATE, BodyComponent.BodyPart.CHEST)
+    if has_state(ModifierComponent.StatusEffect.ABLAZE) and parent.body:
+        parent.body.apply_wound(BodyComponent.WoundType.MODERATE, BodyComponent.BodyPart.CHEST)
 
 func has_state(state: ModifierComponent.StatusEffect) -> bool:
     return state in states

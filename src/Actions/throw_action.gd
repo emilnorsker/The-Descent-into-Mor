@@ -22,24 +22,24 @@ func perform() -> bool:
         return false
         
     var damage = get_damage()
-    var severity = target.components.body.get_wound_severity(damage, target_part)
+    var severity = target.body.get_wound_severity(damage, target_part)
     
     print("throwing ", item.entity_name, " with damage ", damage, " to ", BodyComponent.BodyPart.keys()[target_part])
     
-    target.components.body.apply_wound(severity, target_part)
-    performer.components.inventory.remove_item(item)
+    target.body.apply_wound(severity, target_part)
+    performer.inventory.remove_item(item)
     return true
 
 func get_damage() -> int:
     var damage = 0
     
     # Add power bonus only for actual weapons
-    if item.components.item and item.components.item.power_bonus > 0:
-        damage += item.components.item.power_bonus
+    if item.item and item.item.power_bonus > 0:
+        damage += item.item.power_bonus
     
     # Add weight-based damage
-    if item.components.weight:
-        var weight = item.components.weight.get_weight()
+    if item.weight:
+        var weight = item.weight.get_weight()
         damage += int(ceil(weight * 0.1))  # 50 weight = 5 damage
     
         print("thrown with weightdamage: ", damage)
@@ -48,8 +48,8 @@ func get_damage() -> int:
 
 func get_range() -> int:
     var base_range = 10
-    if item.components.weight:
-        var weight = item.components.weight.get_weight()
+    if item.weight:
+        var weight = item.weight.get_weight()
         base_range = int(10 - ceil(weight * 0.5))  # 0.5 weight = 9 range
     return max(1, base_range)
 

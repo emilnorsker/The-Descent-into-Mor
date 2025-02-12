@@ -5,6 +5,10 @@ func _init() -> void:
     super()
     name = "BaseAIComponent"
 
+func setup_from_dict(data: Dictionary) -> Component:
+    # Base AI component doesn't have any configurable properties yet
+    return self
+
 func setup_from_blueprint(blueprint: Resource) -> Component:
     if not blueprint:
         return self

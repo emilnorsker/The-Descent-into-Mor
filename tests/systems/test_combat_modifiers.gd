@@ -13,7 +13,7 @@ func before_each() -> void:
     entity = Entity.new().setup_from_blueprint(blueprint, Vector2i(1, 1))
     
     # Add combat modifier component if not present
-    if not entity.components.modifiers:
+    if not entity.modifiers:
         var modifiers = ModifierComponent.new()
         entity.components["modifiers"] = modifiers
         entity.add_child(modifiers)

@@ -29,33 +29,33 @@ func after_each() -> void:
 func test_melee_attack() -> void:
 	var melee_action = MeleeAction.new(attacker, target, BodyComponent.BodyPart.CHEST)
 
-	var consciousness = target.components.body.consciousness
+	var consciousness = target.body.consciousness
 	attacker.next_roll = 10
 	target.next_roll = 0
 	var result = melee_action.perform()
 	target.next_roll = -1
 	
 	assert_true(result, "Melee action should succeed")
-	assert_lt(target.components.body.consciousness, consciousness, "Target should lose consciousness on succesfull attack")
+	assert_lt(target.body.consciousness, consciousness, "Target should lose consciousness on succesfull attack")
 
 func test_throw_attack() -> void:
 	var weapon = Entity.new().setup_from_blueprint(preload("res://tests/fixtures/blueprints/items/test_weapon.tres"), Vector2i(0, 0))
-	attacker.components.inventory.add_item(weapon)
+	attacker.inventory.add_item(weapon)
 	target.next_roll = 0
 	
 	var throw_action = ThrowAction.new(attacker, target, weapon)
 	
-	var consciousness = target.components.body.consciousness
+	var consciousness = target.body.consciousness
 	var result = throw_action.perform()
 	target.next_roll = -1
 	assert_true(result, "Throw action should succeed")
-	assert_lt(target.components.body.consciousness, consciousness, "Target should lose consciousness on succesfull attack")
+	assert_lt(target.body.consciousness, consciousness, "Target should lose consciousness on succesfull attack")
 
 # # Test Combat Stats
 # func test_defense_calculation() -> void:
 # 	var armor = Entity.new().setup_from_blueprint(preload("res://tests/fixtures/blueprints/items/test_armor.tres"), Vector2i(0, 0))
-# 	target.components.inventory.add_item(armor)
-# 	target.components.equipment.equip(armor)
+# 	target.inventory.add_item(armor)
+# 	target.equipment.equip(armor)
 	
 # 	var melee_action = MeleeAction.new(attacker, target,  BodyComponent.BodyPart.CHEST)
 # 	attacker.test_mode = true
@@ -63,7 +63,7 @@ func test_throw_attack() -> void:
 # 	melee_action.perform()
 # 	target.next_roll = -1
 	
-# 	var consciousness = target.components.body.consciousness
+# 	var consciousness = target.body.consciousness
 # 	assert_gt(consciousness, 80, "Armor should reduce damage taken")
 
 # remove weapon from attacker
@@ -73,48 +73,48 @@ func test_throw_attack() -> void:
 # assert that the second loss is greater than the first
 func test_power_calculation() -> void:
 	# First create and equip a weapon
-	var con_start = target.components.body.consciousness
+	var con_start = target.body.consciousness
 
-	var weapon = attacker.components.equipment.get_equipped_item(BodyComponent.BodyPart.RIGHT_EQUIPMENT)
+	var weapon = attacker.equipment.get_equipped_item(BodyComponent.BodyPart.RIGHT_EQUIPMENT)
 	assert_null(weapon, "Weapon should not be equipped on attacker")
 	
 	target.next_roll = 0
 	attacker.next_roll = 10
 	var melee_action = MeleeAction.new(attacker, target,  BodyComponent.BodyPart.CHEST)
 	melee_action.perform()
-	var con_loss_1 = con_start - target.components.body.consciousness
+	var con_loss_1 = con_start - target.body.consciousness
 
 	var new_weapon = Entity.new().setup_from_blueprint(preload("res://tests/fixtures/blueprints/items/test_weapon.tres"), Vector2i(0, 0))
-	attacker.components.equipment.equip(new_weapon)
-	assert_not_null(attacker.components.equipment.get_equipped_item(BodyComponent.BodyPart.RIGHT_EQUIPMENT), "Weapon should be equipped on attacker")
+	attacker.equipment.equip(new_weapon)
+	assert_not_null(attacker.equipment.get_equipped_item(BodyComponent.BodyPart.RIGHT_EQUIPMENT), "Weapon should be equipped on attacker")
 
 	target.next_roll = 0
 	attacker.next_roll = 10
 	var melee_action_with_weapon = MeleeAction.new(attacker, target,  BodyComponent.BodyPart.CHEST)
 	melee_action_with_weapon.perform()
-	var con_loss_2 = con_start - target.components.body.consciousness
+	var con_loss_2 = con_start - target.body.consciousness
 
 	assert_gt(con_loss_2, con_loss_1, "Weapon should increase damage dealt")
 # Test Death
 func test_death() -> void:
-	target.components.body.consciousness = 1  # Set target to almost dead
+	target.body.consciousness = 1  # Set target to almost dead
 	# watch for the death siganl
-	watch_signals(target.components.body)
+	watch_signals(target.body)
 	
 	# test that consciousness can go under 0 without dying
 	target.next_roll = 100000
 	attacker.next_roll = 10 # ensure hit
 	var melee_action = MeleeAction.new(attacker, target,  BodyComponent.BodyPart.CHEST)
 	melee_action.perform()
-	assert_signal_not_emitted(target.components.body, "died")
+	assert_signal_not_emitted(target.body, "died")
 
 	# Now test if it dies
-	attacker.components.equipment.equip(Entity.new().setup_from_blueprint(preload("res://tests/fixtures/blueprints/items/test_weapon.tres"), Vector2i(0, 0)))
+	attacker.equipment.equip(Entity.new().setup_from_blueprint(preload("res://tests/fixtures/blueprints/items/test_weapon.tres"), Vector2i(0, 0)))
 	target.next_roll = -1000
 	attacker.next_roll = 1000
 	var melee_action_with_weapon = MeleeAction.new(attacker, target,  BodyComponent.BodyPart.CHEST)
 	melee_action_with_weapon.perform()
 
 
-	assert_signal_emitted(target.components.body, "died")
+	assert_signal_emitted(target.body, "died")
 	assert_eq(GameMap.get_entities_of_type_at(target.grid_position, Entity.EntityType.CORPSE).size(), 1, "Dead target should be removed from map") 

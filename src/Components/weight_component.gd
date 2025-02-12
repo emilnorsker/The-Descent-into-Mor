@@ -8,6 +8,15 @@ var balance_penalty: float = 0.0
 func _init() -> void:
     super()
 
+func setup_from_dict(data: Dictionary) -> Component:
+    if data.has("weight"):
+        weight = data.weight
+    if data.has("affects_balance"):
+        affects_balance = data.affects_balance
+    if data.has("balance_penalty"):
+        balance_penalty = data.balance_penalty
+    return self
+
 func setup_from_blueprint(blueprint: Resource) -> WeightComponent:
     if blueprint:
         weight = blueprint.weight
@@ -19,8 +28,8 @@ func setup_from_blueprint(blueprint: Resource) -> WeightComponent:
 func get_weight() -> float:
     var base_weight = weight
     var parent = get_parent() as Entity
-    if parent and parent.components.modifiers:
-        if parent.components.modifiers.has_state(ModifierComponent.StatusEffect.MUD_COVERED):
+    if parent and parent.modifiers:
+        if parent.modifiers.has_state(ModifierComponent.StatusEffect.MUD_COVERED):
             base_weight *= 1.5  # Mud increases weight by 50%
     return base_weight
 

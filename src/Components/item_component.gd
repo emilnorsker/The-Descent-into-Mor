@@ -23,8 +23,8 @@ func _init() -> void:
 func get_range() -> int:
     if range == -1:
         return 1
-    if get_parent() and get_parent().components.combat:
-        return range + get_parent().components.combat.get_power_bonus()
+    if get_parent() and get_parent().combat:
+        return range + get_parent().combat.get_power_bonus()
     return range
 
 func setup_from_blueprint(blueprint: Resource) -> ItemComponent:
@@ -40,4 +40,17 @@ func setup_from_blueprint(blueprint: Resource) -> ItemComponent:
         if blueprint.range:
             range = blueprint.range
 
+    return self
+
+func setup_from_dict(data: Dictionary) -> Component:
+    if data.has("equipment_type"):
+        equipment_type = data.equipment_type
+    if data.has("power_bonus"):
+        power_bonus = data.power_bonus
+    if data.has("defense_bonus"):
+        defense_bonus = data.defense_bonus
+    if data.has("slot"):
+        slot = data.slot
+    if data.has("range"):
+        range = data.range
     return self

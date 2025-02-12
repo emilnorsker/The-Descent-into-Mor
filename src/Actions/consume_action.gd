@@ -12,11 +12,11 @@ func perform() -> bool:
         return false
         
     # ItemAction is used for consuming items
-    if consumable.components.consumable:
-        return consumable.components.consumable.consume(performer)
+    if consumable.consumable:
+        return consumable.consumable.consume(performer)
     
     # If the item is not consumable, trying to consume it causes head damage
-    if performer.components.body:
-        performer.components.body.apply_wound(BodyComponent.WoundType.LIGHT, BodyComponent.BodyPart.HEAD)
+    if performer.body:
+        performer.body.apply_wound(BodyComponent.WoundType.LIGHT, BodyComponent.BodyPart.HEAD)
     
     return false

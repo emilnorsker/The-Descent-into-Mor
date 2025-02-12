@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="AnatomyBlueprint" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/Components/Blueprints/anatomy_blueprint.gd" id="1_u4r3j"]
+
+[resource]
+script = ExtResource("1_u4r3j")
+anatomy_type = "base"
+nodes = {
+"core": {
+    "id": "core",
+    "type": 1,
+    "parent_id": "",
+    "children": [],
+    "properties": {
+        "vital": true,
+        "damage_multiplier": 1.0
+    }
+}
+}
+root_node = "core"
+mapping_rules = []

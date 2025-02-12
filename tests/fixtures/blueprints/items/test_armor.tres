@@ -14,10 +14,10 @@ protection = 0
 [sub_resource type="Resource" id="test_item"]
 script = ExtResource("5_item")
 equipment_type = 1
-#ARMORpower_bonus = 0
+power_bonus = 0
 defense_bonus = 3
-#Matcharmorprotectionslot = 2
-#CHESTrange = 0
+slot = 8
+range = 0
 
 [sub_resource type="Resource" id="test_material"]
 script = ExtResource("3_material")

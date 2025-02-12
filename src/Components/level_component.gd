@@ -9,6 +9,17 @@ var _level_up_factor: int = 150
 func _init() -> void:
     super()
 
+func setup_from_dict(data: Dictionary) -> Component:
+    if data.has("level"):
+        _level = data.level
+    if data.has("current_xp"):
+        _current_xp = data.current_xp
+    if data.has("level_up_base"):
+        _level_up_base = data.level_up_base
+    if data.has("level_up_factor"):
+        _level_up_factor = data.level_up_factor
+    return self
+
 func setup_from_blueprint(blueprint: Resource) -> ProgressionComponent:
     if blueprint:
         _level = blueprint.current_level
@@ -37,9 +48,6 @@ func add_xp(xp: int) -> void:
         )
         
         var combat: CombatComponent = get_parent().combat
-        var max_hp_increase: int = randi_range(1, 4)
-        combat.max_hp += max_hp_increase
-        combat.hp += max_hp_increase
         
         var power_increase: int = randi_range(1, 2)
         combat.power += power_increase

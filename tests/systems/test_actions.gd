@@ -33,7 +33,7 @@ func test_unarmed_attacks() -> void:
     var result = punch.perform()    
     
     assert_true(result, "Punch should succeed")
-    var wounds = target.components.body.get_wounds(BodyComponent.BodyPart.CHEST)
+    var wounds = target.body.get_wounds(BodyComponent.BodyPart.CHEST)
     assert_true(wounds.size() > 0, "Punch should cause wound")
     
     # Test kick
@@ -42,7 +42,7 @@ func test_unarmed_attacks() -> void:
     result = kick.perform()
     
     assert_true(result, "Kick should succeed")
-    wounds = target.components.body.get_wounds(BodyComponent.BodyPart.ABDOMEN)
+    wounds = target.body.get_wounds(BodyComponent.BodyPart.ABDOMEN)
     assert_true(wounds.size() > 0, "Kick should cause wound")
     
     # Test headbutt
@@ -51,36 +51,36 @@ func test_unarmed_attacks() -> void:
     result = headbutt.perform()
     
     assert_true(result, "Headbutt should succeed")
-    wounds = attacker.components.body.get_wounds(BodyComponent.BodyPart.HEAD)
+    wounds = attacker.body.get_wounds(BodyComponent.BodyPart.HEAD)
     assert_true(wounds.size() > 0, "Headbutt should also damage attacker")
     
 # Weapon Tests
 func test_weapon_attacks() -> void:
     var sword = Entity.new().setup_from_blueprint(TestWeapon, Vector2i.ZERO)
     
-    attacker.components.body.equip_to_slot(sword)
+    attacker.body.equip_to_slot(sword)
     attacker.next_roll = 4  # Just enough to hit DC 4
     var slash = MeleeAction.new(attacker, target, BodyComponent.BodyPart.RIGHT_ARM, BodyComponent.BodyPart.CHEST)
     var result = slash.perform()
     
     assert_true(result, "Sword attack should succeed")
     # assert_true(
-    #     target.components.modifiers and 
-    #     target.components.modifiers.has_state(ModifierComponent.StatusEffect.BLEEDING),
+    #     target.modifiers and 
+    #     target.modifiers.has_state(ModifierComponent.StatusEffect.BLEEDING),
     #         "Slash should cause bleeding")
 
 # Throw Tests
 func test_throw_weapon() -> void:
     var dagger = Entity.new().setup_from_blueprint(TestWeapon, Vector2i.ZERO)
-    dagger.components.weight.weight = 0.5
-    dagger.components.item.power_bonus = 15
+    dagger.weight.weight = 0.5
+    dagger.item.power_bonus = 15
     
-    attacker.components.body.equip_to_slot(dagger)
+    attacker.body.equip_to_slot(dagger)
     var throw = ThrowAction.new(attacker, target, dagger, BodyComponent.BodyPart.LEFT_ARM)
     
     # Calculate expected range based on weight
-    print("dagger weight: ", dagger.components.weight.get_weight())
-    var expected_range = int(10 - ceil(dagger.components.weight.get_weight() * 0.5))
+    print("dagger weight: ", dagger.weight.get_weight())
+    var expected_range = int(10 - ceil(dagger.weight.get_weight() * 0.5))
     assert_eq(throw.get_range(), expected_range, "Throw range should be weight-based")
 
     attacker.next_roll = 10
@@ -89,7 +89,7 @@ func test_throw_weapon() -> void:
     var result = throw.perform()
     assert_true(result, "Throw should succeed")
 
-    var wounds = target.components.body.get_wounds(BodyComponent.BodyPart.LEFT_ARM)
+    var wounds = target.body.get_wounds(BodyComponent.BodyPart.LEFT_ARM)
     assert_true(wounds.size() > 0, "Thrown weapon should cause wound")
     assert_gt(wounds[0].type, BodyComponent.WoundType.LIGHT, "Thrown weapon should use damage if they have it instead of weight")
 
@@ -99,20 +99,20 @@ func test_throw_generic_item() -> void:
         ["ItemComponent", {"power_bonus": 1, "defense_bonus": 1}]
     ])
     
-    attacker.components.body.equip_to_slot(rock)
+    attacker.body.equip_to_slot(rock)
     attacker.next_roll = 5
     target.next_roll = 0
     var throw = ThrowAction.new(attacker, target, rock, BodyComponent.BodyPart.LEFT_ARM)
     
     # Test weight-based damage
-    var expected_damage = int(ceil(rock.components.weight.get_weight() * 0.1)) + rock.components.item.power_bonus
+    var expected_damage = int(ceil(rock.weight.get_weight() * 0.1)) + rock.item.power_bonus
     assert_eq(throw.get_damage(), expected_damage, "Generic throw damage should be weight-based")
     
 
     var result = throw.perform()
     assert_true(result, "Throw should succeed")
     
-    var wounds = target.components.body.get_wounds()
+    var wounds = target.body.get_wounds()
     assert_true(wounds.size() > 0, "Thrown item should cause wound")
     if wounds.size() > 0:
         assert_eq(wounds[0].type, BodyComponent.WoundType.LIGHT,
@@ -134,7 +134,7 @@ func test_attack_ranges() -> void:
     # Move target to range 2
     target.move(Vector2i(3, 1) - target.grid_position)
     
-    attacker.components.body.equip_to_slot(spear)
+    attacker.body.equip_to_slot(spear)
     var thrust = MeleeAction.new(attacker, target, BodyComponent.BodyPart.RIGHT_ARM, BodyComponent.BodyPart.CHEST)
     assert_true(thrust.perform(), "Spear should hit at range 2")
 
@@ -150,11 +150,11 @@ func create_item_entity(data: Array) -> Entity:
         
         match type:
             "ItemComponent":
-                blueprint.components.item.power_bonus = values.get("power_bonus", 0)
-                blueprint.components.item.defense_bonus = values.get("defense_bonus", 0)
-                blueprint.components.item.range = values.get("range", 1)
+                blueprint.item.power_bonus = values.get("power_bonus", 0)
+                blueprint.item.defense_bonus = values.get("defense_bonus", 0)
+                blueprint.item.range = values.get("range", 1)
             "WeightComponent":
-                var weight_blueprint = blueprint.components.weight
+                var weight_blueprint = blueprint.weight
                 weight_blueprint.weight = values.get("weight", 1.5)
                 weight_blueprint.affects_balance = values.get("affects_balance", false)
                 weight_blueprint.balance_penalty = values.get("balance_penalty", 0.0)

@@ -14,8 +14,8 @@ func before_each() -> void:
     
     # Create test entity using blueprint
     entity = Entity.new().setup_from_blueprint(TestHumanoid, Vector2i(1, 1))
-    body = entity.components.body
-    equipment = entity.components.equipment
+    body = entity.body
+    equipment = entity.equipment
 
 func after_each() -> void:
     GameMap.clear()
@@ -150,7 +150,7 @@ func test_item_consumption_misuse() -> void:
     
     var attack_action = MeleeAction.new(entity, entity, BodyComponent.BodyPart.RIGHT_ARM)
     entity.next_roll = 10
-    entity.components.equipment.equip(bandage, BodyComponent.BodyPart.RIGHT_EQUIPMENT)  # Use RIGHT_EQUIPMENT slot
+    entity.equipment.equip(bandage, BodyComponent.BodyPart.RIGHT_EQUIPMENT)  # Use RIGHT_EQUIPMENT slot
     result = attack_action.perform()
     
     assert_true(result, "Should be able to attack with any item")
@@ -213,19 +213,19 @@ func create_armor_entity(data: Array) -> Entity:
         
         match type:
             "ArmorComponent":
-                blueprint.components.armor.slot = values.get("slot",  BodyComponent.BodyPart.CHEST)
-                blueprint.components.armor.protection = values.get("protection", 3)
+                blueprint.armor.slot = values.get("slot",  BodyComponent.BodyPart.CHEST)
+                blueprint.armor.protection = values.get("protection", 3)
             "MaterialComponent":
-                blueprint.components.material.material_type = values.get("type", "metal")
+                blueprint.material.material_type = values.get("type", "metal")
             "WeightComponent":
-                blueprint.components.weight.weight = values.get("weight", 5.0)
+                blueprint.weight.weight = values.get("weight", 5.0)
             "ResistanceComponent":
-                blueprint.components.resistance = {}
+                blueprint.resistance = {}
                 for damage_type in values:
-                    blueprint.components.resistance[damage_type] = values[damage_type]
+                    blueprint.resistance[damage_type] = values[damage_type]
             "DamageTypeComponent":
-                blueprint.components.damage = {}
+                blueprint.damage = {}
                 for damage_type in values:
-                    blueprint.components.damage[damage_type] = values[damage_type]
+                    blueprint.damage[damage_type] = values[damage_type]
     
     return Entity.new().setup_from_blueprint(blueprint, Vector2i.ZERO) 

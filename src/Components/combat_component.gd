@@ -37,6 +37,14 @@ func _init() -> void:
     super()
     name = "CombatComponent"
 
+func setup_from_dict(data: Dictionary) -> Component:
+    if data.has("health"):
+        max_hp = data.health
+        hp = data.health
+    if data.has("damage"):
+        power = data.damage
+    return self
+
 func setup_from_blueprint(blueprint: Resource) -> CombatComponent:
     if blueprint:
         max_hp = blueprint.max_hp
@@ -88,14 +96,14 @@ func die() -> void:
     parent.queue_free()
 
 func get_defense() -> int:
-    return defense + get_parent().components.equipment.total_defense_bonus
+    return defense + get_parent().equipment.total_defense_bonus
 
 func get_power() -> int:
-    return power + get_parent().components.equipment.total_power_bonus
+    return power + get_parent().equipment.total_power_bonus
 
 func get_power_bonus() -> int:
-    if get_parent().components.equipment:
-        return get_parent().components.equipment.power_bonus
+    if get_parent().equipment:
+        return get_parent().equipment.power_bonus
     return 0
 
 
