@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="BodyComponentBlueprint" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/Components/Blueprints/body_component_blueprint.gd" id="1_body"]
+
+[resource]
+script = ExtResource("1_body")
+type = "humanoid"
+parts = {
+"head": true,
+"neck": true,
+"chest": true,
+"abdomen": true,
+"left_arm": true,
+"right_arm": true,
+"left_leg": true,
+"right_leg": true
+}
+consciousness = 100.0
+is_dead = false
+wounds = {} 

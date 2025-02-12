@@ -7,40 +7,16 @@
 resource_name = "burning_status"
 script/source = "extends StatusEffect
 func apply(target: Entity) -> bool:
-	if not target.has_component('material'):
+	
+	if not target.is_flammable:
 		return false
 		
-	var material = target.get_component('material')
-	if not material.is_flammable:
-		return false
+	target.modifier.states.append('burning')
 		
-	# Apply burning status
-	if target.has_component('combat_modifier'):
-		var modifier = target.get_component('combat_modifier')
-		modifier.states.append('burning')
-		
-		# Set up damage over time
-		var timer = Timer.new()
-		timer.wait_time = 1.0  # Damage per second
-		timer.connect('timeout', _on_burn_tick.bind(target))
-		target.add_child(timer)
-		timer.start()
-		
-		return true
-	return false
+	return true
 
 func _on_tick(target: Entity) -> void:
-	if target.has_component('health'):
-		var health = target.get_component('health')
-		health.take_damage(1)  # 1 damage per tick
-		
-	# Check for spread
-	if target.roll_dice(1, 5) == 1:  # 20% chance to spread per tick
-		var nearby = GameMap.get_entities_in_range(target.grid_position, 1)
-		for entity in nearby:
-			if entity != target:
-				apply(entity)  # Try to spread fire"
-
+    pass
 
 
 

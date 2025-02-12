@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="TerrainComponentBlueprint" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/Components/Blueprints/terrain_component_blueprint.gd" id="1_terrain"]
+
+[resource]
+script = ExtResource("1_terrain")
+blocks_sight = false
+movement_cost = 1
+terrain_type = "ground"
+elevation = 0
+surface_type = "normal" 

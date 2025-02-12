@@ -11,7 +11,7 @@ func before_each() -> void:
     GameMap.load_level(test_level)
     
     # Create test entity with body using blueprint
-    entity = Entity.new().setup_from_blueprint(TestHumanoid, Vector2i(1, 1))
+    entity = Entity.new(TestHumanoid, Vector2i(1, 1))
     GameMap.register_entity(entity, Vector2i(1, 1))
     
     body = entity.body

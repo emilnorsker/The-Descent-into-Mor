@@ -13,9 +13,9 @@ func before_each() -> void:
     var orc_blueprint = preload("res://tests/fixtures/blueprints/actors/test_humanoid.tres")
     var sword_blueprint = preload("res://tests/fixtures/blueprints/items/test_weapon.tres")
     
-    player = Entity.new().setup_from_blueprint(player_blueprint, Vector2i(1, 1))
-    orc = Entity.new().setup_from_blueprint(orc_blueprint, Vector2i(2, 2))
-    sword = Entity.new().setup_from_blueprint(sword_blueprint, Vector2i(1, 1))
+    player = Entity.new(player_blueprint, Vector2i(1, 1))
+    orc = Entity.new(orc_blueprint, Vector2i(2, 2))
+    sword = Entity.new(sword_blueprint, Vector2i(1, 1))
 
 func after_each() -> void:
     # Clear GameMap state
@@ -132,9 +132,9 @@ func test_area_effects() -> void:
     var orc_blueprint = preload("res://tests/fixtures/blueprints/actors/test_humanoid.tres")
     var sword_blueprint = preload("res://tests/fixtures/blueprints/items/test_weapon.tres")
     
-    var test_player = Entity.new().setup_from_blueprint(player_blueprint, Vector2i(2, 2))
-    var test_orc = Entity.new().setup_from_blueprint(orc_blueprint, Vector2i(3, 2))
-    var test_sword = Entity.new().setup_from_blueprint(sword_blueprint, Vector2i(5, 5))
+    var test_player = Entity.new(player_blueprint, Vector2i(2, 2))
+    var test_orc = Entity.new(orc_blueprint, Vector2i(3, 2))
+    var test_sword = Entity.new(sword_blueprint, Vector2i(5, 5))
     
     # Place entities in a pattern
     GameMap.register_entity(test_player, Vector2i(2, 2))  # Center
@@ -158,8 +158,8 @@ func test_item_interaction() -> void:
     var player_blueprint = preload("res://tests/fixtures/blueprints/actors/test_humanoid.tres")
     var sword_blueprint = preload("res://tests/fixtures/blueprints/items/test_weapon.tres")
     
-    var test_player = Entity.new().setup_from_blueprint(player_blueprint, pos)
-    var test_sword = Entity.new().setup_from_blueprint(sword_blueprint, pos)
+    var test_player = Entity.new(player_blueprint, pos)
+    var test_sword = Entity.new(sword_blueprint, pos)
     
     # Place sword and player
     GameMap.register_entity(test_sword, pos)

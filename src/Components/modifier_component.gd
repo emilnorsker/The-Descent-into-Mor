@@ -1,7 +1,5 @@
 @tool
-class_name ModifierComponent
-extends Component
-
+class_name ModifierComponent extends Component
 
 enum StatusEffect {
     STUNNED,
@@ -24,32 +22,24 @@ enum StatusEffect {
     WINDED
 }
 
-
 var states: Array[ModifierComponent.StatusEffect] = []
 var _balance_check_results: Dictionary = {}
 
-func _init() -> void:
+func _init(blueprint: Resource = null) -> void:
     super()
+    name = "ModifierComponent"
+    
+    states = []
+    _balance_check_results = {}
+    
+    if blueprint:
+        if not blueprint is ModifierComponentBlueprint:
+            push_error("Invalid blueprint type provided to ModifierComponent")
+            return
+            
+        if blueprint.states:
+            states = blueprint.states.duplicate()
 
-func setup_from_dict(data: Dictionary) -> Component:
-    if data.has("states"):
-        var raw_states = data.states
-        states.clear()
-        for state in raw_states:
-            if state is int and state >= 0 and state < StatusEffect.size():
-                states.append(state as StatusEffect)
-    if data.has("balance_check_results"):
-        _balance_check_results = data.balance_check_results
-    return self
-
-func setup_from_blueprint(blueprint: Resource) -> ModifierComponent:
-    if not blueprint:
-        push_error("Invalid blueprint provided to ModifierComponent.StatusEffect.setup_from_blueprint")
-        return self
-
-    states = blueprint.states
-
-    return self
 
 func apply_state(state: ModifierComponent.StatusEffect, target: Entity = null, body_part: int = -1) -> void:
     if not state in states:
@@ -103,20 +93,6 @@ func is_panicked() -> bool:
 
 func vision_is_blurred() -> bool:
     return has_state(ModifierComponent.StatusEffect.DAZED)
-
-func has_status(status: ModifierComponent.StatusEffect) -> bool:
-    match status:
-        ModifierComponent.StatusEffect.PINNED:
-            if has_state(ModifierComponent.StatusEffect.OILED): # TODO: this is bad fix, we dont want to reroll evertime we check.
-                return roll(4)
-                
-        ModifierComponent.StatusEffect.PRONE_TO_FALLING:
-            return has_state(ModifierComponent.StatusEffect.DAZED)
-        ModifierComponent.StatusEffect.PANICKED:
-            return has_state(ModifierComponent.StatusEffect.ABLAZE)
-        ModifierComponent.StatusEffect.BLEEDING:
-            return has_state(ModifierComponent.StatusEffect.BLEEDING)
-    return false
 
 func roll(check: int, modifiers: Array[int] = []) -> bool:
     var dice = randi() % 6 + 1

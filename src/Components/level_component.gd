@@ -1,5 +1,8 @@
-class_name ProgressionComponent
+@tool
+class_name LevelComponent
 extends Component
+
+const DefaultLevelComponentBlueprint = preload("res://src/Components/Blueprints/level_component_blueprint.gd")
 
 var _level: int = 1
 var _current_xp: int = 0
@@ -8,26 +11,14 @@ var _level_up_factor: int = 150
 
 func _init() -> void:
     super()
+    name = "LevelComponent"
+    
+    # Set default values
+    _level = 1
+    _current_xp = 0
+    _level_up_base = 200
+    _level_up_factor = 150
 
-func setup_from_dict(data: Dictionary) -> Component:
-    if data.has("level"):
-        _level = data.level
-    if data.has("current_xp"):
-        _current_xp = data.current_xp
-    if data.has("level_up_base"):
-        _level_up_base = data.level_up_base
-    if data.has("level_up_factor"):
-        _level_up_factor = data.level_up_factor
-    return self
-
-func setup_from_blueprint(blueprint: Resource) -> ProgressionComponent:
-    if blueprint:
-        _level = blueprint.current_level
-        _current_xp = blueprint.current_xp
-        _level_up_base = blueprint.level_up_base
-        _level_up_factor = blueprint.level_up_factor
-
-    return self
 
 func get_xp_to_next_level() -> int:
     return _level_up_base + _level * _level_up_factor

@@ -1,58 +1,31 @@
 @tool
 class_name CombatComponent extends Component
 
+const DEFAULT_BLUEPRINT = preload("res://new_assets/blueprints/combat/basic.tres")
+
 signal died
 
-var _max_hp: int = 30
-var _defense: int = 2
-var _power: int = 5
-var _hp: int = _max_hp
+var max_hp: int = 30
+var power: int = 5
+var defense: int = 2
+var hp: int = max_hp
 
-@export var max_hp: int:
-    get:
-        return _max_hp
-    set(value):
-        _max_hp = value
-        _hp = mini(_hp, _max_hp)  # Ensure HP doesn't exceed new max
-
-@export var defense: int:
-    get:
-        return _defense
-    set(value):
-        _defense = value
-
-@export var power: int:
-    get:
-        return _power
-    set(value):
-        _power = value
-
-@export var hp: int:
-    get:
-        return _hp
-    set(value):
-        _hp = mini(value, _max_hp)  # Ensure HP doesn't exceed max
-
-func _init() -> void:
+func _init(blueprint: Resource = null) -> void:
     super()
     name = "CombatComponent"
-
-func setup_from_dict(data: Dictionary) -> Component:
-    if data.has("health"):
-        max_hp = data.health
-        hp = data.health
-    if data.has("damage"):
-        power = data.damage
-    return self
-
-func setup_from_blueprint(blueprint: Resource) -> CombatComponent:
+    
+    if not blueprint:
+        blueprint = DEFAULT_BLUEPRINT
+    
     if blueprint:
+        if not blueprint is CombatComponentBlueprint:
+            push_error("Invalid blueprint type provided to CombatComponent")
+            return
+            
         max_hp = blueprint.max_hp
         defense = blueprint.defense
         power = blueprint.power
         hp = blueprint.max_hp
-
-    return self
 
 func is_dead() -> bool:
     return hp <= 0
@@ -105,7 +78,6 @@ func get_power_bonus() -> int:
     if get_parent().equipment:
         return get_parent().equipment.power_bonus
     return 0
-
 
 func roll(difficulty: int) -> bool:
     return randi() % 6 + 1 >= difficulty

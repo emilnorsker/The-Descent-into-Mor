@@ -11,8 +11,8 @@ func before_each() -> void:
     GameMap.load_level(test_level)
     
     # Create entities with body components using blueprint
-    attacker = Entity.new().setup_from_blueprint(TestHumanoid, Vector2i(1, 1))
-    target = Entity.new().setup_from_blueprint(TestHumanoid, Vector2i(2, 1))
+    attacker = Entity.new(TestHumanoid, Vector2i(1, 1))
+    target = Entity.new(TestHumanoid, Vector2i(2, 1))
     
     # Enable test mode for deterministic rolls
     attacker.next_roll = 10
@@ -56,7 +56,7 @@ func test_unarmed_attacks() -> void:
     
 # Weapon Tests
 func test_weapon_attacks() -> void:
-    var sword = Entity.new().setup_from_blueprint(TestWeapon, Vector2i.ZERO)
+    var sword = Entity.new(TestWeapon, Vector2i.ZERO)
     
     attacker.body.equip_to_slot(sword)
     attacker.next_roll = 4  # Just enough to hit DC 4
@@ -71,9 +71,9 @@ func test_weapon_attacks() -> void:
 
 # Throw Tests
 func test_throw_weapon() -> void:
-    var dagger = Entity.new().setup_from_blueprint(TestWeapon, Vector2i.ZERO)
+    var dagger = Entity.new(TestWeapon, Vector2i.ZERO)
     dagger.weight.weight = 0.5
-    dagger.item.power_bonus = 15
+    dagger.power_bonus = 15
     
     attacker.body.equip_to_slot(dagger)
     var throw = ThrowAction.new(attacker, target, dagger, BodyComponent.BodyPart.LEFT_ARM)
@@ -159,4 +159,4 @@ func create_item_entity(data: Array) -> Entity:
                 weight_blueprint.affects_balance = values.get("affects_balance", false)
                 weight_blueprint.balance_penalty = values.get("balance_penalty", 0.0)
     
-    return Entity.new().setup_from_blueprint(blueprint, Vector2i.ZERO)
+    return Entity.new(blueprint, Vector2i.ZERO)

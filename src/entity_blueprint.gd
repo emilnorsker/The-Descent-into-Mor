@@ -1,23 +1,35 @@
 @tool
-extends Resource
-class_name EntityBlueprint
+class_name EntityBlueprint extends Resource
 
-@export var entity_name: String = ""
-@export var blocks_movement: bool = false
-@export var type: Entity.EntityType = Entity.EntityType.ACTOR
-@export var key: String = ""
+func _get_class() -> String:
+    return "EntityBlueprint"
 
-@export_category("Components")
-@export var components: Dictionary = {}
-@export var combat_blueprint: Resource
-@export var inventory_blueprint: Resource
-@export var equipment_blueprint: Resource
-@export var progression_blueprint: Resource
-@export var consumable_blueprint: Resource
-@export var light_blueprint: Resource
-@export var material_blueprint: Resource
-@export var weight_blueprint: Resource
-@export var combat_modifier_blueprint: Resource
-@export var terrain_blueprint: Resource
-@export var ai_blueprint: Resource
-@export var body_blueprint: Resource
+# Default blueprints for each component type
+const DEFAULT_BODY_BLUEPRINT = preload("res://new_assets/blueprints/body/humanoid.tres")
+const DEFAULT_COMBAT_BLUEPRINT = preload("res://new_assets/blueprints/combat/basic.tres")
+const DEFAULT_INVENTORY_BLUEPRINT = preload("res://new_assets/blueprints/inventory/basic.tres")
+const DEFAULT_EQUIPMENT_BLUEPRINT = preload("res://new_assets/blueprints/equipment/basic.tres")
+const DEFAULT_MATERIAL_BLUEPRINT = preload("res://new_assets/blueprints/materials/metal.tres")
+const DEFAULT_MODIFIER_BLUEPRINT = preload("res://new_assets/blueprints/modifiers/basic.tres")
+const DEFAULT_WEIGHT_BLUEPRINT = preload("res://new_assets/blueprints/weights/basic.tres")
+const DEFAULT_LIGHT_BLUEPRINT = preload("res://new_assets/blueprints/light/basic.tres")
+const DEFAULT_TERRAIN_BLUEPRINT = preload("res://new_assets/blueprints/terrain/basic.tres")
+
+var entity_name: String = "Default Entity"
+var entity_type: Entity.EntityType = Entity.EntityType.ACTOR
+
+# TODO: make light a optional component
+# TODO: make this more performant???? now it's instantiating all base components
+#       components every time the blueprint is instantiated, regardless of what components are defined in 
+#       the blueprint
+var components: Dictionary = {
+    "body": DEFAULT_BODY_BLUEPRINT,
+    "combat": DEFAULT_COMBAT_BLUEPRINT,
+    "inventory": DEFAULT_INVENTORY_BLUEPRINT,
+    "equipment": DEFAULT_EQUIPMENT_BLUEPRINT,
+    "material": DEFAULT_MATERIAL_BLUEPRINT,
+    "modifiers": DEFAULT_MODIFIER_BLUEPRINT,
+    "weight": DEFAULT_WEIGHT_BLUEPRINT,
+    "light": DEFAULT_LIGHT_BLUEPRINT,
+    "terrain": DEFAULT_TERRAIN_BLUEPRINT
+}

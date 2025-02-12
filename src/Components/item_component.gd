@@ -2,6 +2,8 @@
 class_name ItemComponent
 extends Component
 
+const DEFAULT_BLUEPRINT = preload("res://new_assets/blueprints/items/basic.tres")
+
 enum EquipmentType {
     NONE,
     WEAPON,
@@ -14,11 +16,29 @@ var equipment_type: EquipmentType = EquipmentType.WEAPON
 # TODO: Add getter and setters to check for potewntial modifiers
 var power_bonus: int = 0
 var defense_bonus: int = 0
+var value: int = 0
 var slot: BodyComponent.BodyPart = BodyComponent.BodyPart.RIGHT_EQUIPMENT
 var range: int = -1 # -1 means default range
 
-func _init() -> void:
+func _init(blueprint: Resource = null) -> void:
     super()
+    name = "ItemComponent"
+    
+    if not blueprint:
+        blueprint = DEFAULT_BLUEPRINT
+    
+    if blueprint:
+        if not blueprint is ItemComponentBlueprint:
+            push_error("Invalid blueprint type provided to ItemComponent")
+            return
+            
+        power_bonus = blueprint.power_bonus
+        defense_bonus = blueprint.defense_bonus
+        value = blueprint.value
+        if blueprint.equipment_type:
+            equipment_type = blueprint.equipment_type
+        if blueprint.range:
+            range = blueprint.range
 
 func get_range() -> int:
     if range == -1:

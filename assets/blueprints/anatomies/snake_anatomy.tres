@@ -8,7 +8,7 @@ anatomy_type = "serpentine"
 nodes = {
 "body_front": {
     "id": "body_front",
-    "type": 1,
+    "type": 1,  # STRUCTURAL
     "parent_id": "core",
     "children": [],
     "properties": {
@@ -18,7 +18,7 @@ nodes = {
 },
 "body_middle": {
     "id": "body_middle",
-    "type": 1,
+    "type": 1,  # STRUCTURAL
     "parent_id": "core",
     "children": [],
     "properties": {
@@ -28,7 +28,7 @@ nodes = {
 },
 "body_rear": {
     "id": "body_rear",
-    "type": 2,
+    "type": 2,  # APPENDAGE
     "parent_id": "core",
     "children": [],
     "properties": {
@@ -38,7 +38,7 @@ nodes = {
 },
 "core": {
     "id": "core",
-    "type": 1,
+    "type": 1,  # STRUCTURAL
     "parent_id": "",
     "children": ["head", "body_front", "body_middle", "body_rear"],
     "properties": {
@@ -48,7 +48,7 @@ nodes = {
 },
 "head": {
     "id": "head",
-    "type": 0,
+    "type": 0,  
     "parent_id": "core",
     "children": [],
     "properties": {

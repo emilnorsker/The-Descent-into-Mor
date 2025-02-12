@@ -6,12 +6,14 @@ extends Component
 # It also tracks the total defense and power bonuses of the equipped items.
 # it is not a single item, but rather the interface to the items equipped on the body.
 
+const DEFAULT_BLUEPRINT = preload("res://new_assets/blueprints/equipment/basic.tres")
 
 signal equipment_changed
 signal item_equipped(item: Entity, slot: String)
 signal item_unequipped(item: Entity, slot: String)
 
 var _equipped_items: Dictionary = {}
+var dropped_items: Array[Entity] = []
 
 var _defense_bonus: int = 0
 var total_defense_bonus: int:
@@ -29,23 +31,20 @@ var total_power_bonus: int:
     get:
         return _get_power_bonus()
 
-func _init() -> void:
+func _init(blueprint: Resource = null) -> void:
     super()
-
-func setup_from_dict(data: Dictionary) -> Component:
-    if data.has("equipped_items"):
-        _equipped_items = data.equipped_items
-    if data.has("defense_bonus"):
-        _defense_bonus = data.defense_bonus
-    if data.has("power_bonus"):
-        _power_bonus = data.power_bonus
-    return self
-
-func setup_from_blueprint(blueprint: Resource) -> EquipmentComponent:
+    name = "EquipmentComponent"
+    
+    if not blueprint:
+        blueprint = DEFAULT_BLUEPRINT
+    
     if blueprint:
-        if blueprint.has_method("equipped_items"):
-            _equipped_items = blueprint.equipped_items
-    return self
+        if not blueprint is EquipmentComponentBlueprint:
+            push_error("Invalid blueprint type provided to EquipmentComponent")
+            return
+            
+        _equipped_items = blueprint.equipped_items.duplicate()
+        dropped_items = blueprint.dropped_items.duplicate()
 
 func _get_defense_bonus() -> int:
     var bonus = 0
@@ -89,11 +88,8 @@ func equip(item: Entity, slot = null) -> void:
     # Add the item to the slot
     _equipped_items[slot_key] = item
     
-    # Update protection if it's armor
-    if item.has("item"):
-        var body = parent.body
-        if body:
-            body.protection[slot] = item.item.defense_bonus
+        
+    parent.body.protection[slot] = item.defense_bonus
     
     item_equipped.emit(item, slot_key)
 

@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="EntityBlueprint" load_steps=11 format=3]
+
+[ext_resource type="Script" path="res://src/entity_blueprint.gd" id="1_script"]
+[ext_resource type="Resource" path="res://new_assets/blueprints/body/humanoid.tres" id="2_body"]
+[ext_resource type="Resource" path="res://new_assets/blueprints/combat/basic.tres" id="3_combat"]
+[ext_resource type="Resource" path="res://new_assets/blueprints/inventory/basic.tres" id="4_inv"]
+[ext_resource type="Resource" path="res://new_assets/blueprints/equipment/basic.tres" id="5_equip"]
+[ext_resource type="Resource" path="res://new_assets/blueprints/materials/metal.tres" id="6_material"]
+[ext_resource type="Resource" path="res://new_assets/blueprints/modifiers/basic.tres" id="7_modifier"]
+[ext_resource type="Resource" path="res://new_assets/blueprints/weights/basic.tres" id="8_weight"]
+[ext_resource type="Resource" path="res://new_assets/blueprints/light/basic.tres" id="9_light"]
+[ext_resource type="Resource" path="res://new_assets/blueprints/terrain/basic.tres" id="10_terrain"]
+
+[resource]
+script = ExtResource("1_script")
+entity_name = "Default Entity"
+entity_type = 2
+components = {
+"body": ExtResource("2_body"),
+"combat": ExtResource("3_combat"),
+"equipment": ExtResource("5_equip"),
+"inventory": ExtResource("4_inv"),
+"light": ExtResource("9_light"),
+"material": ExtResource("6_material"),
+"modifiers": ExtResource("7_modifier"),
+"terrain": ExtResource("10_terrain"),
+"weight": ExtResource("8_weight")
+}

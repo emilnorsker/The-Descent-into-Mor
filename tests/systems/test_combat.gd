@@ -9,11 +9,11 @@ func before_each() -> void:
 	GameMap.load_level(test_level)
 	
 	# We'll create entities in a specific formation for testing different attack patterns
-	attacker = Entity.new().setup_from_blueprint(preload("res://tests/fixtures/blueprints/actors/test_humanoid.tres"), Vector2i(2, 2))
+	attacker = Entity.new(preload("res://tests/fixtures/blueprints/actors/test_humanoid.tres"), Vector2i(2, 2))
 	attacker.entity_name = "Attacker"
-	target = Entity.new().setup_from_blueprint(preload("res://tests/fixtures/blueprints/actors/test_humanoid.tres"), Vector2i(3, 2))
+	target = Entity.new(preload("res://tests/fixtures/blueprints/actors/test_humanoid.tres"), Vector2i(3, 2))
 	target.entity_name = "Target"
-	bystander = Entity.new().setup_from_blueprint(preload("res://tests/fixtures/blueprints/actors/test_humanoid.tres"), Vector2i(4, 2))
+	bystander = Entity.new(preload("res://tests/fixtures/blueprints/actors/test_humanoid.tres"), Vector2i(4, 2))
 	bystander.entity_name = "Bystander"
 	GameMap.register_entity(attacker, attacker.grid_position)
 	GameMap.register_entity(target, target.grid_position)
@@ -39,7 +39,7 @@ func test_melee_attack() -> void:
 	assert_lt(target.body.consciousness, consciousness, "Target should lose consciousness on succesfull attack")
 
 func test_throw_attack() -> void:
-	var weapon = Entity.new().setup_from_blueprint(preload("res://tests/fixtures/blueprints/items/test_weapon.tres"), Vector2i(0, 0))
+	var weapon = Entity.new(preload("res://tests/fixtures/blueprints/items/test_weapon.tres"), Vector2i(0, 0))
 	attacker.inventory.add_item(weapon)
 	target.next_roll = 0
 	
@@ -53,7 +53,7 @@ func test_throw_attack() -> void:
 
 # # Test Combat Stats
 # func test_defense_calculation() -> void:
-# 	var armor = Entity.new().setup_from_blueprint(preload("res://tests/fixtures/blueprints/items/test_armor.tres"), Vector2i(0, 0))
+# 	var armor = Entity.new(preload("res://tests/fixtures/blueprints/items/test_armor.tres"), Vector2i(0, 0))
 # 	target.inventory.add_item(armor)
 # 	target.equipment.equip(armor)
 	
@@ -84,7 +84,7 @@ func test_power_calculation() -> void:
 	melee_action.perform()
 	var con_loss_1 = con_start - target.body.consciousness
 
-	var new_weapon = Entity.new().setup_from_blueprint(preload("res://tests/fixtures/blueprints/items/test_weapon.tres"), Vector2i(0, 0))
+	var new_weapon = Entity.new(preload("res://tests/fixtures/blueprints/items/test_weapon.tres"), Vector2i(0, 0))
 	attacker.equipment.equip(new_weapon)
 	assert_not_null(attacker.equipment.get_equipped_item(BodyComponent.BodyPart.RIGHT_EQUIPMENT), "Weapon should be equipped on attacker")
 
@@ -109,7 +109,7 @@ func test_death() -> void:
 	assert_signal_not_emitted(target.body, "died")
 
 	# Now test if it dies
-	attacker.equipment.equip(Entity.new().setup_from_blueprint(preload("res://tests/fixtures/blueprints/items/test_weapon.tres"), Vector2i(0, 0)))
+	attacker.equipment.equip(Entity.new(preload("res://tests/fixtures/blueprints/items/test_weapon.tres"), Vector2i(0, 0)))
 	target.next_roll = -1000
 	attacker.next_roll = 1000
 	var melee_action_with_weapon = MeleeAction.new(attacker, target,  BodyComponent.BodyPart.CHEST)

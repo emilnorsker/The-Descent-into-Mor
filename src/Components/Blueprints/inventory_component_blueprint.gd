@@ -1,5 +1,9 @@
-@tool   
-class_name InventoryComponentBlueprint extends Resource
+@tool
+class_name InventoryComponentBlueprint extends ComponentBlueprint
 
-@export var capacity: int = 26
-@export var items: Array[EntityBlueprint] = [] 
+var capacity: int = 10
+var items: Array = []
+
+func _init() -> void:
+    super()
+    component_type = "inventory" 

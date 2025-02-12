@@ -63,7 +63,7 @@ func clear() -> void:
 
 func register_entity(entity: Entity, position: Vector2i) -> void:    
     # Add to correct layer first
-    match entity.type:
+    match entity.entity_type:
         Entity.EntityType.CORPSE:
             floor_layer.add_child(entity)
         Entity.EntityType.ITEM:

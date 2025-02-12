@@ -1,15 +1,15 @@
 @tool
-class_name Component
-extends Node
+class_name Component extends Node
 
-@onready var entity: Entity = get_parent() as Entity
+var entity: Entity
+var component_type: String
 
-func _init() -> void:
-    pass
+func _init(blueprint: Resource = null) -> void:
+    if blueprint:
+        component_type = blueprint.component_type if blueprint is ComponentBlueprint else "UNDEFINED"
 
-func setup_from_dict(data: Dictionary) -> Component:
-    push_error("setup_from_dict not implemented for %s" % get_class() + " " + get_name())
-    return self
-
-func setup_from_blueprint(blueprint: Resource) -> Component:
-    return self
+func _ready() -> void:
+    entity = get_parent() as Entity
+    print("Component _ready called")
+    print("Entity: ", entity)
+    print("Parent: ", get_parent())

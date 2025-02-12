@@ -1,6 +1,11 @@
 @tool
-class_name MaterialComponentBlueprint extends Resource
+class_name MaterialComponentBlueprint
+extends ComponentBlueprint
 
-@export var is_flammable: bool = false
-@export var is_slippery: bool = false
-@export var material_type: String = "none"
+var material_type: String = "none"
+var is_flammable: bool = false
+var is_slippery: bool = false
+
+func _init() -> void:
+    super()
+    component_type = "material"

@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="WeightComponentBlueprint" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/Components/Blueprints/weight_component_blueprint.gd" id="1_weight"]
+
+[resource]
+script = ExtResource("1_weight")
+weight = 1.0
+affects_balance = false
+balance_penalty = 0.0 

@@ -1,9 +1,13 @@
 @tool
 class_name TerrainComponentBlueprint
-extends Resource
+extends ComponentBlueprint
 
-@export var blocks_sight: bool = false
-@export var movement_cost: int = 1
-@export var terrain_type: String = "ground"
-@export var elevation: int = 0
-@export var surface_type: String = "normal"  # normal, slippery, rough, etc. 
+var blocks_sight: bool = false
+var movement_cost: int = 1
+var terrain_type: String = "ground"
+var elevation: int = 0
+var surface_type: String = "normal"  # normal, slippery, rough, etc.
+
+func _init() -> void:
+    super()
+    component_type = "terrain" 

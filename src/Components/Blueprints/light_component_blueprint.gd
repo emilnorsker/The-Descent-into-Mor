@@ -1,7 +1,12 @@
 @tool
-class_name LightComponentBlueprint extends Resource
+class_name LightComponentBlueprint
+extends ComponentBlueprint
 
-@export var range: float = 100.0
-@export var color: Color = Color.WHITE
-@export var angle: float = 30.0
-@export var fan_angle: float = TAU 
+var range: int = 5
+var color: Color = Color.WHITE
+var angle: float = 0.0
+var fan_angle: float = 360.0
+
+func _init() -> void:
+    super()
+    component_type = "light" 

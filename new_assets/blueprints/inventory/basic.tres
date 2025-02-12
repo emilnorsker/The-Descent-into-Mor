@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="InventoryComponentBlueprint" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/Components/Blueprints/inventory_component_blueprint.gd" id="1_inv"]
+
+[resource]
+script = ExtResource("1_inv")
+capacity = 10
+items = [] 

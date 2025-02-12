@@ -10,7 +10,7 @@ func before_each() -> void:
     
     # Create test entity with combat modifier component
     var blueprint = preload("res://assets/blueprints/actors/player.tres")
-    entity = Entity.new().setup_from_blueprint(blueprint, Vector2i(1, 1))
+    entity = Entity.new(blueprint, Vector2i(1, 1))
     
     # Add combat modifier component if not present
     if not entity.modifiers:
@@ -25,7 +25,7 @@ func after_each() -> void:
 
 # Utility Functions
 func create_enemy_nearby() -> Entity:
-    var enemy = Entity.new().setup_from_blueprint(
+    var enemy = Entity.new(
         preload("res://assets/blueprints/actors/monsters/orc.tres")
     )
     enemy.grid_position = entity.grid_position + Vector2i(1, 0)

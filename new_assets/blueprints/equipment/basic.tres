@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="EquipmentComponentBlueprint" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/Components/Blueprints/equipment_component_blueprint.gd" id="1_equip"]
+
+[resource]
+script = ExtResource("1_equip")
+equipped_items = {}
+dropped_items = [] 

@@ -1,8 +1,21 @@
 @tool
-class_name ItemComponentBlueprint extends Resource
+class_name ItemComponentBlueprint extends ComponentBlueprint
 
-@export var equipment_type: ItemComponent.EquipmentType
-@export var power_bonus: int = 0
-@export var defense_bonus: int = 0
-@export var slot: BodyComponent.BodyPart = BodyComponent.BodyPart.RIGHT_EQUIPMENT
-@export var range: int = 0
+enum EquipmentType {
+    NONE,
+    WEAPON,
+    ARMOR,
+    ACCESSORY,
+    RANGED
+}
+
+var equipment_type: EquipmentType = EquipmentType.NONE
+var power_bonus: int = 0
+var defense_bonus: int = 0
+var value: int = 0
+var slot: int = 0  # Use raw int instead of enum reference
+var range: int = -1
+
+func _init() -> void:
+    super()
+    component_type = "item"

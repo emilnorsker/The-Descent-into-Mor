@@ -1,6 +1,9 @@
 @tool
 class_name BodyComponent extends Component
 
+const DefultBodyComponentBlueprint = preload("res://src/Components/Blueprints/body_component_blueprint.gd")
+const DEFAULT_BLUEPRINT = preload("res://new_assets/blueprints/body/humanoid.tres")
+
 signal consciousness_check_failed
 signal wound_applied(wound_type: int, body_part: int)
 signal condition_applied(condition: int)
@@ -30,12 +33,13 @@ enum WoundType {
     FATAL
 }
 
+var type: String = "humanoid"
 var parts: Dictionary = {}
-var wounds: Dictionary = {}  # Dictionary of BodyPart -> Array of Wound
-var consciousness: float = 80.0
-var is_dead = false
+var consciousness: float = 100.0
+var is_dead: bool = false
 var equipment: Dictionary = {}  # Dictionary of slot -> Entity
 var protection: Dictionary = {}  # Dictionary of part -> total protection
+var wounds: Dictionary = {}
 
 class Wound:
     var type: WoundType
@@ -48,30 +52,88 @@ class Wound:
         self.part = part
         self.treatment_level = 0
 
-func _init() -> void:
+func _init(blueprint: Resource = null) -> void:
     super()
-    for part in BodyPart.values():
+    name = "BodyComponent"
+    
+    if not blueprint:
+        blueprint = DEFAULT_BLUEPRINT
+    
+    if blueprint:
+        if not blueprint is BodyComponentBlueprint:
+            push_error("Invalid blueprint type provided to BodyComponent")
+            return
+            
+        type = blueprint.type
+        parts = blueprint.parts.duplicate()
+        wounds = blueprint.wounds.duplicate()
+        consciousness = blueprint.consciousness
+        is_dead = blueprint.is_dead
+
+    # Initialize parts dictionary with default humanoid parts
+    parts = {
+        "head": true,
+        "neck": true,
+        "chest": true,
+        "abdomen": true,
+        "left_arm": true,
+        "right_arm": true,
+        "left_leg": true,
+        "right_leg": true
+    }
+    
+    # Initialize wounds dictionary with empty arrays for each part
+    for part in parts.keys():
         wounds[part] = []
+    for part in BodyPart.values():
         equipment[part] = null
         protection[part] = 0
 
-func setup_from_blueprint(blueprint: Resource) -> BodyComponent:
-    if not blueprint:
+func _get_part_from_string(part_str: String) -> BodyPart:
+    match part_str.to_lower():
+        "head": return BodyPart.HEAD
+        "neck": return BodyPart.NECK
+        "chest": return BodyPart.CHEST
+        "abdomen": return BodyPart.ABDOMEN
+        "left_arm": return BodyPart.LEFT_ARM
+        "right_arm": return BodyPart.RIGHT_ARM
+        "left_leg": return BodyPart.LEFT_LEG
+        "right_leg": return BodyPart.RIGHT_LEG
+        _: return BodyPart.NONE
+
+func setup_from_blueprint(blueprint: Resource) -> Component:
+    if not blueprint or not blueprint is BodyComponentBlueprint:
         push_error("Invalid blueprint provided to BodyComponent.setup_from_blueprint")
         return self
-
-    wounds = blueprint.wounds
-    consciousness = blueprint.consciousness
-    is_dead = blueprint.is_dead
-    parts = blueprint.parts
-
+    
+    var body_blueprint = blueprint as BodyComponentBlueprint
+    type = body_blueprint.type
+    parts = body_blueprint.parts
+    consciousness = body_blueprint.consciousness
+    is_dead = body_blueprint.is_dead
+    
+    # Initialize wounds dictionary with empty arrays for each part
+    wounds = {}
+    for part in BodyPart.values():
+        wounds[part] = []
+    
+    # Copy wounds from blueprint, converting string keys to enum values
+    for part_str in body_blueprint.wounds:
+        var part = _get_part_from_string(part_str)
+        if part != null:
+            wounds[part] = body_blueprint.wounds[part_str].duplicate()
+    
     return self
 
 func setup_from_dict(data: Dictionary) -> Component:
     if data.has("parts"):
         parts = data.parts if data.parts is Dictionary else {}
     if data.has("wounds"):
-        wounds = data.wounds if data.wounds is Dictionary else {}
+        var wound_data = data.wounds if data.wounds is Dictionary else {}
+        for part_name in wound_data:
+            var part = _get_part_from_string(part_name)
+            if part != BodyPart.NONE:
+                wounds[part] = wound_data[part_name]
     if data.has("consciousness"):
         consciousness = data.consciousness
     if data.has("equipment"):
@@ -80,16 +142,21 @@ func setup_from_dict(data: Dictionary) -> Component:
         protection = data.protection if data.protection is Dictionary else {}
     return self
 
-func apply_wound(type: BodyComponent.WoundType, part: BodyComponent.BodyPart = BodyComponent.BodyPart.NONE) -> void:
+func apply_wound(type: WoundType, part: BodyPart = BodyPart.NONE) -> void:
     if is_dead:
         return
         
-    if part == BodyComponent.BodyPart.NONE:
+    if part == BodyPart.NONE:
         part = randi_range(BodyPart.HEAD, BodyPart.RIGHT_LEG)
     var wound = Wound.new(type, part)
-    wounds[wound.part].append(wound)
     
-    var consciousness_loss = (wound.type+2) * 3  # (0-5 +2) * 3 = 6-24
+    # Ensure the part exists in the wounds dictionary
+    if not wounds.has(part):
+        wounds[part] = []
+    
+    wounds[part].append(wound)
+    
+    var consciousness_loss = (type+2) * 3  # (0-5 +2) * 3 = 6-24
     match part:
         BodyPart.HEAD:
             consciousness_loss *= 5
@@ -105,8 +172,6 @@ func apply_wound(type: BodyComponent.WoundType, part: BodyComponent.BodyPart = B
     if type == WoundType.FATAL and (part == BodyPart.HEAD or part == BodyPart.NECK):
         die()
     check_consciousness()
-    
-    
 
 func add_consciousness(amount: int) -> void:
     consciousness += amount
@@ -141,18 +206,16 @@ func die() -> void:
     is_dead = true
     emit_signal("died")
 
-
 func get_wounds(part = null) -> Array:
-    if part:
-        assert(part is BodyPart, "ERROR: You must give part a value.");
+    if part != null:
+        if not wounds.has(part):
+            wounds[part] = []
         return wounds[part]
     else:
-        var wounds_arr = []
-        for wounded_part in wounds.keys():
-            for wound in wounds[wounded_part]:
-                wound.part = wounded_part
-                wounds_arr.append(wound)
-        return wounds_arr
+        var all_wounds = []
+        for part_wounds in wounds.values():
+            all_wounds.append_array(part_wounds)
+        return all_wounds
 
 func get_wound_severity(damage: int, part: BodyPart) -> WoundType:
     damage -= get_bodypart_protection(part)
@@ -190,9 +253,9 @@ func process_recovery() -> void:
         for wound in wounds[part]:
             if wound.treatment_level > 0:
                 # Treated wounds can improve
-                if wound.severity > 1 and randf() < 0.1:  # 10% chance per turn
-                    wound.severity -= 1
-                    if wound.severity == 0:
+                if wound.type > 1 and randf() < 0.1:  # 10% chance per turn
+                    wound.type -= 1
+                    if wound.type == 0:
                         wounds[part].erase(wound) 
 
 func get_bodypart_protection(part: BodyPart) -> int:

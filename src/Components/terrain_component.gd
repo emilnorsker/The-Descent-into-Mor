@@ -2,14 +2,31 @@
 class_name TerrainComponent
 extends Component
 
-@export var blocks_sight: bool = false
-@export var movement_cost: int = 1
-@export var terrain_type: String = "ground"
-@export var elevation: int = 0
-@export var surface_type: String = "normal"
+const DEFAULT_BLUEPRINT = preload("res://new_assets/blueprints/terrain/basic.tres")
 
-func _init() -> void:
+var blocks_sight: bool = false
+var movement_cost: int = 1
+var terrain_type: String = "ground"
+var elevation: int = 0
+var surface_type: String = "normal"
+
+func _init(blueprint: Resource = null) -> void:
     super()
+    name = "TerrainComponent"
+    
+    if not blueprint:
+        blueprint = DEFAULT_BLUEPRINT
+    
+    if blueprint:
+        if not blueprint is TerrainComponentBlueprint:
+            push_error("Invalid blueprint type provided to TerrainComponent")
+            return
+            
+        blocks_sight = blueprint.blocks_sight
+        movement_cost = blueprint.movement_cost
+        terrain_type = blueprint.terrain_type
+        elevation = blueprint.elevation
+        surface_type = blueprint.surface_type
 
 func setup_from_dict(data: Dictionary) -> Component:
     if data.has("blocks_sight"):
