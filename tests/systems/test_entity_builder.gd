@@ -153,3 +153,32 @@ func test_component_property_conflicts() -> void:
 func test_entity_properties():
     var entity = Entity.new()
     assert_eq(entity.entity_type, Entity.EntityType.ACTOR, "Should have correct entity_type enum value")
+
+# Verifies that all entity blueprints in new_assets/entities can be used to create entities.
+# This test dynamically loads all .tres files in the directory and attempts to create
+# an entity with each one. This helps catch issues with blueprint configurations.
+func test_all_entity_blueprints() -> void:
+    var dir = DirAccess.open("res://new_assets/entities")
+    assert_not_null(dir, "Should be able to open entities directory")
+    
+    dir.list_dir_begin()
+    var file_name = dir.get_next()
+    var tested_blueprints = 0
+    
+    while file_name != "":
+        if file_name.ends_with(".tres"):
+            var blueprint_path = "res://new_assets/entities/" + file_name
+            var blueprint = load(blueprint_path).duplicate()
+            assert_not_null(blueprint, "Should be able to load blueprint: %s" % blueprint_path)
+            
+            var entity = Entity.new(blueprint)
+            assert_not_null(entity, "Should be able to create entity from blueprint: %s" % blueprint_path)
+            assert_true(entity._components.size() > 0, "Entity should have components: %s" % blueprint_path)
+            
+            tested_blueprints += 1
+            
+        file_name = dir.get_next()
+    
+    dir.list_dir_end()
+    assert_true(tested_blueprints > 0, "Should have tested at least one blueprint")
+    print("=== Completed test_all_entity_blueprints, tested %d blueprints ===\n" % tested_blueprints)

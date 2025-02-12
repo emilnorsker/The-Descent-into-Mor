@@ -33,3 +33,29 @@ var components: Dictionary = {
     "light": DEFAULT_LIGHT_BLUEPRINT,
     "terrain": DEFAULT_TERRAIN_BLUEPRINT
 }
+
+func _to_string() -> String:
+    return "EntityBlueprint(%s, type=%s, components=%s)" % [
+        entity_name,
+        Entity.EntityType.keys()[entity_type],
+        components.keys()
+    ]
+
+func _get_property_list() -> Array[Dictionary]:
+    var properties: Array[Dictionary] = []
+    properties.append({
+        "name": "entity_name",
+        "type": TYPE_STRING,
+        "usage": PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
+    })
+    properties.append({
+        "name": "entity_type",
+        "type": TYPE_INT,
+        "usage": PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
+    })
+    properties.append({
+        "name": "components",
+        "type": TYPE_DICTIONARY,
+        "usage": PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_SCRIPT_VARIABLE
+    })
+    return properties
